@@ -6,7 +6,7 @@ class CustomTextField extends StatelessWidget {
   final String? errorText;
 
   const CustomTextField({
-    super.key, // Convertido a super parámetro
+    super.key,
     required this.label,
     required this.controller,
     this.errorText,

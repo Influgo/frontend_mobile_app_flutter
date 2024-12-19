@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
@@ -34,4 +35,4 @@ flutter:
           weight: 900
 
   assets:
-     - assets/images/influyo_logo.jpg
+    - assets/images/influyo_logo.svg
