@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'select_profile_page.dart';
 import 'step1_entrepreneur_register_page.dart';
 import 'step2_entrepreneur_register_page.dart';
+import 'step3_entrepreneur_register_page.dart';
+import 'step4_terms_conditions.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -10,7 +12,6 @@ class RegisterPage extends StatefulWidget {
     final state = context.findAncestorStateOfType<_RegisterPageState>();
     state?._nextStep();
   }
-  
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -28,6 +29,8 @@ class _RegisterPageState extends State<RegisterPage> {
       SelectProfilePage(onNextStep: _nextStep),
       const Step1EntrepreneurRegisterPage(),
       const Step2EntrepreneurRegisterPage(),
+      const Step3EntrepreneurRegisterPage(),
+      const Step4TermsConditionsPage(),
     ];
   }
 

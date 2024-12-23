@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
 import '../widgets/custom_text_field.dart';
 
 class Step2EntrepreneurRegisterPage extends StatefulWidget {
@@ -215,7 +216,7 @@ class _Step2EntrepreneurRegisterPageState extends State<Step2EntrepreneurRegiste
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
               ),
               onPressed: () {
-                // next
+                RegisterPage.goToNextStep(context);
               },
               child: const Text(
                 'Continuar',
