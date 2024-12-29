@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/password_field.dart';
@@ -73,7 +74,13 @@ class LoginPageState extends State<LoginPage> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                     onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage(),
+                        ),
+                      );
+                    },
                     style: ButtonStyle(
                       overlayColor: WidgetStateProperty.all(Colors.transparent),
                       foregroundColor: WidgetStateProperty.resolveWith((states) {
