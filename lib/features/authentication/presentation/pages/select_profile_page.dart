@@ -5,7 +5,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/hoverable_elevated_button.dart';
 
 class SelectProfilePage extends StatelessWidget {
-  final VoidCallback onNextStep;
+  final Function(String profile) onNextStep;
 
   const SelectProfilePage({
     super.key,
@@ -52,14 +52,12 @@ class SelectProfilePage extends StatelessWidget {
                 const SizedBox(height: 32),
                 HoverableElevatedButton(
                   text: 'Influencer',
-                  onPressed: () {
-                    // seleccionó influencer
-                  },
+                  onPressed: () => onNextStep("Influencer"),
                 ),
                 const SizedBox(height: 16),
                 HoverableElevatedButton(
                   text: 'Emprendedor',
-                  onPressed: onNextStep,
+                  onPressed: () => onNextStep("Emprendedor"),
                 ),
               ],
             ),
@@ -86,9 +84,11 @@ class SelectProfilePage extends StatelessWidget {
                           ..onTap = () {
                             Navigator.of(context).pushReplacement(
                               PageRouteBuilder(
-                                pageBuilder: (context, animation, secondaryAnimation) =>
-                                    const LoginPage(),
-                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const LoginPage(),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
                                   return child;
                                 },
                               ),

@@ -5,16 +5,14 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
 
-class Step3EntrepreneurRegisterPage extends StatefulWidget {
-  const Step3EntrepreneurRegisterPage({super.key});
+class Step3RegisterPage extends StatefulWidget {
+  const Step3RegisterPage({super.key});
 
   @override
-  State<Step3EntrepreneurRegisterPage> createState() =>
-      _Step3EntrepreneurRegisterPageState();
+  State<Step3RegisterPage> createState() => _Step3RegisterPageState();
 }
 
-class _Step3EntrepreneurRegisterPageState
-    extends State<Step3EntrepreneurRegisterPage> {
+class _Step3RegisterPageState extends State<Step3RegisterPage> {
   File? _selectedImage;
   String? _webImagePath;
   final ImagePicker _picker = ImagePicker();
@@ -36,8 +34,7 @@ class _Step3EntrepreneurRegisterPageState
 
   Future<void> _takePhoto() async {
     if (!kIsWeb) {
-      final XFile? photo =
-          await _picker.pickImage(source: ImageSource.camera);
+      final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
 
       if (photo != null) {
         setState(() {
@@ -76,7 +73,8 @@ class _Step3EntrepreneurRegisterPageState
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 40),
                   child: Row(
                     children: [
                       Expanded(
@@ -136,12 +134,14 @@ class _Step3EntrepreneurRegisterPageState
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Foto de registro',
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
+                      style:
+                          TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
@@ -169,8 +169,8 @@ class _Step3EntrepreneurRegisterPageState
                     ),
                     child: Center(
                       child: Container(
-                        width: circleSize +8, 
-                        height: circleSize +8,
+                        width: circleSize + 8,
+                        height: circleSize + 8,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
@@ -183,8 +183,10 @@ class _Step3EntrepreneurRegisterPageState
                               shape: BoxShape.circle,
                               color: Colors.grey[200],
                             ),
-                            child: (_selectedImage == null && _webImagePath == null)
-                                ? const Icon(Icons.camera_alt, size: 50, color: Colors.grey)
+                            child: (_selectedImage == null &&
+                                    _webImagePath == null)
+                                ? const Icon(Icons.camera_alt,
+                                    size: 50, color: Colors.grey)
                                 : ClipOval(
                                     child: kIsWeb
                                         ? Image.network(
@@ -210,53 +212,53 @@ class _Step3EntrepreneurRegisterPageState
             ),
           ),
           if (_selectedImage != null || _webImagePath != null)
+            Positioned(
+              bottom: 85,
+              left: 30,
+              right: 30,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  side: const BorderSide(color: Colors.black, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                onPressed: () {
+                  _pickImage();
+                },
+                child: const Text(
+                  'Tomar otra foto',
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
+              ),
+            ),
           Positioned(
-            bottom: 85,
+            bottom: 16,
             left: 30,
             right: 30,
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    (_selectedImage == null && _webImagePath == null)
+                        ? Colors.grey
+                        : const Color(0xFF222222),
                 padding: const EdgeInsets.symmetric(vertical: 24),
-                side: const BorderSide(color: Colors.black, width: 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
-              onPressed: () {
-                _pickImage();
-              },
+              onPressed: (_selectedImage != null || _webImagePath != null)
+                  ? () {
+                      RegisterPage.goToNextStep(context);
+                    }
+                  : null,
               child: const Text(
-                'Tomar otra foto',
-                style: TextStyle(color: Colors.black, fontSize: 16),
+                'Continuar',
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ),
-        Positioned(
-          bottom: 16,
-          left: 30,
-          right: 30,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: (_selectedImage == null && _webImagePath == null)
-                  ? Colors.grey
-                  : const Color(0xFF222222),
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-            onPressed: (_selectedImage != null || _webImagePath != null)
-                ? () {
-                    RegisterPage.goToNextStep(context);
-                  }
-                : null,
-            child: const Text(
-              'Continuar',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
-        ),
-
         ],
       ),
     );

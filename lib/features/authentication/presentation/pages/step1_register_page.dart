@@ -4,8 +4,8 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import '../widgets/custom_text_field.dart';
 import '../widgets/password_field.dart';
 
-class Step1EntrepreneurRegisterPage extends StatelessWidget {
-  const Step1EntrepreneurRegisterPage({super.key});
+class Step1RegisterPage extends StatelessWidget {
+  const Step1RegisterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,8 @@ class Step1EntrepreneurRegisterPage extends StatelessWidget {
     final TextEditingController emailController = TextEditingController();
     final TextEditingController phoneController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
-    final TextEditingController confirmPasswordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,7 +36,8 @@ class Step1EntrepreneurRegisterPage extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 40),
                   child: Row(
                     children: [
                       Expanded(
@@ -73,12 +75,14 @@ class Step1EntrepreneurRegisterPage extends StatelessWidget {
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Ingresa tus datos',
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
+                      style:
+                          TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
@@ -94,7 +98,8 @@ class Step1EntrepreneurRegisterPage extends StatelessWidget {
                 ),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 16.0),
                     children: [
                       CustomTextField(
                         label: 'Nombre completo',
@@ -108,8 +113,10 @@ class Step1EntrepreneurRegisterPage extends StatelessWidget {
                         ),
                         items: const [
                           DropdownMenuItem(value: 'DNI', child: Text('DNI')),
-                          DropdownMenuItem(value: 'Pasaporte', child: Text('Pasaporte')),
-                          DropdownMenuItem(value: 'Cédula', child: Text('Cédula')),
+                          DropdownMenuItem(
+                              value: 'Pasaporte', child: Text('Pasaporte')),
+                          DropdownMenuItem(
+                              value: 'Cédula', child: Text('Cédula')),
                         ],
                         onChanged: (value) {},
                       ),
@@ -146,7 +153,8 @@ class Step1EntrepreneurRegisterPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF222222),
                 padding: const EdgeInsets.symmetric(vertical: 24),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
               ),
               onPressed: () {
                 RegisterPage.goToNextStep(context);
