@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomNumberField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String? errorText;
 
-  const CustomTextField({
+  const CustomNumberField({
     super.key,
     required this.label,
     required this.controller,
@@ -16,6 +17,10 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+      ],
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.grey),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/error_text_widget.dart';
 
 class Step2InfluencerRegisterPage extends StatefulWidget {
   const Step2InfluencerRegisterPage({super.key});
@@ -13,13 +14,27 @@ class Step2InfluencerRegisterPage extends StatefulWidget {
 
 class _Step2InfluencerRegisterPageState
     extends State<Step2InfluencerRegisterPage> {
-  final TextEditingController businessNameController = TextEditingController();
-  final TextEditingController rucController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController twitchController = TextEditingController();
-  bool hasRUC = true;
+
+  String? instagramEmpty;
+  String? tiktokEmpty;
+
+  void validateAndContinue() {
+    setState(() {
+      instagramEmpty = instagramController.text.trim().isEmpty
+          ? 'Link de Instagram es requerido'
+          : null;
+      tiktokEmpty = tiktokController.text.trim().isEmpty
+          ? 'Link de TikTok es requerido'
+          : null;
+      if ([instagramEmpty, tiktokEmpty].every((error) => error == null)) {
+        RegisterPage.goToNextStep(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,11 +133,15 @@ class _Step2InfluencerRegisterPageState
                         label: 'Instagram',
                         controller: instagramController,
                       ),
+                      if (instagramEmpty != null)
+                        ErrorTextWidget(error: instagramEmpty!),
                       const SizedBox(height: 16),
                       CustomTextField(
                         label: 'Tiktok',
                         controller: tiktokController,
                       ),
+                      if (tiktokEmpty != null)
+                        ErrorTextWidget(error: tiktokEmpty!),
                       const SizedBox(height: 32),
                       const Text(
                         'Otras redes sociales (opcional)',
@@ -156,9 +175,7 @@ class _Step2InfluencerRegisterPageState
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),
-              onPressed: () {
-                RegisterPage.goToNextStep(context);
-              },
+              onPressed: validateAndContinue,
               child: const Text(
                 'Continuar',
                 style: TextStyle(color: Colors.white, fontSize: 16),
