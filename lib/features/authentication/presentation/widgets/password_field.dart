@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class PasswordField extends StatefulWidget {
   final TextEditingController controller;
   final String? errorText;
+  final Function(String)? onChanged;  
 
   const PasswordField({
     super.key,
     required this.controller,
     this.errorText,
+    this.onChanged,  
   });
 
   @override
@@ -22,6 +24,7 @@ class PasswordFieldState extends State<PasswordField> {
     return TextField(
       controller: widget.controller,
       obscureText: _obscureText,
+      onChanged: widget.onChanged,  // Llamamos a onChanged
       decoration: InputDecoration(
         labelText: 'Contraseña',
         labelStyle: const TextStyle(color: Colors.grey),
