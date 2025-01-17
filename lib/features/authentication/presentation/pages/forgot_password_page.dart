@@ -5,7 +5,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import '../widgets/custom_input.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({Key? key}) : super(key: key);
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _FindAccountPageState();

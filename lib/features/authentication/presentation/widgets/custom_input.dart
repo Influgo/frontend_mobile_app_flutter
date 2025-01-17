@@ -7,12 +7,12 @@ class CustomInput extends StatelessWidget {
   final Function(String)? onChanged; // Nuevo parámetro onChanged
 
   const CustomInput({
-    Key? key,
+    super.key,
     required this.label,
     required this.controller,
     this.errorText,
     this.onChanged, // Se incluye como opcional
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
