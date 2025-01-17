@@ -5,16 +5,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
 
-class Step3EntrepreneurRegisterPage extends StatefulWidget {
-  const Step3EntrepreneurRegisterPage({super.key});
+class StepEntrepreneurRegisterPage extends StatefulWidget {
+  const StepEntrepreneurRegisterPage({super.key});
 
   @override
-  State<Step3EntrepreneurRegisterPage> createState() =>
+  State<StepEntrepreneurRegisterPage> createState() =>
       _Step3EntrepreneurRegisterPageState();
 }
 
 class _Step3EntrepreneurRegisterPageState
-    extends State<Step3EntrepreneurRegisterPage> {
+    extends State<StepEntrepreneurRegisterPage> {
   File? _selectedImage;
   String? _webImagePath;
   final ImagePicker _picker = ImagePicker();

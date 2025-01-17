@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
 
-class Step4TermsConditionsPage extends StatelessWidget {
-  const Step4TermsConditionsPage({super.key});
+class Step7TermsConditionsPage extends StatelessWidget {
+  const Step7TermsConditionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +109,7 @@ class Step4TermsConditionsPage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    //nextito
+                   RegisterPage.goToNextStep(context);
                   },
                   child: const Text(
                     'Acepto y continuar',
