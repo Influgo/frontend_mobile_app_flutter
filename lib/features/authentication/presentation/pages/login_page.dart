@@ -2,9 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/password_field.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,19 +28,10 @@ class LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/images/influyo_logo.svg',
-                  height: 25,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
+            const InfluyoLogo(),
             const Spacer(),
             Column(
               mainAxisSize: MainAxisSize.min,

@@ -3,14 +3,14 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
-class Step3RegisterPage extends StatefulWidget {
-  const Step3RegisterPage({super.key});
+class Step5RegisterPage extends StatefulWidget {
+  const Step5RegisterPage({super.key});
 
   @override
-  State<Step3RegisterPage> createState() => _Step3RegisterPageState();
+  State<Step5RegisterPage> createState() => _Step5RegisterPageState();
 }
 
-class _Step3RegisterPageState extends State<Step3RegisterPage> {
+class _Step5RegisterPageState extends State<Step5RegisterPage> {
   void validateAndContinue() {
     RegisterPage.goToNextStep(context);
   }
@@ -36,13 +36,7 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Vamos a validar tu identidad',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w500),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Saca una foto a tu DNI',
+                          'Foto de registro',
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.w500),
                         ),
@@ -93,7 +87,25 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                             ),
                             Expanded(
                               child: Text(
-                                'Enfoca bien tu documento de identidad.',
+                                'Mantén tu rostro despejado.',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 8.0, right: 8.0, top: 8.0),
+                              child: Icon(Icons.circle, size: 8),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Coloca el móvil a la altura de tu rostro.',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w400),
                               ),

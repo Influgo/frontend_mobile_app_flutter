@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step4_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step5_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step6_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step7_terms_conditions.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step8_register_page.dart';
 import 'select_profile_page.dart';
 import 'step1_register_page.dart';
 import 'step2_entrepreneur_register_page.dart';
 import 'step2_influencer_register_page.dart';
 import 'step3_register_page.dart';
-import 'step4_terms_conditions.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -56,14 +60,22 @@ class _RegisterPageState extends State<RegisterPage> {
           const Step1RegisterPage(),
           const Step2InfluencerRegisterPage(),
           const Step3RegisterPage(),
-          const Step4TermsConditionsPage(),
+          const Step4RegisterPage(),
+          const Step5RegisterPage(),
+          const Step6RegisterPage(),
+          const Step7TermsConditionsPage(),
+          const Step8RegisterPage(),
         ]);
       } else if (_selectedProfile == "Emprendedor") {
         _pages.addAll([
           const Step1RegisterPage(),
           const Step2EntrepreneurRegisterPage(),
           const Step3RegisterPage(),
-          const Step4TermsConditionsPage(),
+          const Step4RegisterPage(),
+          const Step5RegisterPage(),
+          const Step6RegisterPage(),
+          const Step7TermsConditionsPage(),
+          const Step8RegisterPage(),
         ]);
       }
     });
@@ -71,7 +83,11 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _nextStep() {
-    if (_currentStep < _pages.length - 1) {
+    if (_currentStep == 8) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } else {
       setState(() {
         _currentStep++;
       });
@@ -103,7 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
             physics: const NeverScrollableScrollPhysics(),
             children: _pages,
           ),
-          if (_currentStep >= 0)
+          if (_currentStep >= 0 && _currentStep < 8)
             Positioned(
               top: 30,
               left: 16,

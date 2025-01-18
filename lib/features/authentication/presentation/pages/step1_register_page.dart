@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_email_field.dart';
 import '../widgets/custom_number_field.dart';
@@ -123,6 +124,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         RegisterPage.goToNextStep(context);
       }
     });
+    // Descomentar para realizar pruebas sin validaciones:
     //RegisterPage.goToNextStep(context);
   }
 
@@ -136,55 +138,8 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
             padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    const Spacer(),
-                    SvgPicture.asset(
-                      'assets/images/influyo_logo.svg',
-                      height: 25,
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 40),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color(0xFFC20B0C),
-                                Color(0xFF7E0F9D),
-                                Color(0xFF2616C7)
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(2)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          color: const Color(0xFFE0E0E0),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          color: const Color(0xFFE0E0E0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const InfluyoLogo(),
+                GradientBars(barCount: 1),
                 const Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/hoverable_elevated_button.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
 class SelectProfilePage extends StatelessWidget {
   final Function(String profile) onNextStep;
@@ -17,19 +17,10 @@ class SelectProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/images/influyo_logo.svg',
-                  height: 25,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
+            const InfluyoLogo(),
             const Spacer(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,

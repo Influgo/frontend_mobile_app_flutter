@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
-import '../widgets/custom_text_field.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_username_field.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_separator.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import '../widgets/error_text_widget.dart';
 
 class Step2InfluencerRegisterPage extends StatefulWidget {
@@ -19,21 +21,60 @@ class _Step2InfluencerRegisterPageState
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController twitchController = TextEditingController();
 
+  bool showInstagramField = false;
+  bool showTiktokField = false;
+  bool showYoutubeField = false;
+  bool showTwitchField = false;
+
+  String? socialMediaEmpty;
   String? instagramEmpty;
   String? tiktokEmpty;
+  String? youtubeEmpty;
+  String? twitchEmpty;
 
   void validateAndContinue() {
     setState(() {
-      instagramEmpty = instagramController.text.trim().isEmpty
-          ? 'Link de Instagram es requerido'
-          : null;
-      tiktokEmpty = tiktokController.text.trim().isEmpty
-          ? 'Link de TikTok es requerido'
-          : null;
-      if ([instagramEmpty, tiktokEmpty].every((error) => error == null)) {
+      if (!showInstagramField && !showTiktokField) {
+        socialMediaEmpty =
+            'Debe seleccionar al menos Instagram o Tiktok como red social';
+      } else {
+        socialMediaEmpty = null;
+        if (showInstagramField && instagramController.text.trim().isEmpty) {
+          instagramEmpty = 'Debe ingresar su usuario de Instagram';
+        } else {
+          instagramEmpty = null;
+        }
+
+        if (showTiktokField && tiktokController.text.trim().isEmpty) {
+          tiktokEmpty = 'Debe ingresar su usuario de Tiktok';
+        } else {
+          tiktokEmpty = null;
+        }
+      }
+
+      if (showYoutubeField && youtubeController.text.trim().isEmpty) {
+        youtubeEmpty = 'Debe ingresar su canal de Youtube';
+      } else {
+        youtubeEmpty = null;
+      }
+      if (showTwitchField && twitchController.text.trim().isEmpty) {
+        twitchEmpty = 'Debe ingresar su canal de Twitch';
+      } else {
+        twitchEmpty = null;
+      }
+
+      if ([
+        socialMediaEmpty,
+        instagramEmpty,
+        tiktokEmpty,
+        youtubeEmpty,
+        twitchEmpty
+      ].every((error) => error == null)) {
         RegisterPage.goToNextStep(context);
       }
     });
+    // Descomentar para realizar pruebas sin validaciones:
+    //RegisterPage.goToNextStep(context);
   }
 
   @override
@@ -46,119 +87,157 @@ class _Step2InfluencerRegisterPageState
             padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    const Spacer(),
-                    SvgPicture.asset(
-                      'assets/images/influyo_logo.svg',
-                      height: 25,
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 40),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color(0xFFC20B0C),
-                                Color(0xFF7E0F9D),
-                                Color(0xFF2616C7),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(2)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color(0xFFC20B0C),
-                                Color(0xFF7E0F9D),
-                                Color(0xFF2616C7),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(2)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          color: const Color(0xFFE0E0E0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Ingresa tus redes sociales',
-                      style:
-                          TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ),
+                const InfluyoLogo(),
+                GradientBars(barCount: 2),
                 Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 0.0),
-                    children: [
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Ingresa el link de las redes sociales que manejas',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                          label: 'Instagram',
-                          controller: instagramController,
-                          maxLength: 100),
-                      if (instagramEmpty != null)
-                        ErrorTextWidget(error: instagramEmpty!),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                          label: 'Tiktok',
-                          controller: tiktokController,
-                          maxLength: 100),
-                      if (tiktokEmpty != null)
-                        ErrorTextWidget(error: tiktokEmpty!),
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Otras redes sociales (opcional)',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                          label: 'Youtube',
-                          controller: youtubeController,
-                          maxLength: 100),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                          label: 'Twitch',
-                          controller: twitchController,
-                          maxLength: 100),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 80),
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 20.0),
+                      children: [
+                        const Text(
+                          'Ingresa tus redes sociales',
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Ingresa el usuario de las redes sociales que administras',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Instagram',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            Checkbox(
+                              value: showInstagramField,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  showInstagramField = value ?? false;
+                                });
+                              },
+                              activeColor: Colors.black,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (showInstagramField) ...[
+                          CustomUsernameField(
+                            label: 'Usuario de Instagram',
+                            controller: instagramController,
+                            maxLength: 100,
+                          ),
+                          if (instagramEmpty != null)
+                            ErrorTextWidget(error: instagramEmpty!),
+                          const SizedBox(height: 8),
+                        ],
+                        const FormSeparator(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Tiktok',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            Checkbox(
+                              value: showTiktokField,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  showTiktokField = value ?? false;
+                                });
+                              },
+                              activeColor: Colors.black,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (showTiktokField) ...[
+                          CustomUsernameField(
+                            label: 'Usuario de Tiktok',
+                            controller: tiktokController,
+                            maxLength: 100,
+                          ),
+                          if (tiktokEmpty != null)
+                            ErrorTextWidget(error: tiktokEmpty!),
+                        ],
+                        if (socialMediaEmpty != null)
+                          ErrorTextWidget(error: socialMediaEmpty!),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Otras redes sociales (opcional)',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Youtube',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            Checkbox(
+                              value: showYoutubeField,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  showYoutubeField = value ?? false;
+                                });
+                              },
+                              activeColor: Colors.black,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (showYoutubeField) ...[
+                          CustomUsernameField(
+                            label: 'Canal de Youtube',
+                            controller: youtubeController,
+                            maxLength: 100,
+                          ),
+                          if (youtubeEmpty != null)
+                            ErrorTextWidget(error: youtubeEmpty!),
+                          const SizedBox(height: 8),
+                        ],
+                        const FormSeparator(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Twitch',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            Checkbox(
+                              value: showTwitchField,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  showTwitchField = value ?? false;
+                                });
+                              },
+                              activeColor: Colors.black,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (showTwitchField) ...[
+                          CustomUsernameField(
+                            label: 'Canal de Twitch',
+                            controller: twitchController,
+                            maxLength: 100,
+                          ),
+                          if (twitchEmpty != null)
+                            ErrorTextWidget(error: twitchEmpty!),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -3,14 +3,14 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
-class Step3RegisterPage extends StatefulWidget {
-  const Step3RegisterPage({super.key});
+class Step8RegisterPage extends StatefulWidget {
+  const Step8RegisterPage({super.key});
 
   @override
-  State<Step3RegisterPage> createState() => _Step3RegisterPageState();
+  State<Step8RegisterPage> createState() => _Step8RegisterPageState();
 }
 
-class _Step3RegisterPageState extends State<Step3RegisterPage> {
+class _Step8RegisterPageState extends State<Step8RegisterPage> {
   void validateAndContinue() {
     RegisterPage.goToNextStep(context);
   }
@@ -25,8 +25,6 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
             padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
             child: Column(
               children: [
-                const InfluyoLogo(),
-                GradientBars(barCount: 3),
                 const Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -36,13 +34,7 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Vamos a validar tu identidad',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w500),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Saca una foto a tu DNI',
+                          'Tu perfil está en revisión',
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.w500),
                         ),
@@ -58,7 +50,7 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Antes de continuar, sigue estas instrucciones para validar tu identidad:',
+                          'Te avisaremos de su aprobación dentro de 12 hrs hábiles. Por mientras explora lo que te ofrece Influyo!',
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
@@ -75,25 +67,7 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                             ),
                             Expanded(
                               child: Text(
-                                'Asegúrate de estar en un lugar bien iluminado.',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: 8.0, right: 8.0, top: 8.0),
-                              child: Icon(Icons.circle, size: 8),
-                            ),
-                            Expanded(
-                              child: Text(
-                                'Enfoca bien tu documento de identidad.',
+                                '(Pantalla en desarrollo).',
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w400),
                               ),

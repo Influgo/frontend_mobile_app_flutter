@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
-class Step4TermsConditionsPage extends StatelessWidget {
-  const Step4TermsConditionsPage({super.key});
+class Step7TermsConditionsPage extends StatefulWidget {
+  const Step7TermsConditionsPage({super.key});
+
+  @override
+  _Step7TermsConditionsPageState createState() =>
+      _Step7TermsConditionsPageState();
+}
+
+class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
+  void validateAndContinue() {
+    RegisterPage.goToNextStep(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,22 +24,7 @@ class Step4TermsConditionsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                const Spacer(),
-                SvgPicture.asset(
-                  'assets/images/influyo_logo.svg',
-                  height: 25,
-                ),
-                const Spacer(),
-              ],
-            ),
+            const InfluyoLogo(),
             const SizedBox(height: 40),
             const Text(
               'Términos y Condiciones',
@@ -96,7 +92,7 @@ class Step4TermsConditionsPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only( bottom: 0, left: 12, right: 12),
+              padding: const EdgeInsets.only(bottom: 0, left: 12, right: 12),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -107,9 +103,7 @@ class Step4TermsConditionsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  onPressed: () {
-                    //nextito
-                  },
+                  onPressed: validateAndContinue,
                   child: const Text(
                     'Acepto y continuar',
                     style: TextStyle(color: Colors.white, fontSize: 16),
