@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomEmailField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String? errorText;
   final int maxLength;
 
-  const CustomTextField({
+  const CustomEmailField({
     super.key,
     required this.label,
     required this.controller,
@@ -20,21 +20,19 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLength: maxLength,
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.emailAddress,
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
         FilteringTextInputFormatter.allow(
-          RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ '-]"),
+          RegExp(r"[a-zA-Z0-9@._-]"),
         ),
       ],
       onChanged: (value) {
         String newValue = value;
 
-        if (newValue.startsWith(' ')) {
-          newValue = newValue.trimLeft();
+        if (newValue.contains(' ')) {
+          newValue = newValue.replaceAll(' ', '');
         }
-
-        newValue = newValue.replaceAll(RegExp(r'\s{2,}'), ' ');
 
         if (newValue != value) {
           controller.value = TextEditingValue(

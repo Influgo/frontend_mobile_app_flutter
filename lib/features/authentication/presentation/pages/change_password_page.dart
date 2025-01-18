@@ -12,7 +12,8 @@ class ChangePasswordPage extends StatefulWidget {
 
 class _ChangePasswordScreenState extends State<ChangePasswordPage> {
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isButtonEnabled = false;
   bool _isLengthValid = false;
@@ -65,7 +66,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordPage> {
             const SizedBox(height: 16),
             PasswordField(
               controller: _newPasswordController,
-              errorText: !_isLengthValid || !_hasUppercase || !_hasSpecialChar 
+              label: "Contraseña",
+              errorText: !_isLengthValid || !_hasUppercase || !_hasSpecialChar
                   ? 'La contraseña no es válida'
                   : null,
               onChanged: (value) {
@@ -75,8 +77,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordPage> {
             const SizedBox(height: 16),
             PasswordField(
               controller: _confirmPasswordController,
-              errorText: _confirmPasswordController.text.isNotEmpty && 
-                        _newPasswordController.text != _confirmPasswordController.text
+              label: "Confirmar contraseña",
+              errorText: _confirmPasswordController.text.isNotEmpty &&
+                      _newPasswordController.text !=
+                          _confirmPasswordController.text
                   ? 'Las contraseñas no coinciden'
                   : null,
               onChanged: (value) {
@@ -109,8 +113,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordPage> {
                   ? () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => SuccessPasswordPage(onPressed: () { 
-                         },)),
+                        MaterialPageRoute(
+                            builder: (context) => SuccessPasswordPage(
+                                  onPressed: () {},
+                                )),
                       );
                     }
                   : null,

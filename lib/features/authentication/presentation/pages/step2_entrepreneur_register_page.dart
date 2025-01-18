@@ -153,9 +153,9 @@ class _Step2EntrepreneurRegisterPageState
                         horizontal: 16.0, vertical: 20.0),
                     children: [
                       CustomTextField(
-                        label: 'Nombre del emprendimiento',
-                        controller: businessNameController,
-                      ),
+                          label: 'Nombre del emprendimiento',
+                          controller: businessNameController,
+                          maxLength: 100),
                       if (businessNameEmpty != null)
                         ErrorTextWidget(error: businessNameEmpty!),
                       const SizedBox(height: 16),
@@ -214,16 +214,16 @@ class _Step2EntrepreneurRegisterPageState
                         ),
                         const SizedBox(height: 16),
                         CustomTextField(
-                          label: 'Instagram',
-                          controller: instagramController,
-                        ),
+                            label: 'Instagram',
+                            controller: instagramController,
+                            maxLength: 100),
                         if (instagramEmpty != null)
                           ErrorTextWidget(error: instagramEmpty!),
                         const SizedBox(height: 16),
                         CustomTextField(
-                          label: 'Tiktok',
-                          controller: tiktokController,
-                        ),
+                            label: 'Tiktok',
+                            controller: tiktokController,
+                            maxLength: 100),
                         if (tiktokEmpty != null)
                           ErrorTextWidget(error: tiktokEmpty!),
                         const SizedBox(height: 32),
@@ -234,18 +234,19 @@ class _Step2EntrepreneurRegisterPageState
                         ),
                         const SizedBox(height: 16),
                         CustomTextField(
-                          label: 'Youtube',
-                          controller: youtubeController,
-                        ),
+                            label: 'Youtube',
+                            controller: youtubeController,
+                            maxLength: 100),
                         const SizedBox(height: 16),
                         CustomTextField(
-                          label: 'Twitch',
-                          controller: twitchController,
-                        ),
+                            label: 'Twitch',
+                            controller: twitchController,
+                            maxLength: 100),
                       ] else ...[
                         CustomNumberField(
                           label: 'RUC',
                           controller: rucController,
+                          maxLength: 11,
                         ),
                         if (rucEmpty != null) ErrorTextWidget(error: rucEmpty!),
                       ]

@@ -66,15 +66,16 @@ class LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 32),
                 CustomTextField(
-                  label: 'Correo, número o teléfono',
-                  controller: _identifierController,
-                ),
+                    label: 'Correo, número o teléfono',
+                    controller: _identifierController,
+                    maxLength: 100),
                 const SizedBox(height: 16),
-                PasswordField(controller: _passwordController),
+                PasswordField(
+                    controller: _passwordController, label: "Contraseña"),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                     onPressed: () {
+                    onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const ForgotPasswordPage(),
@@ -83,7 +84,8 @@ class LoginPageState extends State<LoginPage> {
                     },
                     style: ButtonStyle(
                       overlayColor: WidgetStateProperty.all(Colors.transparent),
-                      foregroundColor: WidgetStateProperty.resolveWith((states) {
+                      foregroundColor:
+                          WidgetStateProperty.resolveWith((states) {
                         if (states.contains(WidgetState.hovered)) {
                           return const Color.fromARGB(255, 0, 107, 214);
                         }
@@ -141,11 +143,8 @@ class LoginPageState extends State<LoginPage> {
                 child: Text.rich(
                   TextSpan(
                     text: '¿No tienes una cuenta? ',
-                    style: 
-                    const TextStyle(
-                      color: Color.fromARGB(255, 34, 34, 34),  
-                      fontSize: 14
-                    ),
+                    style: const TextStyle(
+                        color: Color.fromARGB(255, 34, 34, 34), fontSize: 14),
                     children: [
                       TextSpan(
                         text: 'Regístrate',
@@ -157,7 +156,9 @@ class LoginPageState extends State<LoginPage> {
                           ..onTap = () {
                             Navigator.of(context).pushReplacement(
                               PageRouteBuilder(
-                                pageBuilder: (context, animation1, animation2) => const RegisterPage(),
+                                pageBuilder:
+                                    (context, animation1, animation2) =>
+                                        const RegisterPage(),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),

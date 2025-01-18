@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login_page.dart';
 import 'select_profile_page.dart';
 import 'step1_register_page.dart';
 import 'step2_entrepreneur_register_page.dart';
@@ -79,7 +80,11 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _previousStep() {
-    if (_currentStep > 0) {
+    if (_currentStep == 0) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } else {
       setState(() {
         _currentStep--;
       });
@@ -98,13 +103,13 @@ class _RegisterPageState extends State<RegisterPage> {
             physics: const NeverScrollableScrollPhysics(),
             children: _pages,
           ),
-          if (_currentStep > 0)
+          if (_currentStep >= 0)
             Positioned(
               top: 30,
               left: 16,
               child: IconButton(
                 icon: const Icon(
-                  Icons.arrow_back,
+                  Icons.arrow_back_ios,
                   color: Colors.black,
                 ),
                 onPressed: _previousStep,

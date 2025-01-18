@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 
 class PasswordField extends StatefulWidget {
   final TextEditingController controller;
+  final String label;
   final String? errorText;
-  final Function(String)? onChanged;  
+  final Function(String)? onChanged;
 
   const PasswordField({
     super.key,
     required this.controller,
+    required this.label,
     this.errorText,
-    this.onChanged,  
+    this.onChanged,
   });
 
   @override
@@ -24,9 +26,9 @@ class PasswordFieldState extends State<PasswordField> {
     return TextField(
       controller: widget.controller,
       obscureText: _obscureText,
-      onChanged: widget.onChanged,  // Llamamos a onChanged
+      onChanged: widget.onChanged,
       decoration: InputDecoration(
-        labelText: 'Contraseña',
+        labelText: widget.label, // Usar el texto personalizado
         labelStyle: const TextStyle(color: Colors.grey),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
