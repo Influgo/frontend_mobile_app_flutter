@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/change_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/change_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_button.dart';
 
-import '../widgets/custom_input.dart';
+import '../../widgets/custom_input.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({Key? key}) : super(key: key);
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _FindAccountPageState();

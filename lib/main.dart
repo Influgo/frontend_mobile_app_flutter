@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 
 void main() {
   runApp(const MyApp());

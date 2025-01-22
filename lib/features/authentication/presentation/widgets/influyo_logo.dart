@@ -5,9 +5,9 @@ class InfluyoLogo extends StatelessWidget {
   final double logoHeight;
 
   const InfluyoLogo({
-    Key? key,
+    super.key,
     this.logoHeight = 25.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

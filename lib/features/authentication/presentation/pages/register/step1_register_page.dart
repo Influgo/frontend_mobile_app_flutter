@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/custom_email_field.dart';
-import '../widgets/custom_number_field.dart';
-import '../widgets/password_field.dart';
-import '../widgets/error_text_widget.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/custom_email_field.dart';
+import '../../widgets/custom_number_field.dart';
+import '../../widgets/password_field.dart';
+import '../../widgets/error_text_widget.dart';
 
 class Step1RegisterPage extends StatefulWidget {
   const Step1RegisterPage({super.key});

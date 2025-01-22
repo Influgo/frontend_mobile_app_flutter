@@ -4,9 +4,9 @@ class GradientBars extends StatelessWidget {
   final int barCount;
 
   const GradientBars({
-    Key? key,
+    super.key,
     required this.barCount,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

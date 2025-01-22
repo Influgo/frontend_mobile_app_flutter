@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
-class Step8RegisterPage extends StatefulWidget {
-  const Step8RegisterPage({super.key});
+class Step4RegisterPage extends StatefulWidget {
+  const Step4RegisterPage({super.key});
 
   @override
-  State<Step8RegisterPage> createState() => _Step8RegisterPageState();
+  State<Step4RegisterPage> createState() => _Step4RegisterPageState();
 }
 
-class _Step8RegisterPageState extends State<Step8RegisterPage> {
+class _Step4RegisterPageState extends State<Step4RegisterPage> {
   void validateAndContinue() {
     RegisterPage.goToNextStep(context);
   }
@@ -25,6 +25,8 @@ class _Step8RegisterPageState extends State<Step8RegisterPage> {
             padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
             child: Column(
               children: [
+                const InfluyoLogo(),
+                GradientBars(barCount: 3),
                 const Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -34,9 +36,9 @@ class _Step8RegisterPageState extends State<Step8RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Tu perfil está en revisión',
+                          'Frente de tu DNI:',
                           style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w500),
+                              fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -50,29 +52,11 @@ class _Step8RegisterPageState extends State<Step8RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Te avisaremos de su aprobación dentro de 12 hrs hábiles. Por mientras explora lo que te ofrece Influyo!',
+                          'Fotografía frontal del DNI (en desarrollo)',
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey),
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: 8.0, right: 8.0, top: 8.0),
-                              child: Icon(Icons.circle, size: 8),
-                            ),
-                            Expanded(
-                              child: Text(
-                                '(Pantalla en desarrollo).',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),

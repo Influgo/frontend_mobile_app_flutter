@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class FormSeparator extends StatelessWidget {
   final double verticalSpacing;
 
-  const FormSeparator({this.verticalSpacing = 8.0, Key? key}) : super(key: key);
+  const FormSeparator({this.verticalSpacing = 8.0, super.key});
 
   @override
   Widget build(BuildContext context) {

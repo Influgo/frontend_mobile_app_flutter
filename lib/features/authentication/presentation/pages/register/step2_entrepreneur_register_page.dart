@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_email_field.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_username_field.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_separator.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
-import '../widgets/error_text_widget.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/custom_number_field.dart';
+import '../../widgets/error_text_widget.dart';
 
-class Step2InfluencerRegisterPage extends StatefulWidget {
-  const Step2InfluencerRegisterPage({super.key});
+class Step2EntrepreneurRegisterPage extends StatefulWidget {
+  const Step2EntrepreneurRegisterPage({super.key});
 
   @override
-  State<Step2InfluencerRegisterPage> createState() =>
-      _Step2InfluencerRegisterPageState();
+  State<Step2EntrepreneurRegisterPage> createState() =>
+      _Step2EntrepreneurRegisterPageState();
 }
 
-class _Step2InfluencerRegisterPageState
-    extends State<Step2InfluencerRegisterPage> {
+class _Step2EntrepreneurRegisterPageState
+    extends State<Step2EntrepreneurRegisterPage> {
+  final TextEditingController businessNameController = TextEditingController();
+  final TextEditingController businessNicknameController =
+      TextEditingController();
+  final TextEditingController rucController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
@@ -26,6 +33,9 @@ class _Step2InfluencerRegisterPageState
   bool showYoutubeField = false;
   bool showTwitchField = false;
 
+  String? businessNameEmpty;
+  String? businessNicknameEmpty;
+  String? rucEmpty;
   String? socialMediaEmpty;
   String? instagramEmpty;
   String? tiktokEmpty;
@@ -34,6 +44,18 @@ class _Step2InfluencerRegisterPageState
 
   void validateAndContinue() {
     setState(() {
+      businessNameEmpty = businessNameController.text.trim().isEmpty
+          ? 'Nombre del emprendimiento es requerido'
+          : null;
+      businessNicknameEmpty = businessNicknameController.text.trim().isEmpty
+          ? 'Nickname del emprendimiento es requerido'
+          : null;
+      rucEmpty = rucController.text.trim().isEmpty
+          ? 'RUC es requerido'
+          : (rucController.text.trim().length != 11
+              ? 'RUC debe tener 11 dígitos'
+              : null);
+
       if (!showInstagramField && !showTiktokField) {
         socialMediaEmpty =
             'Debe seleccionar al menos Instagram o Tiktok como red social';
@@ -64,6 +86,9 @@ class _Step2InfluencerRegisterPageState
       }
 
       if ([
+        businessNameEmpty,
+        businessNicknameEmpty,
+        rucEmpty,
         socialMediaEmpty,
         instagramEmpty,
         tiktokEmpty,
@@ -89,6 +114,28 @@ class _Step2InfluencerRegisterPageState
               children: [
                 const InfluyoLogo(),
                 GradientBars(barCount: 2),
+                const Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Ingresa los datos de tu emprendimiento',
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Rellena los campos',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ),
+                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 80),
@@ -96,6 +143,27 @@ class _Step2InfluencerRegisterPageState
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 20.0),
                       children: [
+                        CustomTextField(
+                            label: 'Nombre del emprendimiento',
+                            controller: businessNameController,
+                            maxLength: 100),
+                        if (businessNameEmpty != null)
+                          ErrorTextWidget(error: businessNameEmpty!),
+                        const SizedBox(height: 16),
+                        CustomEmailField(
+                            label: 'Nickname del emprendimiento',
+                            controller: businessNicknameController,
+                            maxLength: 100),
+                        if (businessNicknameEmpty != null)
+                          ErrorTextWidget(error: businessNicknameEmpty!),
+                        const SizedBox(height: 16),
+                        CustomNumberField(
+                          label: 'RUC',
+                          controller: rucController,
+                          maxLength: 11,
+                        ),
+                        if (rucEmpty != null) ErrorTextWidget(error: rucEmpty!),
+                        const SizedBox(height: 16),
                         const Text(
                           'Ingresa tus redes sociales',
                           style: TextStyle(

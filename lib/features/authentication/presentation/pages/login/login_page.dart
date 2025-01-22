@@ -1,10 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/forgot_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/password_field.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/password_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

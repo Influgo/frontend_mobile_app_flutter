@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/success_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/success_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_button.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_field.dart';
 
 class ChangePasswordPage extends StatefulWidget {
-  const ChangePasswordPage({Key? key}) : super(key: key);
+  const ChangePasswordPage({super.key});
 
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();

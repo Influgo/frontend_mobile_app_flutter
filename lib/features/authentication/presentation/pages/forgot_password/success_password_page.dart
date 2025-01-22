@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_button.dart';
 
 class SuccessPasswordPage extends StatelessWidget {
   final String title;
-  final String subtitle; 
+  final String subtitle;
   final String buttonText;
   final VoidCallback onPressed;
 
   const SuccessPasswordPage({
     super.key,
     this.title = 'Tu contraseña se ha cambiado\ncon éxito',
-    this.subtitle = 'Ahora podrás ingresar a tu cuenta con tu\nnueva contraseña.',
+    this.subtitle =
+        'Ahora podrás ingresar a tu cuenta con tu\nnueva contraseña.',
     this.buttonText = 'Siguiente',
     required this.onPressed,
   });

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
-class Step6RegisterPage extends StatefulWidget {
-  const Step6RegisterPage({super.key});
+class Step3RegisterPage extends StatefulWidget {
+  const Step3RegisterPage({super.key});
 
   @override
-  State<Step6RegisterPage> createState() => _Step6RegisterPageState();
+  State<Step3RegisterPage> createState() => _Step3RegisterPageState();
 }
 
-class _Step6RegisterPageState extends State<Step6RegisterPage> {
+class _Step3RegisterPageState extends State<Step3RegisterPage> {
   void validateAndContinue() {
     RegisterPage.goToNextStep(context);
   }
@@ -36,9 +36,15 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Selfie de registro:',
+                          'Vamos a validar tu identidad',
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
+                              fontSize: 22, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Saca una foto a tu DNI',
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -52,11 +58,47 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Selfie del usuario (en desarrollo)',
+                          'Antes de continuar, sigue estas instrucciones para validar tu identidad:',
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
                               color: Colors.grey),
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 8.0, right: 8.0, top: 8.0),
+                              child: Icon(Icons.circle, size: 8),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Asegúrate de estar en un lugar bien iluminado.',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 8.0, right: 8.0, top: 8.0),
+                              child: Icon(Icons.circle, size: 8),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Enfoca bien tu documento de identidad.',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

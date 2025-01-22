@@ -4,21 +4,21 @@ class CustomInput extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String? errorText;
-  final Function(String)? onChanged; // Nuevo parámetro onChanged
+  final Function(String)? onChanged;
 
   const CustomInput({
-    Key? key,
+    super.key,
     required this.label,
     required this.controller,
     this.errorText,
-    this.onChanged, // Se incluye como opcional
-  }) : super(key: key);
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      onChanged: onChanged, // Vinculación con el evento onChanged
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.grey),

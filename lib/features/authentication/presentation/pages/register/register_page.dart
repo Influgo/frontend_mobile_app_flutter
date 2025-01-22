@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step4_register_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step5_register_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step6_register_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step7_terms_conditions.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/step8_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step5_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step7_terms_conditions.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step8_register_page.dart';
 import 'select_profile_page.dart';
 import 'step1_register_page.dart';
 import 'step2_entrepreneur_register_page.dart';

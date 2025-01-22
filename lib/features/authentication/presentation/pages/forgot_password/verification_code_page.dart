@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_button.dart';
 
 class VerificationCodeScreen extends StatelessWidget {
-  const VerificationCodeScreen({Key? key}) : super(key: key);
+  const VerificationCodeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class VerificationCodeScreen extends StatelessWidget {
       (index) => FocusNode(),
     );
 
-    void _onCodeChanged(String value, int index) {
+    void onCodeChanged(String value, int index) {
       if (value.length == 1 && index < 4) {
         focusNodes[index + 1].requestFocus();
       } else if (value.isEmpty && index > 0) {
@@ -82,7 +82,7 @@ class VerificationCodeScreen extends StatelessWidget {
                         borderSide: const BorderSide(color: Colors.black),
                       ),
                     ),
-                    onChanged: (value) => _onCodeChanged(value, index),
+                    onChanged: (value) => onCodeChanged(value, index),
                   ),
                 ),
               ),
@@ -90,9 +90,7 @@ class VerificationCodeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: TextButton(
-                onPressed: () {
-           
-                },
+                onPressed: () {},
                 child: Text(
                   'Reenviar código en 00:50',
                   style: TextStyle(
@@ -105,10 +103,8 @@ class VerificationCodeScreen extends StatelessWidget {
             const Spacer(),
             FormButton(
               text: 'Siguiente',
-              isEnabled: false, 
-              onPressed: () {
-           
-              },
+              isEnabled: false,
+              onPressed: () {},
             ),
             const SizedBox(height: 20),
           ],
