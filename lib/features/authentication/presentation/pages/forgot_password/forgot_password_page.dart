@@ -1,91 +1,89 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/change_password_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_button.dart';
-
-import '../../widgets/custom_input.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step1_forgot_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step2_forgot_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step3_forgot_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step4_forgot_password_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
-  @override
-  State<ForgotPasswordPage> createState() => _FindAccountPageState();
-}
-
-class _FindAccountPageState extends State<ForgotPasswordPage> {
-  final TextEditingController _emailOrPhoneController = TextEditingController();
-  bool _isButtonEnabled = false;
-
-  void _validateInput(String value) {
-    setState(() {
-      _isButtonEnabled = value.isNotEmpty;
-    });
+  static void goToNextStep(BuildContext context) {
+    final state = context.findAncestorStateOfType<_ForgotPasswordPageState>();
+    state?._nextStep();
   }
 
   @override
-  void dispose() {
-    _emailOrPhoneController.dispose();
-    super.dispose();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final PageController _pageController = PageController();
+  int _currentStep = 0;
+
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      Step1ForgotPasswordPage(onNextStep: _nextStep),
+      const Step2ForgotPasswordPage(),
+      const Step3ForgotPasswordPage(),
+      const Step4ForgotPasswordPage(),
+    ];
+  }
+
+  void _nextStep() {
+    if (_currentStep == 3) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } else {
+      setState(() {
+        _currentStep++;
+      });
+      _pageController.jumpToPage(_currentStep);
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep == 0) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } else {
+      setState(() {
+        _currentStep--;
+      });
+      _pageController.jumpToPage(_currentStep);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            const Text(
-              'Encuentra tu cuenta',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+      body: Stack(
+        children: [
+          PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: _pages,
+          ),
+          if (_currentStep >= 0)
+            Positioned(
+              top: 30,
+              left: 16,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.black,
+                ),
+                onPressed: _previousStep,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Por favor, ingresa tu correo o celular para buscar tu cuenta',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 32),
-            CustomInput(
-              label: 'Correo o celular',
-              controller: _emailOrPhoneController,
-              onChanged: _validateInput,
-            ),
-            const Spacer(),
-            FormButton(
-              text: 'Siguiente',
-              isEnabled: _isButtonEnabled,
-              onPressed: _isButtonEnabled
-                  ? () {
-                      // Navega a la página de cambio de contraseña
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChangePasswordPage(),
-                        ),
-                      );
-                    }
-                  : null,
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
+        ],
       ),
     );
   }

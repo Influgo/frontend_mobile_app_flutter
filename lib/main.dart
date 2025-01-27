@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/core/di/injection_container.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 
 void main() {
+  setupDependencies();
   runApp(const MyApp());
 }
 
