@@ -66,7 +66,7 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
               ),
               onPressed: validateAndContinue,
               child: const Text(
-                'Continuar',
+                'Siguiente',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),

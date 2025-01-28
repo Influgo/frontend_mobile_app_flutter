@@ -14,16 +14,19 @@ class CustomCheckmarkSimple extends StatelessWidget {
       ),
       child: Center(
         child: Container(
-          width: 80,
-          height: 80,
-          decoration: const BoxDecoration(
-            color: Color(0xFF1B5E20),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.check,
-            color: Colors.white,
-            size: 48,
+          // width: 80,
+          // height: 80,
+          // decoration: const BoxDecoration(
+          //   color: Color(0xFF1B5E20),
+          //   shape: BoxShape.circle,
+          // ),
+          child: Center(
+            child: Image.asset(
+              'assets/images/check.gif',
+              width: 61,
+              height: 61,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
       ),
