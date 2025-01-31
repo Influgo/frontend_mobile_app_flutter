@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:frontend_mobile_app_flutter/core/constants/api_endpoints.dart';
 import 'package:frontend_mobile_app_flutter/core/utils/api_helper.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +9,12 @@ abstract class AuthRemoteDataSource {
   Future<void> requestPasswordReset(String email);
   Future<http.Response> registerInfluencer(Map<String, dynamic> influencerData);
   Future<http.Response> registerEntrepreneur(Map<String, dynamic> entrepreneurData);
+  Future<http.Response> validateImages({
+    required String userIdentifier,
+    required Uint8List documentFrontImage,
+    required Uint8List documentBackImage,
+    required Uint8List profileImage,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -61,6 +68,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       },
       body: jsonEncode(entrepreneurData),
     );
+    return response;
+  }
+
+  @override
+  Future<http.Response> validateImages({
+    required String userIdentifier,
+    required Uint8List documentFrontImage,
+    required Uint8List documentBackImage,
+    required Uint8List profileImage,
+  }) async {
+    final url = Uri.parse(APIHelper.buildUrl(validateImagesEndpoint).toString());
+    final request = http.MultipartRequest('POST', url)
+      ..fields['userIdentifier'] = userIdentifier
+      ..files.add(http.MultipartFile.fromBytes(
+        'documentFrontImage',
+        documentFrontImage,
+        filename: 'documentFrontImage.jpg',
+      ))
+      ..files.add(http.MultipartFile.fromBytes(
+        'documentBackImage',
+        documentBackImage,
+        filename: 'documentBackImage.jpg',
+      ))
+      ..files.add(http.MultipartFile.fromBytes(
+        'profileImage',
+        profileImage,
+        filename: 'profileImage.jpg',
+      ));
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode != 200) {
+      throw ServerException(message: 'Error validating images');
+    }
+
     return response;
   }
 }

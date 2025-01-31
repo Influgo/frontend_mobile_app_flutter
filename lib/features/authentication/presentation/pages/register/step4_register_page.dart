@@ -1,18 +1,52 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
 class Step4RegisterPage extends StatefulWidget {
-  const Step4RegisterPage({super.key});
+  final Function(Uint8List) onImageCaptured;
+
+  const Step4RegisterPage({super.key, required this.onImageCaptured});
 
   @override
   State<Step4RegisterPage> createState() => _Step4RegisterPageState();
 }
 
 class _Step4RegisterPageState extends State<Step4RegisterPage> {
+  CameraController? _cameraController;
+  Uint8List? _capturedImageBytes;
+  bool _isCameraInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    final cameras = await availableCameras();
+    if (cameras.isNotEmpty) {
+      _cameraController = CameraController(cameras[0], ResolutionPreset.high);
+      await _cameraController!.initialize();
+      setState(() {
+        _isCameraInitialized = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _cameraController?.dispose();
+    super.dispose();
+  }
+
   void validateAndContinue() {
-    RegisterPage.goToNextStep(context);
+    if (_capturedImageBytes != null) {
+      widget.onImageCaptured(_capturedImageBytes!);
+      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4);
+    }
   }
 
   @override
@@ -28,42 +62,81 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
                 const InfluyoLogo(),
                 GradientBars(barCount: 3),
                 const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Frente de tu DNI:',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                      ],
+                    child: Text(
+                      'Anverso de tu documento de identidad:',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Fotografía frontal del DNI (en desarrollo)',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey),
-                        ),
-                      ],
-                    ),
+                const SizedBox(height: 16),
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: _capturedImageBytes == null
+                        ? _isCameraInitialized
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: CameraPreview(_cameraController!),
+                              )
+                            : const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                        : Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey, width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Image.memory(
+                              _capturedImageBytes!,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
               ],
+            ),
+          ),
+          Positioned(
+            bottom: 80,
+            left: 30,
+            right: 30,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (_cameraController != null && _cameraController!.value.isInitialized) {
+                  if (_capturedImageBytes == null) {
+                    final image = await _cameraController!.takePicture();
+                    final bytes = await image.readAsBytes();
+                    setState(() {
+                      _capturedImageBytes = bytes;
+                    });
+                  } else {
+                    setState(() {
+                      _capturedImageBytes = null;
+                      _initializeCamera();
+                    });
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _capturedImageBytes == null
+                    ? const Color(0xFF222222)
+                    : const Color(0xFF222222),
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)),
+              ),
+              child: Text(
+                _capturedImageBytes == null
+                    ? 'Tomar Foto'
+                    : 'Tomar otra foto',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
             ),
           ),
           Positioned(
@@ -77,13 +150,15 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),
-              onPressed: validateAndContinue,
+              onPressed: _capturedImageBytes != null
+                  ? validateAndContinue
+                  : null,
               child: const Text(
                 'Continuar',
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

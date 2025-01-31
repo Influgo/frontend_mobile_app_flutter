@@ -5,15 +5,16 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
-class Step6RegisterPage extends StatefulWidget {
+class Step4_5RegisterPage extends StatefulWidget {
   final Function(Uint8List) onImageCaptured;
-  const Step6RegisterPage({super.key, required this.onImageCaptured});
+
+  const Step4_5RegisterPage({super.key, required this.onImageCaptured});
 
   @override
-  State<Step6RegisterPage> createState() => _Step6RegisterPageState();
+  State<Step4_5RegisterPage> createState() => _Step4_5RegisterPageState();
 }
 
-class _Step6RegisterPageState extends State<Step6RegisterPage> {
+class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
   CameraController? _cameraController;
   Uint8List? _capturedImageBytes;
   bool _isCameraInitialized = false;
@@ -44,7 +45,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
   void validateAndContinue() {
     if (_capturedImageBytes != null) {
       widget.onImageCaptured(_capturedImageBytes!);
-      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 6);
+      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4.5);
     }
   }
 
@@ -64,37 +65,14 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Foto de registro:',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                      ],
+                    child: Text(
+                      'Reverso de tu documento de identidad:',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tome una foto de su rostro',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 AspectRatio(
                   aspectRatio: 1,
                   child: Padding(
@@ -172,7 +150,9 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),
-              onPressed: validateAndContinue,
+              onPressed: _capturedImageBytes != null
+                  ? validateAndContinue
+                  : null,
               child: const Text(
                 'Continuar',
                 style: TextStyle(color: Colors.white, fontSize: 16),
