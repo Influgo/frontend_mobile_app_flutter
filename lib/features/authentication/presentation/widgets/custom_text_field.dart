@@ -20,11 +20,11 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLength: maxLength,
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.emailAddress,
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
         FilteringTextInputFormatter.allow(
-          RegExp(r"[a-zA-ZáéíóúÁÉÍÓÚñÑ '-]"),
+          RegExp(r"[a-zA-Z0-9@._-]"),
         ),
       ],
       onChanged: (value) {

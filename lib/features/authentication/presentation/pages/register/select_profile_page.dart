@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/hoverable_elevated_button.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:logger/logger.dart';
 
 class SelectProfilePage extends StatelessWidget {
-  final Function(String profile) onNextStep;
+  final Function(String) onNextStep;
 
-  const SelectProfilePage({
-    super.key,
-    required this.onNextStep,
-  });
+  const SelectProfilePage({super.key, required this.onNextStep});
+
+  void onProfileSelected(BuildContext context, String profile) {
+    var logger = Logger();
+    logger.i('Perfil seleccionado: $profile');
+    onNextStep(profile);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +47,12 @@ class SelectProfilePage extends StatelessWidget {
                 const SizedBox(height: 32),
                 HoverableElevatedButton(
                   text: 'Influencer',
-                  onPressed: () => onNextStep("Influencer"),
+                  onPressed: () => onProfileSelected(context, "Influencer"),
                 ),
                 const SizedBox(height: 16),
                 HoverableElevatedButton(
                   text: 'Emprendedor',
-                  onPressed: () => onNextStep("Emprendedor"),
+                  onPressed: () => onProfileSelected(context, "Emprendedor"),
                 ),
               ],
             ),

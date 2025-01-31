@@ -1,10 +1,13 @@
-import 'package:flutter/gestures.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:http/http.dart' as http;
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
-import '../../widgets/custom_text_field.dart';
-import '../../widgets/password_field.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_text_field.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_field.dart';
+import 'package:flutter/gestures.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,11 +19,53 @@ class LoginPage extends StatefulWidget {
 class LoginPageState extends State<LoginPage> {
   final TextEditingController _identifierController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final Logger logger = Logger();
 
-  void _validateAndLogin() {
-    setState(() {
-      // lógica auth, revisar en figma (pendiente el acceso)
-    });
+  Future<void> _validateAndLogin() async {
+    final String userIdentifier = _identifierController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    if (userIdentifier.isEmpty || password.isEmpty) {
+      _showSnackBar("Por favor, ingrese todos los campos");
+      return;
+    }
+
+    final Map<String, dynamic> requestBody = {
+      "userIdentifier": userIdentifier,
+      "password": password,
+    };
+
+    final url = Uri.parse('https://influyo-testing.ryzeon.me/api/v1/authentication/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      logger.i('Request Body: $requestBody');
+      logger.i('Response Status: ${response.statusCode}');
+      logger.i('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        _showSnackBar("Credenciales correctas, bienvenido a influyo!");
+      } else if (response.statusCode == 400) {
+        _showSnackBar("Credenciales incorrectas");
+      } else {
+        _showSnackBar("Error en el servidor, por favor intente nuevamente");
+      }
+    } catch (e) {
+      logger.e('Error en la conexión: $e');
+      _showSnackBar("Error en la conexión, por favor intente nuevamente");
+    }
+  }
+
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override

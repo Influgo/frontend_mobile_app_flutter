@@ -6,6 +6,8 @@ import 'package:frontend_mobile_app_flutter/core/errors/exceptions.dart';
 
 abstract class AuthRemoteDataSource {
   Future<void> requestPasswordReset(String email);
+  Future<http.Response> registerInfluencer(Map<String, dynamic> influencerData);
+  Future<http.Response> registerEntrepreneur(Map<String, dynamic> entrepreneurData);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -34,5 +36,31 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       } catch (e) {}
       throw ServerException(message: errorMessage);
     }
+  }
+
+  @override
+  Future<http.Response> registerInfluencer(Map<String, dynamic> influencerData) async {
+    final url = Uri.parse(APIHelper.buildUrl(registerInfluencerEndpoint).toString());
+    final response = await client.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(influencerData),
+    );
+    return response;
+  }
+
+  @override
+  Future<http.Response> registerEntrepreneur(Map<String, dynamic> entrepreneurData) async {
+    final url = Uri.parse(APIHelper.buildUrl(registerEntrepreneurEndpoint).toString());
+    final response = await client.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(entrepreneurData),
+    );
+    return response;
   }
 }

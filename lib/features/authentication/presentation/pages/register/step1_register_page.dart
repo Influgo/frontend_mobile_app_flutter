@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:logger/logger.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_email_field.dart';
 import '../../widgets/custom_number_field.dart';
@@ -9,7 +10,8 @@ import '../../widgets/password_field.dart';
 import '../../widgets/error_text_widget.dart';
 
 class Step1RegisterPage extends StatefulWidget {
-  const Step1RegisterPage({super.key});
+  final String profile;
+  const Step1RegisterPage({super.key, required this.profile});
 
   @override
   State<Step1RegisterPage> createState() => _Step1RegisterPageState();
@@ -24,8 +26,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   final RegExp emailRegExp = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
@@ -121,6 +122,22 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         passwordError,
         confirmPasswordError
       ].every((error) => error == null)) {
+        var logger = Logger();
+        Map<String, dynamic> requestBody = {
+          "names": firstNameController.text.trim(),
+          "lastNames": lastNameController.text.trim(),
+          "identificationType": selectedDocumentType == 'dni' ? 1 : 0,
+          "identificationNumber": selectedDocumentType == 'dni'
+              ? dniController.text.trim()
+              : selectedDocumentType == 'pasaporte'
+                  ? passportController.text.trim()
+                  : carnetController.text.trim(),
+          "email": emailController.text.trim(),
+          "phoneNumber": phoneController.text.trim(),
+          "password": passwordController.text.trim(),
+        };
+        logger.i('Request Body: $requestBody');
+        RegisterPage.updateRequestBody(context, requestBody);
         RegisterPage.goToNextStep(context);
       }
     });

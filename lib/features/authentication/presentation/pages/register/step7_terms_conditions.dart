@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 
 class Step7TermsConditionsPage extends StatefulWidget {
-  const Step7TermsConditionsPage({super.key});
+  final Map<String, dynamic> requestBody;
+
+  const Step7TermsConditionsPage({super.key, required this.requestBody});
 
   @override
   _Step7TermsConditionsPageState createState() =>
@@ -11,8 +16,52 @@ class Step7TermsConditionsPage extends StatefulWidget {
 }
 
 class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
-  void validateAndContinue() {
-    RegisterPage.goToNextStep(context);
+  final Logger logger = Logger();
+  final AuthRemoteDataSource authRemoteDataSource = AuthRemoteDataSourceImpl(client: http.Client());
+
+  Future<void> validateAndContinue() async {
+    final requestBody = widget.requestBody;
+
+    if (!requestBody.containsKey("entrepreneurshipName")) {
+      String alias = '';
+      for (var social in requestBody['socials']) {
+        if (social['name'] == 'Instagram' || social['name'] == 'Youtube') {
+          alias = social['socialUrl'].split('/').last;
+          break;
+        }
+      }
+      requestBody['alias'] = alias;
+    }
+
+    logger.i('Request Body in Step7: $requestBody');
+
+    try {
+      http.Response response;
+      if (requestBody.containsKey("entrepreneurshipName")) {
+        response = await authRemoteDataSource.registerEntrepreneur(requestBody);
+      } else {
+        response = await authRemoteDataSource.registerInfluencer(requestBody);
+      }
+
+      if (response.statusCode == 200) {
+        logger.i('Registro exitoso: ${response.body}');
+        if (mounted) {
+          _showSnackBar("Usuario registrado con éxito");
+          RegisterPage.goToNextStep(context);
+        }
+      } else {
+        logger.e('Error en el registro: ${response.body}');
+        _showSnackBar("Error en el registro: ${response.body}");
+      }
+    } catch (e) {
+      logger.e('Error en el registro: $e');
+      _showSnackBar("Error en el registro: $e");
+    }
+  }
+
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override

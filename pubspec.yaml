@@ -19,6 +19,8 @@ dependencies:
   get_it: ^7.6.4
   injectable: ^2.1.5
   cached_network_image: ^3.2.3
+  logger: ^1.0.0
+  fluttertoast: ^8.0.8
 
 dev_dependencies:
   flutter_test:

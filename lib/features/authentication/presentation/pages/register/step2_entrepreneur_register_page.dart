@@ -5,6 +5,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_separator.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:logger/logger.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_number_field.dart';
 import '../../widgets/error_text_widget.dart';
@@ -95,11 +96,46 @@ class _Step2EntrepreneurRegisterPageState
         youtubeEmpty,
         twitchEmpty
       ].every((error) => error == null)) {
+        var logger = Logger();
+        List<Map<String, String>> socials = [];
+
+        if (showInstagramField) {
+          socials.add({
+            "name": "Instagram",
+            "socialUrl": "https://instagram.com/${instagramController.text.trim()}"
+          });
+        }
+        if (showTiktokField) {
+          socials.add({
+            "name": "Tiktok",
+            "socialUrl": "https://www.tiktok.com/@${tiktokController.text.trim()}"
+          });
+        }
+        if (showYoutubeField) {
+          socials.add({
+            "name": "Youtube",
+            "socialUrl": "https://www.youtube.com/@${youtubeController.text.trim()}"
+          });
+        }
+        if (showTwitchField) {
+          socials.add({
+            "name": "Twitch",
+            "socialUrl": "https://www.twitch.tv/${twitchController.text.trim()}"
+          });
+        }
+
+        Map<String, dynamic> requestBody = {
+          "entrepreneurshipName": businessNameController.text.trim(),
+          "entrepreneursNickname": businessNicknameController.text.trim(),
+          "entrepreneurshipRUC": rucController.text.trim(),
+          "socials": socials,
+        };
+
+        logger.i('Request Body: $requestBody');
+        RegisterPage.updateRequestBody(context, requestBody);
         RegisterPage.goToNextStep(context);
       }
     });
-    // Descomentar para realizar pruebas sin validaciones:
-    //RegisterPage.goToNextStep(context);
   }
 
   @override

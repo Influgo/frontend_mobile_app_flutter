@@ -5,6 +5,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step7_terms_conditions.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step8_register_page.dart';
+import 'package:logger/logger.dart';
 import 'select_profile_page.dart';
 import 'step1_register_page.dart';
 import 'step2_entrepreneur_register_page.dart';
@@ -19,6 +20,11 @@ class RegisterPage extends StatefulWidget {
     state?._nextStep();
   }
 
+  static void updateRequestBody(BuildContext context, Map<String, dynamic> data) {
+    final state = context.findAncestorStateOfType<_RegisterPageState>();
+    state?._updateRequestBody(data);
+  }
+
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -27,8 +33,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
   late List<Widget> _pages;
-
   String _selectedProfile = "";
+  Map<String, dynamic> _requestBody = {};
+  final Logger logger = Logger();
 
   @override
   void initState() {
@@ -57,29 +64,36 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (_selectedProfile == "Influencer") {
         _pages.addAll([
-          const Step1RegisterPage(),
+          Step1RegisterPage(profile: _selectedProfile),
           const Step2InfluencerRegisterPage(),
           const Step3RegisterPage(),
           const Step4RegisterPage(),
           const Step5RegisterPage(),
           const Step6RegisterPage(),
-          const Step7TermsConditionsPage(),
+          Step7TermsConditionsPage(requestBody: _requestBody),
           const Step8RegisterPage(),
         ]);
       } else if (_selectedProfile == "Emprendedor") {
         _pages.addAll([
-          const Step1RegisterPage(),
+          Step1RegisterPage(profile: _selectedProfile),
           const Step2EntrepreneurRegisterPage(),
           const Step3RegisterPage(),
           const Step4RegisterPage(),
           const Step5RegisterPage(),
           const Step6RegisterPage(),
-          const Step7TermsConditionsPage(),
+          Step7TermsConditionsPage(requestBody: _requestBody),
           const Step8RegisterPage(),
         ]);
       }
     });
     _nextStep();
+  }
+
+  void _updateRequestBody(Map<String, dynamic> data) {
+    setState(() {
+      _requestBody.addAll(data);
+      logger.i('Updated Request Body: $_requestBody');
+    });
   }
 
   void _nextStep() {
