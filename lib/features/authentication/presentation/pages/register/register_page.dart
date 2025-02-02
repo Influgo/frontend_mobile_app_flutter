@@ -86,7 +86,12 @@ class _RegisterPageState extends State<RegisterPage> {
             _perfilImage = image;
             logger.i('Perfil Image Captured');
           }),
-          Step7TermsConditionsPage(requestBody: _requestBody),
+          Step7TermsConditionsPage(
+            requestBody: _requestBody,
+            anversoImage: _anversoImage,
+            reversoImage: _reversoImage,
+            perfilImage: _perfilImage,
+          ),
           const Step8RegisterPage(),
         ]);
       } else if (_selectedProfile == "Emprendedor") {
@@ -107,7 +112,12 @@ class _RegisterPageState extends State<RegisterPage> {
             _perfilImage = image;
             logger.i('Perfil Image Captured');
           }),
-          Step7TermsConditionsPage(requestBody: _requestBody),
+          Step7TermsConditionsPage(
+            requestBody: _requestBody,
+            anversoImage: _anversoImage,
+            reversoImage: _reversoImage,
+            perfilImage: _perfilImage,
+          ),
           const Step8RegisterPage(),
         ]);
       }

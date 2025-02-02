@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
@@ -7,8 +8,17 @@ import 'package:logger/logger.dart';
 
 class Step7TermsConditionsPage extends StatefulWidget {
   final Map<String, dynamic> requestBody;
+  final Uint8List? anversoImage;
+  final Uint8List? reversoImage;
+  final Uint8List? perfilImage;
 
-  const Step7TermsConditionsPage({super.key, required this.requestBody});
+  const Step7TermsConditionsPage({
+    super.key,
+    required this.requestBody,
+    this.anversoImage,
+    this.reversoImage,
+    this.perfilImage,
+  });
 
   @override
   _Step7TermsConditionsPageState createState() =>
@@ -47,6 +57,30 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
         logger.i('Registro exitoso: ${response.body}');
         if (mounted) {
           _showSnackBar("Usuario registrado con éxito");
+
+          if (widget.anversoImage == null || widget.reversoImage == null || widget.perfilImage == null) {
+            logger.e('Una o más imágenes son nulas');
+            _showSnackBar("Error: Una o más imágenes son nulas");
+            return;
+          }
+
+          final userEmail = requestBody['email'];
+
+          final validateResponse = await authRemoteDataSource.validateImages(
+            userIdentifier: userEmail,
+            documentFrontImage: widget.anversoImage!,
+            documentBackImage: widget.reversoImage!,
+            profileImage: widget.perfilImage!,
+          );
+
+          if (validateResponse.statusCode == 200) {
+            logger.i('Validación de imágenes exitosa: ${validateResponse.body}');
+            _showSnackBar("Validación de imágenes exitosa");
+          } else {
+            logger.e('Error en la validación de imágenes: ${validateResponse.body}');
+            _showSnackBar("Error en la validación de imágenes: ${validateResponse.body}");
+          }
+
           RegisterPage.goToNextStep(context);
         }
       } else {
@@ -66,6 +100,13 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool areImagesAvailable = widget.anversoImage != null && widget.reversoImage != null && widget.perfilImage != null;
+
+    logger.i('Estado de las imágenes en Step7:');
+    logger.i('Anverso Image: ${widget.anversoImage != null ? 'Disponible' : 'Nula'}');
+    logger.i('Reverso Image: ${widget.reversoImage != null ? 'Disponible' : 'Nula'}');
+    logger.i('Perfil Image: ${widget.perfilImage != null ? 'Disponible' : 'Nula'}');
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -152,7 +193,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  onPressed: validateAndContinue,
+                  onPressed: areImagesAvailable ? validateAndContinue : null,
                   child: const Text(
                     'Acepto y continuar',
                     style: TextStyle(color: Colors.white, fontSize: 16),

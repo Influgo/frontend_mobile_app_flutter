@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:logger/logger.dart';
 
 class Step6RegisterPage extends StatefulWidget {
   final Function(Uint8List) onImageCaptured;
@@ -17,6 +18,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
   CameraController? _cameraController;
   Uint8List? _capturedImageBytes;
   bool _isCameraInitialized = false;
+  final Logger logger = Logger();
 
   @override
   void initState() {
@@ -43,8 +45,11 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
 
   void validateAndContinue() {
     if (_capturedImageBytes != null) {
+      logger.i('Foto de perfil capturada: ${_capturedImageBytes!.length} bytes');
       widget.onImageCaptured(_capturedImageBytes!);
       RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 6);
+    } else {
+      logger.e('Foto de perfil es null');
     }
   }
 
@@ -137,6 +142,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                     setState(() {
                       _capturedImageBytes = bytes;
                     });
+                    logger.i('Foto de perfil capturada: ${bytes.length} bytes');
                   } else {
                     setState(() {
                       _capturedImageBytes = null;
@@ -172,7 +178,9 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),
-              onPressed: validateAndContinue,
+              onPressed: _capturedImageBytes != null
+                  ? validateAndContinue
+                  : null,
               child: const Text(
                 'Continuar',
                 style: TextStyle(color: Colors.white, fontSize: 16),

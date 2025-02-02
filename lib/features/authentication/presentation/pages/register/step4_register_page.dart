@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:logger/logger.dart';
 
 class Step4RegisterPage extends StatefulWidget {
   final Function(Uint8List) onImageCaptured;
@@ -18,6 +19,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
   CameraController? _cameraController;
   Uint8List? _capturedImageBytes;
   bool _isCameraInitialized = false;
+  final Logger logger = Logger();
 
   @override
   void initState() {
@@ -44,8 +46,11 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
 
   void validateAndContinue() {
     if (_capturedImageBytes != null) {
+      logger.i('La imagen anversa capturada con exito: ${_capturedImageBytes!.length} bytes');
       widget.onImageCaptured(_capturedImageBytes!);
       RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4);
+    } else {
+      logger.e('La imagen anversa es null');
     }
   }
 
@@ -115,6 +120,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
                     setState(() {
                       _capturedImageBytes = bytes;
                     });
+                    logger.i('La imagen anversa capturada: ${bytes.length} bytes');
                   } else {
                     setState(() {
                       _capturedImageBytes = null;
