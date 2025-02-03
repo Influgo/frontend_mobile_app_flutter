@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step3.5_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4.5_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step5_register_page.dart';
@@ -17,12 +18,14 @@ import 'step3_register_page.dart';
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
-  static void goToNextStep(BuildContext context, {Uint8List? image, double? step}) {
+  static void goToNextStep(BuildContext context,
+      {Uint8List? image, double? step}) {
     final state = context.findAncestorStateOfType<_RegisterPageState>();
     state?._nextStep(image: image, step: step?.toInt());
   }
 
-  static void updateRequestBody(BuildContext context, Map<String, dynamic> data) {
+  static void updateRequestBody(
+      BuildContext context, Map<String, dynamic> data) {
     final state = context.findAncestorStateOfType<_RegisterPageState>();
     state?._updateRequestBody(data);
   }

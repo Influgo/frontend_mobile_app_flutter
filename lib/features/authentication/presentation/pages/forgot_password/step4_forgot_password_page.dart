@@ -19,9 +19,8 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
+        backgroundColor: Colors.white,
+        body: Column(children: [
           const Padding(
             padding: EdgeInsets.only(top: 30, left: 16, right: 16),
             child: InfluyoLogo(),
@@ -70,9 +69,7 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ]));
   }
 }
