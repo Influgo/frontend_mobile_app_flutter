@@ -46,3 +46,4 @@ flutter:
   assets:
     - assets/images/influyo_logo.svg
     - assets/images/review.gif
+    - assets/images/check.gif

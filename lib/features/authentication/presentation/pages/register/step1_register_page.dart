@@ -273,6 +273,82 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
                         ),
                         if (confirmPasswordError != null)
                           ErrorTextWidget(error: confirmPasswordError!),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Recuerda que tu contraseña debe incluir:',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey),
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 8.0, right: 8.0, top: 8.0),
+                                    child: Icon(Icons.circle, size: 8),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'Entre 8 y 20 caracteres',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 8.0, right: 8.0, top: 8.0),
+                                    child: Icon(Icons.circle, size: 8),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'Al menos 1 letra mayúscula y 1 letra minúscula',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        left: 8.0, right: 8.0, top: 8.0),
+                                    child: Icon(Icons.circle, size: 8),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      '1 o más caracteres especiales',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.grey),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
