@@ -53,10 +53,8 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
               ],
             ),
           ),
-          Positioned(
-            bottom: 16,
-            left: 30,
-            right: 30,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16, left: 30, right: 30),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF222222),
@@ -70,8 +68,8 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:http/http.dart' as http;
@@ -8,16 +8,12 @@ import 'package:logger/logger.dart';
 
 class Step7TermsConditionsPage extends StatefulWidget {
   final Map<String, dynamic> requestBody;
-  final Uint8List? anversoImage;
-  final Uint8List? reversoImage;
-  final Uint8List? perfilImage;
+  final ValidationData validationData;
 
   const Step7TermsConditionsPage({
     super.key,
     required this.requestBody,
-    this.anversoImage,
-    this.reversoImage,
-    this.perfilImage,
+    required this.validationData,
   });
 
   @override
@@ -58,27 +54,16 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
         if (mounted) {
           _showSnackBar("Usuario registrado con éxito");
 
-          if (widget.anversoImage == null || widget.reversoImage == null || widget.perfilImage == null) {
-            logger.e('Una o más imágenes son nulas');
-            _showSnackBar("Error: Una o más imágenes son nulas");
-            return;
-          }
-
           final userEmail = requestBody['email'];
 
-          final validateResponse = await authRemoteDataSource.validateImages(
-            userIdentifier: userEmail,
-            documentFrontImage: widget.anversoImage!,
-            documentBackImage: widget.reversoImage!,
-            profileImage: widget.perfilImage!,
-          );
-
-          if (validateResponse.statusCode == 200) {
-            logger.i('Validación de imágenes exitosa: ${validateResponse.body}');
-            _showSnackBar("Validación de imágenes exitosa");
-          } else {
-            logger.e('Error en la validación de imágenes: ${validateResponse.body}');
-            _showSnackBar("Error en la validación de imágenes: ${validateResponse.body}");
+          try {
+            await authRemoteDataSource.validateImages(
+              userIdentifier: userEmail,
+              documentFrontImage: widget.validationData.anversoImage!,
+              documentBackImage: widget.validationData.reversoImage!,
+              profileImage: widget.validationData.perfilImage!,
+            );
+          } catch (e) {
           }
 
           RegisterPage.goToNextStep(context);
@@ -100,12 +85,14 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool areImagesAvailable = widget.anversoImage != null && widget.reversoImage != null && widget.perfilImage != null;
+    final bool areImagesAvailable = widget.validationData.anversoImage != null &&
+        widget.validationData.reversoImage != null &&
+        widget.validationData.perfilImage != null;
 
     logger.i('Estado de las imágenes en Step7:');
-    logger.i('Anverso Image: ${widget.anversoImage != null ? 'Disponible' : 'Nula'}');
-    logger.i('Reverso Image: ${widget.reversoImage != null ? 'Disponible' : 'Nula'}');
-    logger.i('Perfil Image: ${widget.perfilImage != null ? 'Disponible' : 'Nula'}');
+    logger.i('Anverso Image: ${widget.validationData.anversoImage != null ? 'Disponible' : 'Nula'}');
+    logger.i('Reverso Image: ${widget.validationData.reversoImage != null ? 'Disponible' : 'Nula'}');
+    logger.i('Perfil Image: ${widget.validationData.perfilImage != null ? 'Disponible' : 'Nula'}');
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -193,7 +180,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  onPressed: areImagesAvailable ? validateAndContinue : null,
+                  onPressed: validateAndContinue,
                   child: const Text(
                     'Acepto y continuar',
                     style: TextStyle(color: Colors.white, fontSize: 16),

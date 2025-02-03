@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4.5_register_page.dart';
@@ -17,12 +18,14 @@ import 'step3_register_page.dart';
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
-  static void goToNextStep(BuildContext context, {Uint8List? image, double? step}) {
+  static void goToNextStep(BuildContext context,
+      {Uint8List? image, double? step}) {
     final state = context.findAncestorStateOfType<_RegisterPageState>();
-    state?._nextStep(image: image, step: step?.toInt());
+    state?._nextStep();
   }
 
-  static void updateRequestBody(BuildContext context, Map<String, dynamic> data) {
+  static void updateRequestBody(
+      BuildContext context, Map<String, dynamic> data) {
     final state = context.findAncestorStateOfType<_RegisterPageState>();
     state?._updateRequestBody(data);
   }
@@ -33,15 +36,11 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final PageController _pageController = PageController();
-  int _currentStep = 0;
-  late List<Widget> _pages;
-  String _selectedProfile = "";
-  Map<String, dynamic> _requestBody = {};
+  final ValidationData _validationData = ValidationData();
   final Logger logger = Logger();
 
-  Uint8List? _anversoImage;
-  Uint8List? _reversoImage;
-  Uint8List? _perfilImage;
+  int _currentStep = 0;
+  late List<Widget> _pages;
 
   @override
   void initState() {
@@ -49,8 +48,10 @@ class _RegisterPageState extends State<RegisterPage> {
     _pages = [
       SelectProfilePage(
         onNextStep: (profile) {
-          _selectedProfile = profile;
-          _initializePages();
+          setState(() {
+            _validationData.selectedProfile = profile;
+            _initializePages();
+          });
         },
       ),
     ];
@@ -61,99 +62,88 @@ class _RegisterPageState extends State<RegisterPage> {
       _pages = [
         SelectProfilePage(
           onNextStep: (profile) {
-            _selectedProfile = profile;
+            _validationData.selectedProfile = profile;
             _initializePages();
           },
         ),
       ];
       _currentStep = 0;
 
-      if (_selectedProfile == "Influencer") {
-        _pages.addAll([
-          Step1RegisterPage(profile: _selectedProfile),
-          const Step2InfluencerRegisterPage(),
-          const Step3RegisterPage(),
-          Step4RegisterPage(onImageCaptured: (image) {
-            _anversoImage = image;
-            logger.i('Anverso Image Captured');
-          }),
-          Step4_5RegisterPage(onImageCaptured: (image) {
-            _reversoImage = image;
-            logger.i('Reverso Image Captured');
-          }),
-          Step5RegisterPage(),
-          Step6RegisterPage(onImageCaptured: (image) {
-            _perfilImage = image;
-            logger.i('Perfil Image Captured');
-          }),
-          Step7TermsConditionsPage(
-            requestBody: _requestBody,
-            anversoImage: _anversoImage,
-            reversoImage: _reversoImage,
-            perfilImage: _perfilImage,
-          ),
-          const Step8RegisterPage(),
-        ]);
-      } else if (_selectedProfile == "Emprendedor") {
-        _pages.addAll([
-          Step1RegisterPage(profile: _selectedProfile),
-          const Step2EntrepreneurRegisterPage(),
-          const Step3RegisterPage(),
-          Step4RegisterPage(onImageCaptured: (image) {
-            _anversoImage = image;
-            logger.i('Anverso Image Captured');
-          }),
-          Step4_5RegisterPage(onImageCaptured: (image) {
-            _reversoImage = image;
-            logger.i('Reverso Image Captured');
-          }),
-          Step5RegisterPage(),
-          Step6RegisterPage(onImageCaptured: (image) {
-            _perfilImage = image;
-            logger.i('Perfil Image Captured');
-          }),
-          Step7TermsConditionsPage(
-            requestBody: _requestBody,
-            anversoImage: _anversoImage,
-            reversoImage: _reversoImage,
-            perfilImage: _perfilImage,
-          ),
-          const Step8RegisterPage(),
-        ]);
+      if (_validationData.selectedProfile == "Influencer") {
+        _pages.addAll(_getInfluencerSteps());
+      } else if (_validationData.selectedProfile == "Emprendedor") {
+        _pages.addAll(_getEntrepreneurSteps());
       }
     });
     _nextStep();
   }
 
+  List<Widget> _getInfluencerSteps() {
+    return [
+      Step1RegisterPage(profile: _validationData.selectedProfile),
+      const Step2InfluencerRegisterPage(),
+      const Step3RegisterPage(),
+      Step4RegisterPage(onImageCaptured: (image) {
+        setState(() => _validationData.anversoImage = image);
+        logger.i('Anverso Image Captured');
+      }),
+      Step4_5RegisterPage(onImageCaptured: (image) {
+        setState(() => _validationData.reversoImage = image);
+        logger.i('Reverso Image Captured');
+      }),
+      Step5RegisterPage(),
+      Step6RegisterPage(onImageCaptured: (image) {
+        setState(() => _validationData.perfilImage = image);
+        logger.i('Perfil Image Captured');
+      }),
+      Step7TermsConditionsPage(
+        requestBody: _validationData.requestBody,
+        validationData: _validationData,
+      ),
+      const Step8RegisterPage(),
+    ];
+  }
+
+  List<Widget> _getEntrepreneurSteps() {
+    return [
+      Step1RegisterPage(profile: _validationData.selectedProfile),
+      const Step2EntrepreneurRegisterPage(),
+      const Step3RegisterPage(),
+      Step4RegisterPage(onImageCaptured: (image) {
+        setState(() => _validationData.anversoImage = image);
+        logger.i('Anverso Image Captured');
+      }),
+      Step4_5RegisterPage(onImageCaptured: (image) {
+        setState(() => _validationData.reversoImage = image);
+        logger.i('Reverso Image Captured');
+      }),
+      Step5RegisterPage(),
+      Step6RegisterPage(onImageCaptured: (image) {
+        setState(() => _validationData.perfilImage = image);
+        logger.i('Perfil Image Captured');
+      }),
+      Step7TermsConditionsPage(
+        requestBody: _validationData.requestBody,
+        validationData: _validationData,
+      ),
+      const Step8RegisterPage(),
+    ];
+  }
+
   void _updateRequestBody(Map<String, dynamic> data) {
     setState(() {
-      _requestBody.addAll(data);
-      logger.i('Updated Request Body: $_requestBody');
+      _validationData.requestBody.addAll(data);
+      logger.i('Updated Request Body: ${_validationData.requestBody}');
     });
   }
 
-  void _nextStep({Uint8List? image, int? step}) {
-    if (image != null && step != null) {
-      if (step == 4) {
-        _anversoImage = image;
-        logger.i('Anverso Image Captured');
-      } else if (step == 4.5) {
-        _reversoImage = image;
-        logger.i('Reverso Image Captured');
-      } else if (step == 6) {
-        _perfilImage = image;
-        logger.i('Perfil Image Captured');
-      }
-    }
-
+  void _nextStep() {
     if (_currentStep == 8) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     } else {
-      setState(() {
-        _currentStep++;
-      });
+      setState(() => _currentStep++);
       _pageController.jumpToPage(_currentStep);
     }
   }
