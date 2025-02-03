@@ -85,10 +85,6 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool areImagesAvailable = widget.validationData.anversoImage != null &&
-        widget.validationData.reversoImage != null &&
-        widget.validationData.perfilImage != null;
-
     logger.i('Estado de las imágenes en Step7:');
     logger.i('Anverso Image: ${widget.validationData.anversoImage != null ? 'Disponible' : 'Nula'}');
     logger.i('Reverso Image: ${widget.validationData.reversoImage != null ? 'Disponible' : 'Nula'}');

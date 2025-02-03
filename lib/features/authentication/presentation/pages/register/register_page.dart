@@ -173,15 +173,20 @@ class _RegisterPageState extends State<RegisterPage> {
             children: _pages,
           ),
           if (_currentStep >= 0 && _currentStep < 8)
-            Positioned(
-              top: 30,
-              left: 16,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black,
+            SafeArea(
+              child: Positioned(
+                top: 30,
+                left: 16,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.black,
+                    ),
+                    onPressed: _previousStep,
+                  ),
                 ),
-                onPressed: _previousStep,
               ),
             ),
         ],

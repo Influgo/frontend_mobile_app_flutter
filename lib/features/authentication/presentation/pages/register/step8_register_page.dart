@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_button.dart';
 
 class Step8RegisterPage extends StatelessWidget {
   final String title;

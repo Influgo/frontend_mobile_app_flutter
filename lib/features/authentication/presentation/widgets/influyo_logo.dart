@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class InfluyoLogo extends StatelessWidget {
   final double logoHeight;
@@ -11,15 +10,17 @@ class InfluyoLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Spacer(),
-        SvgPicture.asset(
-          'assets/images/influyo_logo.svg',
-          height: logoHeight,
-        ),
-        const Spacer(),
-      ],
+    return SafeArea(
+      child: Row(
+        children: [
+          const Spacer(),
+          Image.asset(
+            'assets/images/influyo_logo.png',
+            height: logoHeight,
+          ),
+          const Spacer(),
+        ],
+      ),
     );
   }
 }

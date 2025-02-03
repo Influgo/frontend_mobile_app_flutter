@@ -72,15 +72,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             children: _pages,
           ),
           if (_currentStep >= 0)
-            Positioned(
-              top: 30,
-              left: 16,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.black,
+            SafeArea(
+              child: Positioned(
+                top: 30,
+                left: 16,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.black,
+                    ),
+                    onPressed: _previousStep,
+                  ),
                 ),
-                onPressed: _previousStep,
               ),
             ),
         ],
