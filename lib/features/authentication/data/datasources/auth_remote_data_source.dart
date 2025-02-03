@@ -7,8 +7,10 @@ import 'package:frontend_mobile_app_flutter/core/errors/exceptions.dart';
 
 abstract class AuthRemoteDataSource {
   Future<void> requestPasswordReset(String email);
+  Future<http.Response> requestCheckToken(String token);
   Future<http.Response> registerInfluencer(Map<String, dynamic> influencerData);
-  Future<http.Response> registerEntrepreneur(Map<String, dynamic> entrepreneurData);
+  Future<http.Response> registerEntrepreneur(
+      Map<String, dynamic> entrepreneurData);
   Future<http.Response> validateImages({
     required String userIdentifier,
     required Uint8List documentFrontImage,
@@ -45,9 +47,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  Future<http.Response> requestCheckToken(String token) async {
+    final url = Uri.parse('${APIHelper.buildUrl(checkTokenEndpoint)}/$token');
+
+    final response = await client.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    return response;
+  }
+
   @override
-  Future<http.Response> registerInfluencer(Map<String, dynamic> influencerData) async {
-    final url = Uri.parse(APIHelper.buildUrl(registerInfluencerEndpoint).toString());
+  Future<http.Response> registerInfluencer(
+      Map<String, dynamic> influencerData) async {
+    final url =
+        Uri.parse(APIHelper.buildUrl(registerInfluencerEndpoint).toString());
     final response = await client.post(
       url,
       headers: {
@@ -59,8 +74,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<http.Response> registerEntrepreneur(Map<String, dynamic> entrepreneurData) async {
-    final url = Uri.parse(APIHelper.buildUrl(registerEntrepreneurEndpoint).toString());
+  Future<http.Response> registerEntrepreneur(
+      Map<String, dynamic> entrepreneurData) async {
+    final url =
+        Uri.parse(APIHelper.buildUrl(registerEntrepreneurEndpoint).toString());
     final response = await client.post(
       url,
       headers: {
@@ -78,7 +95,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required Uint8List documentBackImage,
     required Uint8List profileImage,
   }) async {
-    final url = Uri.parse(APIHelper.buildUrl(validateImagesEndpoint).toString());
+    final url =
+        Uri.parse(APIHelper.buildUrl(validateImagesEndpoint).toString());
     final request = http.MultipartRequest('POST', url)
       ..fields['userIdentifier'] = userIdentifier
       ..files.add(http.MultipartFile.fromBytes(

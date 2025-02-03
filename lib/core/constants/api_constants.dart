@@ -1,1 +1,1 @@
-const String baseUrl = "https://influyo-testing.ryzeon.me/api/v1";
+const String baseUrl = "https://influyo-testing.ryzeon.me";
