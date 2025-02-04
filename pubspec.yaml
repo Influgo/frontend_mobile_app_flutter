@@ -1,9 +1,9 @@
 name: frontend_mobile_app_flutter
-description: "A new Flutter project."
+description: "version 0.1.2"
 
 publish_to: "none"
 
-version: 1.0.0+1
+version: 0.1.2+1
 
 environment:
   sdk: ^3.6.0
@@ -32,9 +32,9 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/logo_app_influyo.svg"  
-  adaptive_icon_foreground: "assets/icons/logo_app_influyo.svg"  
-  adaptive_icon_background: "#ffffff"  
+  image_path: "assets/icons/logo_app_influyo.svg"
+  adaptive_icon_foreground: "assets/icons/logo_app_influyo.svg"
+  adaptive_icon_background: "#ffffff"
 
 flutter:
   uses-material-design: true
