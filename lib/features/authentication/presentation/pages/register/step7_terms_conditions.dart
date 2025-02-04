@@ -31,7 +31,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
     if (!requestBody.containsKey("entrepreneurshipName")) {
       String alias = '';
       for (var social in requestBody['socials']) {
-        if (social['name'] == 'Instagram' || social['name'] == 'Youtube') {
+        if (social['name'] == 'Instagram' || social['name'] == 'Tiktok') {
           alias = social['socialUrl'].split('/').last;
           break;
         }
@@ -64,6 +64,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
               profileImage: widget.validationData.perfilImage!,
             );
           } catch (e) {
+            logger.e('Error en la validación de imágenes: $e');
           }
 
           RegisterPage.goToNextStep(context);
