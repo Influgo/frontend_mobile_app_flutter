@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step3.5_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4.5_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step5_register_page.dart';
@@ -139,7 +138,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _nextStep() {
-    if (_currentStep == 8) {
+    if (_currentStep == 10) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginPage()),
       );
@@ -173,7 +172,7 @@ class _RegisterPageState extends State<RegisterPage> {
             physics: const NeverScrollableScrollPhysics(),
             children: _pages,
           ),
-          if (_currentStep >= 0 && _currentStep < 8)
+          if (_currentStep >= 0 && _currentStep < 9)
             SafeArea(
               child: Positioned(
                 top: 30,

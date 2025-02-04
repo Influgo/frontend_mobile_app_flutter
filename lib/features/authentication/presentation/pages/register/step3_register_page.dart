@@ -138,7 +138,7 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
             ),
           ),
           Positioned(
-            bottom: 80,
+            bottom: 125,
             left: 30,
             right: 30,
             child: Row(
@@ -152,50 +152,54 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                     });
                   },
                 ),
-                GestureDetector(
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Step3_5RegisterPage(),
-                      ),
-                    );
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Step3_5RegisterPage(),
+                        ),
+                      );
 
-                    if (result == true) {
-                      setState(() {
-                        _acceptTermsAndConditions = true;
-                      });
-                    }
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        const TextSpan(
-                          text: 'He leído y acepto el ',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
+                      if (result == true) {
+                        setState(() {
+                          _acceptTermsAndConditions = true;
+                        });
+                      }
+                    },
+                    child: RichText(
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'He leído y acepto el ',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: 'Tratamiento de datos personales',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            decoration: TextDecoration.underline,
-                            foreground: Paint()
-                              ..shader = const LinearGradient(
-                                colors: [
-                                  Color(0xFFC20B0C),
-                                  Color(0xFF7E0F9D),
-                                  Color(0xFF2616C7)
-                                ],
-                              ).createShader(
-                                  const Rect.fromLTWH(0, 0, 200, 20)),
+                          TextSpan(
+                            text: 'Tratamiento de datos personales',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              decoration: TextDecoration.underline,
+                              foreground: Paint()
+                                ..shader = const LinearGradient(
+                                  colors: [
+                                    Color(0xFFC20B0C),
+                                    Color(0xFF7E0F9D),
+                                    Color(0xFF2616C7)
+                                  ],
+                                ).createShader(
+                                    const Rect.fromLTWH(0, 0, 200, 20)),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -46,7 +46,8 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
 
   void validateAndContinue() {
     if (_capturedImageBytes != null) {
-      logger.i('La imagen inversa capturada: ${_capturedImageBytes!.length} bytes');
+      logger.i(
+          'La imagen inversa capturada: ${_capturedImageBytes!.length} bytes');
       widget.onImageCaptured(_capturedImageBytes!);
       RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4.5);
     } else {
@@ -67,13 +68,14 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
                 const InfluyoLogo(),
                 GradientBars(barCount: 3),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Reverso de tu documento de identidad:',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ),
@@ -108,19 +110,21 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
             ),
           ),
           Positioned(
-            bottom: 80,
+            bottom: 96,
             left: 30,
             right: 30,
             child: ElevatedButton(
               onPressed: () async {
-                if (_cameraController != null && _cameraController!.value.isInitialized) {
+                if (_cameraController != null &&
+                    _cameraController!.value.isInitialized) {
                   if (_capturedImageBytes == null) {
                     final image = await _cameraController!.takePicture();
                     final bytes = await image.readAsBytes();
                     setState(() {
                       _capturedImageBytes = bytes;
                     });
-                    logger.i('La imagen inversa capturada: ${bytes.length} bytes');
+                    logger.i(
+                        'La imagen inversa capturada: ${bytes.length} bytes');
                   } else {
                     setState(() {
                       _capturedImageBytes = null;
@@ -138,9 +142,7 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
                     borderRadius: BorderRadius.circular(5)),
               ),
               child: Text(
-                _capturedImageBytes == null
-                    ? 'Tomar Foto'
-                    : 'Tomar otra foto',
+                _capturedImageBytes == null ? 'Tomar Foto' : 'Tomar otra foto',
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
@@ -156,9 +158,8 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),
-              onPressed: _capturedImageBytes != null
-                  ? validateAndContinue
-                  : null,
+              onPressed:
+                  _capturedImageBytes != null ? validateAndContinue : null,
               child: const Text(
                 'Continuar',
                 style: TextStyle(color: Colors.white, fontSize: 16),

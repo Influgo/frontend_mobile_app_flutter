@@ -6,6 +6,7 @@ class CustomUsernameField extends StatelessWidget {
   final TextEditingController controller;
   final String? errorText;
   final int maxLength;
+  final FocusNode? focusNode;
 
   const CustomUsernameField({
     super.key,
@@ -13,12 +14,14 @@ class CustomUsernameField extends StatelessWidget {
     required this.controller,
     this.errorText,
     required this.maxLength,
+    this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       maxLength: maxLength - 1,
       keyboardType: TextInputType.text,
       inputFormatters: [

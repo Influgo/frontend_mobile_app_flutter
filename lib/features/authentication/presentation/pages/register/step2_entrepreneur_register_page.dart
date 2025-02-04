@@ -29,6 +29,11 @@ class _Step2EntrepreneurRegisterPageState
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController twitchController = TextEditingController();
 
+  final FocusNode instagramFocusNode = FocusNode();
+  final FocusNode tiktokFocusNode = FocusNode();
+  final FocusNode youtubeFocusNode = FocusNode();
+  final FocusNode twitchFocusNode = FocusNode();
+
   bool showInstagramField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
@@ -42,6 +47,15 @@ class _Step2EntrepreneurRegisterPageState
   String? tiktokEmpty;
   String? youtubeEmpty;
   String? twitchEmpty;
+
+  @override
+  void dispose() {
+    instagramFocusNode.dispose();
+    tiktokFocusNode.dispose();
+    youtubeFocusNode.dispose();
+    twitchFocusNode.dispose();
+    super.dispose();
+  }
 
   void validateAndContinue() {
     setState(() {
@@ -102,19 +116,22 @@ class _Step2EntrepreneurRegisterPageState
         if (showInstagramField) {
           socials.add({
             "name": "Instagram",
-            "socialUrl": "https://instagram.com/${instagramController.text.trim()}"
+            "socialUrl":
+                "https://instagram.com/${instagramController.text.trim()}"
           });
         }
         if (showTiktokField) {
           socials.add({
             "name": "Tiktok",
-            "socialUrl": "https://www.tiktok.com/@${tiktokController.text.trim()}"
+            "socialUrl":
+                "https://www.tiktok.com/@${tiktokController.text.trim()}"
           });
         }
         if (showYoutubeField) {
           socials.add({
             "name": "Youtube",
-            "socialUrl": "https://www.youtube.com/@${youtubeController.text.trim()}"
+            "socialUrl":
+                "https://www.youtube.com/@${youtubeController.text.trim()}"
           });
         }
         if (showTwitchField) {
@@ -133,6 +150,7 @@ class _Step2EntrepreneurRegisterPageState
 
         logger.i('Request Body: $requestBody');
         RegisterPage.updateRequestBody(context, requestBody);
+        FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
       }
     });
@@ -225,6 +243,13 @@ class _Step2EntrepreneurRegisterPageState
                                 setState(() {
                                   showInstagramField = value ?? false;
                                 });
+                                if (showInstagramField) {
+                                  Future.delayed(Duration(milliseconds: 100),
+                                      () {
+                                    FocusScope.of(context)
+                                        .requestFocus(instagramFocusNode);
+                                  });
+                                }
                               },
                               activeColor: Colors.black,
                             ),
@@ -236,6 +261,7 @@ class _Step2EntrepreneurRegisterPageState
                             label: 'Usuario de Instagram',
                             controller: instagramController,
                             maxLength: 100,
+                            focusNode: instagramFocusNode,
                           ),
                           if (instagramEmpty != null)
                             ErrorTextWidget(error: instagramEmpty!),
@@ -256,6 +282,13 @@ class _Step2EntrepreneurRegisterPageState
                                 setState(() {
                                   showTiktokField = value ?? false;
                                 });
+                                if (showTiktokField) {
+                                  Future.delayed(Duration(milliseconds: 100),
+                                      () {
+                                    FocusScope.of(context)
+                                        .requestFocus(tiktokFocusNode);
+                                  });
+                                }
                               },
                               activeColor: Colors.black,
                             ),
@@ -267,6 +300,7 @@ class _Step2EntrepreneurRegisterPageState
                             label: 'Usuario de Tiktok',
                             controller: tiktokController,
                             maxLength: 100,
+                            focusNode: tiktokFocusNode,
                           ),
                           if (tiktokEmpty != null)
                             ErrorTextWidget(error: tiktokEmpty!),
@@ -294,6 +328,13 @@ class _Step2EntrepreneurRegisterPageState
                                 setState(() {
                                   showYoutubeField = value ?? false;
                                 });
+                                if (showYoutubeField) {
+                                  Future.delayed(Duration(milliseconds: 100),
+                                      () {
+                                    FocusScope.of(context)
+                                        .requestFocus(youtubeFocusNode);
+                                  });
+                                }
                               },
                               activeColor: Colors.black,
                             ),
@@ -305,6 +346,7 @@ class _Step2EntrepreneurRegisterPageState
                             label: 'Canal de Youtube',
                             controller: youtubeController,
                             maxLength: 100,
+                            focusNode: youtubeFocusNode,
                           ),
                           if (youtubeEmpty != null)
                             ErrorTextWidget(error: youtubeEmpty!),
@@ -325,6 +367,13 @@ class _Step2EntrepreneurRegisterPageState
                                 setState(() {
                                   showTwitchField = value ?? false;
                                 });
+                                if (showTwitchField) {
+                                  Future.delayed(Duration(milliseconds: 100),
+                                      () {
+                                    FocusScope.of(context)
+                                        .requestFocus(twitchFocusNode);
+                                  });
+                                }
                               },
                               activeColor: Colors.black,
                             ),
@@ -336,6 +385,7 @@ class _Step2EntrepreneurRegisterPageState
                             label: 'Canal de Twitch',
                             controller: twitchController,
                             maxLength: 100,
+                            focusNode: twitchFocusNode,
                           ),
                           if (twitchEmpty != null)
                             ErrorTextWidget(error: twitchEmpty!),

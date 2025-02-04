@@ -100,15 +100,20 @@ class _Step3_5RegisterPageState extends State<Step3_5RegisterPage> {
               ),
             ),
           ),
-          Positioned(
-            top: 30,
-            left: 16,
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
+          SafeArea(
+            child: Positioned(
+              top: 30,
+              left: 16,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.black,
+                  ),
+                  onPressed: goBack,
+                ),
               ),
-              onPressed: goBack,
             ),
           ),
         ],

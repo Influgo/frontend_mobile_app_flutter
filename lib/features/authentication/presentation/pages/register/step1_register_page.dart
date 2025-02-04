@@ -3,6 +3,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_email_field.dart';
 import '../../widgets/custom_number_field.dart';
@@ -45,7 +46,9 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
   String? passwordError;
   String? confirmPasswordError;
 
-  void validateAndContinue() {
+  void validateAndContinue() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('acceptTermsAndConditions', false);
     setState(() {
       firstNameError = firstNameController.text.trim().isEmpty
           ? 'Nombres es requerido'
@@ -139,11 +142,13 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         };
         logger.i('Request Body: $requestBody');
         RegisterPage.updateRequestBody(context, requestBody);
+        FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
       }
     });
-    // Descomentar para realizar pruebas sin validaciones:
-    //RegisterPage.goToNextStep(context);
+    // COMENTAR
+    FocusScope.of(context).unfocus();
+    RegisterPage.goToNextStep(context);
   }
 
   @override
