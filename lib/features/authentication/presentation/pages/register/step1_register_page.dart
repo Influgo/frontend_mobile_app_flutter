@@ -146,9 +146,9 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         RegisterPage.goToNextStep(context);
       }
     });
-    // COMENTAR
     FocusScope.of(context).unfocus();
-    RegisterPage.goToNextStep(context);
+    // COMENTAR
+    //RegisterPage.goToNextStep(context);
   }
 
   @override
