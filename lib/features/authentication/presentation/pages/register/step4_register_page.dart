@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
@@ -32,6 +33,8 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
     if (cameras.isNotEmpty) {
       _cameraController = CameraController(cameras[0], ResolutionPreset.high);
       await _cameraController!.initialize();
+      await _cameraController!
+          .lockCaptureOrientation(DeviceOrientation.portraitUp);
       setState(() {
         _isCameraInitialized = true;
       });
@@ -88,7 +91,10 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
                         ? _isCameraInitialized
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: CameraPreview(_cameraController!),
+                                child: Transform.rotate(
+                                  angle: 1.5708,
+                                  child: CameraPreview(_cameraController!),
+                                ),
                               )
                             : const Center(
                                 child: CircularProgressIndicator(),

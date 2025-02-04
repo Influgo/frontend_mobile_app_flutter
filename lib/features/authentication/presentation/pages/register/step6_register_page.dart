@@ -28,13 +28,15 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
-    if (cameras.isNotEmpty) {
-      _cameraController = CameraController(cameras[0], ResolutionPreset.high);
-      await _cameraController!.initialize();
-      setState(() {
-        _isCameraInitialized = true;
-      });
-    }
+    final frontCamera = cameras.firstWhere(
+      (camera) => camera.lensDirection == CameraLensDirection.front,
+      orElse: () => cameras.first,
+    );
+    _cameraController = CameraController(frontCamera, ResolutionPreset.high);
+    await _cameraController!.initialize();
+    setState(() {
+      _isCameraInitialized = true;
+    });
   }
 
   @override
@@ -110,7 +112,12 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                         ? _isCameraInitialized
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: CameraPreview(_cameraController!),
+                                child: Transform.rotate(
+                                  angle: -90 *
+                                      3.1416 /
+                                      180, // Rotar 90 grados en sentido antihorario
+                                  child: CameraPreview(_cameraController!),
+                                ),
                               )
                             : const Center(
                                 child: CircularProgressIndicator(),
