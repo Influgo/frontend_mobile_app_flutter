@@ -4,7 +4,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../widgets/custom_name_field.dart';
 import '../../widgets/custom_email_field.dart';
 import '../../widgets/custom_number_field.dart';
 import '../../widgets/password_field.dart';
@@ -192,7 +192,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 16.0),
                       children: [
-                        CustomTextField(
+                        CustomNameField(
                           label: 'Nombres',
                           controller: firstNameController,
                           maxLength: 100,
@@ -200,7 +200,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
                         if (firstNameError != null)
                           ErrorTextWidget(error: firstNameError!),
                         const SizedBox(height: 16),
-                        CustomTextField(
+                        CustomNameField(
                           label: 'Apellidos',
                           controller: lastNameController,
                           maxLength: 100,

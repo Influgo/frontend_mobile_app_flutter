@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomEmailOrNumberField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String? errorText;
   final int maxLength;
 
-  const CustomTextField({
+  const CustomEmailOrNumberField({
     super.key,
     required this.label,
     required this.controller,
@@ -20,21 +20,21 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLength: maxLength,
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.text,
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
         FilteringTextInputFormatter.allow(
-          RegExp(r"[a-zA-Z0-9@._-]"),
+          RegExp(
+              r"[a-zA-Z0-9@._+-]"), // Permite letras, números, '@', '.', '_', '+', y '-'
         ),
       ],
       onChanged: (value) {
         String newValue = value;
 
-        if (newValue.startsWith(' ')) {
-          newValue = newValue.trimLeft();
+        // Aseguramos que el formato del texto sea adecuado
+        if (newValue.contains('@')) {
+          newValue = _formatEmail(newValue); // Formato específico para correos
         }
-
-        newValue = newValue.replaceAll(RegExp(r'\s{2,}'), ' ');
 
         if (newValue != value) {
           controller.value = TextEditingValue(
@@ -58,5 +58,10 @@ class CustomTextField extends StatelessWidget {
         counterText: "",
       ),
     );
+  }
+
+  // Función para asegurar que el correo tenga el formato correcto (minúsculas)
+  String _formatEmail(String email) {
+    return email.toLowerCase();
   }
 }

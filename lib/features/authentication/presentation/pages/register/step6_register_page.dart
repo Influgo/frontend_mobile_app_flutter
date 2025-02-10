@@ -113,9 +113,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Transform.rotate(
-                                  angle: -90 *
-                                      3.1416 /
-                                      180, // Rotar 90 grados en sentido antihorario
+                                  angle: -90 * 3.1416 / 180,
                                   child: CameraPreview(_cameraController!),
                                 ),
                               )
