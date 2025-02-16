@@ -24,16 +24,14 @@ class CustomEmailOrNumberField extends StatelessWidget {
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
         FilteringTextInputFormatter.allow(
-          RegExp(
-              r"[a-zA-Z0-9@._+-]"), // Permite letras, números, '@', '.', '_', '+', y '-'
+          RegExp(r"[a-zA-Z0-9@._+-]"),
         ),
       ],
       onChanged: (value) {
         String newValue = value;
 
-        // Aseguramos que el formato del texto sea adecuado
         if (newValue.contains('@')) {
-          newValue = _formatEmail(newValue); // Formato específico para correos
+          newValue = _formatEmail(newValue);
         }
 
         if (newValue != value) {
@@ -60,7 +58,6 @@ class CustomEmailOrNumberField extends StatelessWidget {
     );
   }
 
-  // Función para asegurar que el correo tenga el formato correcto (minúsculas)
   String _formatEmail(String email) {
     return email.toLowerCase();
   }
