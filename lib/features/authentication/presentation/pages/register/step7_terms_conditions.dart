@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
@@ -50,6 +52,33 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
     await prefs.remove('show_tiktok_field_register');
     await prefs.remove('show_youtube_field_register');
     await prefs.remove('show_twitch_field_register');
+    await prefs.remove('saved_image_path_doc_front');
+    await prefs.remove('saved_image_path_doc_rev');
+  }
+
+  Future<void> deleteStoredPhotos() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final photoNames = [
+        'document_front.jpg',
+        'document_rev.jpg',
+        'selfie_register.jpg'
+      ];
+
+      for (final photoName in photoNames) {
+        final filePath = '${directory.path}/$photoName';
+        final file = File(filePath);
+
+        if (await file.exists()) {
+          await file.delete();
+          print('$photoName eliminada exitosamente');
+        } else {
+          print('$photoName no se encontró para eliminar');
+        }
+      }
+    } catch (e) {
+      print('Error al intentar eliminar las fotos: $e');
+    }
   }
 
   Future<void> validateAndContinue() async {
@@ -94,6 +123,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
             logger.e('Error en la validación de imágenes: $e');
           }
           _deleteLocalData();
+          deleteStoredPhotos();
           RegisterPage.goToNextStep(context);
         }
       } else {
