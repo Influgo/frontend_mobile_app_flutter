@@ -1,7 +1,9 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
@@ -26,6 +28,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
   void initState() {
     super.initState();
     _initializeCamera();
+    _loadSavedImage();
   }
 
   Future<void> _initializeCamera() async {
@@ -41,6 +44,27 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
     }
   }
 
+  Future<void> _loadSavedImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final imagePath = prefs.getString('saved_image_path_doc_front');
+    if (imagePath != null && File(imagePath).existsSync()) {
+      final imageBytes = await File(imagePath).readAsBytes();
+      setState(() {
+        _capturedImageBytes = imageBytes;
+      });
+    }
+  }
+
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/document_front.jpg';
+    final imageFile = File(imagePath);
+    await imageFile.writeAsBytes(imageBytes);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_image_path_doc_front', imagePath);
+  }
+
   @override
   void dispose() {
     _cameraController?.dispose();
@@ -50,7 +74,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
   void validateAndContinue() {
     if (_capturedImageBytes != null) {
       logger.i(
-          'La imagen anversa capturada con exito: ${_capturedImageBytes!.length} bytes');
+          'La imagen anversa capturada con éxito: ${_capturedImageBytes!.length} bytes');
       widget.onImageCaptured(_capturedImageBytes!);
       RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4);
     } else {
@@ -96,9 +120,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
                                   child: CameraPreview(_cameraController!),
                                 ),
                               )
-                            : const Center(
-                                child: CircularProgressIndicator(),
-                              )
+                            : const Center(child: CircularProgressIndicator())
                         : Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey, width: 2),
@@ -126,6 +148,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
                   if (_capturedImageBytes == null) {
                     final image = await _cameraController!.takePicture();
                     final bytes = await image.readAsBytes();
+                    await _saveImage(bytes);
                     setState(() {
                       _capturedImageBytes = bytes;
                     });

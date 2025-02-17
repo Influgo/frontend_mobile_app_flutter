@@ -1,7 +1,9 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
@@ -26,6 +28,8 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
   void initState() {
     super.initState();
     _initializeCamera();
+    _loadSavedImage();
+    _takePhotoAutomatically();
   }
 
   Future<void> _initializeCamera() async {
@@ -41,6 +45,41 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
     }
   }
 
+  Future<void> _loadSavedImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final imagePath = prefs.getString('saved_image_path_doc_rev');
+    if (imagePath != null && File(imagePath).existsSync()) {
+      final imageBytes = await File(imagePath).readAsBytes();
+      setState(() {
+        _capturedImageBytes = imageBytes;
+      });
+      logger
+          .i('Imagen cargada desde almacenamiento: ${imageBytes.length} bytes');
+    }
+  }
+
+  Future<void> _takePhotoAutomatically() async {
+    if (_cameraController != null && _cameraController!.value.isInitialized) {
+      final image = await _cameraController!.takePicture();
+      final bytes = await image.readAsBytes();
+      await _saveImage(bytes);
+      setState(() {
+        _capturedImageBytes = bytes;
+      });
+      logger.i('Imagen tomada automáticamente: ${bytes.length} bytes');
+    }
+  }
+
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/document_rev.jpg';
+    final imageFile = File(imagePath);
+    await imageFile.writeAsBytes(imageBytes);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_image_path_doc_rev', imagePath);
+  }
+
   @override
   void dispose() {
     _cameraController?.dispose();
@@ -50,11 +89,11 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
   void validateAndContinue() {
     if (_capturedImageBytes != null) {
       logger.i(
-          'La imagen inversa capturada: ${_capturedImageBytes!.length} bytes');
+          'La imagen reversa capturada con éxito: ${_capturedImageBytes!.length} bytes');
       widget.onImageCaptured(_capturedImageBytes!);
-      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4.5);
+      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 5);
     } else {
-      logger.e('La imagen inversa capturada es null');
+      logger.e('La imagen reversa es null');
     }
   }
 
@@ -96,9 +135,7 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
                                   child: CameraPreview(_cameraController!),
                                 ),
                               )
-                            : const Center(
-                                child: CircularProgressIndicator(),
-                              )
+                            : const Center(child: CircularProgressIndicator())
                         : Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey, width: 2),
@@ -126,11 +163,12 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
                   if (_capturedImageBytes == null) {
                     final image = await _cameraController!.takePicture();
                     final bytes = await image.readAsBytes();
+                    await _saveImage(bytes);
                     setState(() {
                       _capturedImageBytes = bytes;
                     });
                     logger.i(
-                        'La imagen inversa capturada: ${bytes.length} bytes');
+                        'La imagen reversa capturada: ${bytes.length} bytes');
                   } else {
                     setState(() {
                       _capturedImageBytes = null;

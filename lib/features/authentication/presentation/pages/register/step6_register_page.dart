@@ -1,6 +1,9 @@
 import 'dart:typed_data';
+import 'dart:io'; // Importa la librería de IO para manejar archivos.
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
@@ -24,6 +27,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
   void initState() {
     super.initState();
     _initializeCamera();
+    _loadSavedImage(); // Cargar la imagen guardada al iniciar el widget.
   }
 
   Future<void> _initializeCamera() async {
@@ -37,6 +41,27 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
     setState(() {
       _isCameraInitialized = true;
     });
+  }
+
+  // Cargar la imagen guardada desde el almacenamiento local.
+  Future<void> _loadSavedImage() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/selfie_register.jpg';
+    final imageFile = File(imagePath);
+    if (await imageFile.exists()) {
+      final imageBytes = await imageFile.readAsBytes();
+      setState(() {
+        _capturedImageBytes = imageBytes;
+      });
+    }
+  }
+
+  // Guardar la imagen con el nombre 'selfie_register.jpg'.
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final imagePath = '${directory.path}/selfie_register.jpg';
+    final imageFile = File(imagePath);
+    await imageFile.writeAsBytes(imageBytes);
   }
 
   @override
@@ -117,9 +142,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                                   child: CameraPreview(_cameraController!),
                                 ),
                               )
-                            : const Center(
-                                child: CircularProgressIndicator(),
-                              )
+                            : const Center(child: CircularProgressIndicator())
                         : Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey, width: 2),
@@ -147,6 +170,8 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                   if (_capturedImageBytes == null) {
                     final image = await _cameraController!.takePicture();
                     final bytes = await image.readAsBytes();
+                    await _saveImage(
+                        bytes); // Guardar la imagen con el nombre 'selfie_register.jpg'
                     setState(() {
                       _capturedImageBytes = bytes;
                     });
