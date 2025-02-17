@@ -5,6 +5,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Step7TermsConditionsPage extends StatefulWidget {
   final Map<String, dynamic> requestBody;
@@ -23,7 +24,33 @@ class Step7TermsConditionsPage extends StatefulWidget {
 
 class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
   final Logger logger = Logger();
-  final AuthRemoteDataSource authRemoteDataSource = AuthRemoteDataSourceImpl(client: http.Client());
+  final AuthRemoteDataSource authRemoteDataSource =
+      AuthRemoteDataSourceImpl(client: http.Client());
+
+  Future<void> _deleteLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('first_name_register');
+    await prefs.remove('last_name_register');
+    await prefs.remove('dni_register');
+    await prefs.remove('passport_register');
+    await prefs.remove('carnet_register');
+    await prefs.remove('email_register');
+    await prefs.remove('phone_register');
+    await prefs.remove('password_register');
+    await prefs.remove('confirm_password_register');
+    await prefs.remove('document_type_register');
+    await prefs.remove('business_name_register');
+    await prefs.remove('business_nickname_register');
+    await prefs.remove('ruc_register');
+    await prefs.remove('instagram_register');
+    await prefs.remove('tiktok_register');
+    await prefs.remove('youtube_register');
+    await prefs.remove('twitch_register');
+    await prefs.remove('show_instagram_field_register');
+    await prefs.remove('show_tiktok_field_register');
+    await prefs.remove('show_youtube_field_register');
+    await prefs.remove('show_twitch_field_register');
+  }
 
   Future<void> validateAndContinue() async {
     final requestBody = widget.requestBody;
@@ -66,7 +93,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
           } catch (e) {
             logger.e('Error en la validación de imágenes: $e');
           }
-
+          _deleteLocalData();
           RegisterPage.goToNextStep(context);
         }
       } else {
@@ -87,9 +114,12 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
   @override
   Widget build(BuildContext context) {
     logger.i('Estado de las imágenes en Step7:');
-    logger.i('Anverso Image: ${widget.validationData.anversoImage != null ? 'Disponible' : 'Nula'}');
-    logger.i('Reverso Image: ${widget.validationData.reversoImage != null ? 'Disponible' : 'Nula'}');
-    logger.i('Perfil Image: ${widget.validationData.perfilImage != null ? 'Disponible' : 'Nula'}');
+    logger.i(
+        'Anverso Image: ${widget.validationData.anversoImage != null ? 'Disponible' : 'Nula'}');
+    logger.i(
+        'Reverso Image: ${widget.validationData.reversoImage != null ? 'Disponible' : 'Nula'}');
+    logger.i(
+        'Perfil Image: ${widget.validationData.perfilImage != null ? 'Disponible' : 'Nula'}');
 
     return Scaffold(
       backgroundColor: Colors.white,
