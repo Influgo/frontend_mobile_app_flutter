@@ -46,6 +46,47 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
   String? passwordError;
   String? confirmPasswordError;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      firstNameController.text = prefs.getString('first_name_register') ?? '';
+      lastNameController.text = prefs.getString('last_name_register') ?? '';
+      dniController.text = prefs.getString('dni_register') ?? '';
+      passportController.text = prefs.getString('passport_register') ?? '';
+      carnetController.text = prefs.getString('carnet_register') ?? '';
+      emailController.text = prefs.getString('email_register') ?? '';
+      phoneController.text = prefs.getString('phone_register') ?? '';
+      passwordController.text = prefs.getString('password_register') ?? '';
+      confirmPasswordController.text =
+          prefs.getString('confirm_password_register') ?? '';
+      selectedDocumentType = prefs.getString('document_type_register') ?? 'dni';
+    });
+  }
+
+  Future<void> _saveDataLocally() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString('first_name_register', firstNameController.text);
+    await prefs.setString('last_name_register', lastNameController.text);
+    await prefs.setString('dni_register', dniController.text);
+    await prefs.setString('passport_register', passportController.text);
+    await prefs.setString('carnet_register', carnetController.text);
+    await prefs.setString('email_register', emailController.text);
+    await prefs.setString('phone_register', phoneController.text);
+    await prefs.setString('password_register', passwordController.text);
+    await prefs.setString(
+        'confirm_password_register', confirmPasswordController.text);
+    await prefs.setString(
+        'document_type_register', selectedDocumentType ?? 'dni');
+  }
+
   void validateAndContinue() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('acceptTermsAndConditions', false);
@@ -141,6 +182,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
           "password": passwordController.text.trim(),
         };
         logger.i('Request Body: $requestBody');
+        _saveDataLocally();
         RegisterPage.updateRequestBody(context, requestBody);
         FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
@@ -149,6 +191,20 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
     FocusScope.of(context).unfocus();
     // COMENTAR
     //RegisterPage.goToNextStep(context);
+  }
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    dniController.dispose();
+    passportController.dispose();
+    carnetController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override

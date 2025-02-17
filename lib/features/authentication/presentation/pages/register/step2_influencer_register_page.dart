@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_username_field.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/form_separator.dart';
@@ -37,6 +38,37 @@ class _Step2InfluencerRegisterPageState
   String? tiktokEmpty;
   String? youtubeEmpty;
   String? twitchEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedData();
+  }
+
+  Future<void> _loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    instagramController.text = prefs.getString('instagram_register') ?? '';
+    tiktokController.text = prefs.getString('tiktok_register') ?? '';
+    youtubeController.text = prefs.getString('youtube_register') ?? '';
+    twitchController.text = prefs.getString('twitch_register') ?? '';
+    showInstagramField =
+        prefs.getBool('show_instagram_field_register') ?? false;
+    showTiktokField = prefs.getBool('show_tiktok_field_register') ?? false;
+    showYoutubeField = prefs.getBool('show_youtube_field_register') ?? false;
+    showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
+  }
+
+  Future<void> _saveDataLocally() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('instagram_register', instagramController.text);
+    await prefs.setString('tiktok_register', tiktokController.text);
+    await prefs.setString('youtube_register', youtubeController.text);
+    await prefs.setString('twitch_register', twitchController.text);
+    await prefs.setBool('show_instagram_field_register', showInstagramField);
+    await prefs.setBool('show_tiktok_field_register', showTiktokField);
+    await prefs.setBool('show_youtube_field_register', showYoutubeField);
+    await prefs.setBool('show_twitch_field_register', showTwitchField);
+  }
 
   @override
   void dispose() {
@@ -121,6 +153,7 @@ class _Step2InfluencerRegisterPageState
         };
 
         logger.i('Request Body: $requestBody');
+        _saveDataLocally();
         RegisterPage.updateRequestBody(context, requestBody);
         FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
