@@ -73,39 +73,34 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
-        child: Column(
-          children: [
-            const InfluyoLogo(),
-            const Spacer(),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Iniciar sesión',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w500,
-                    ),
+                const InfluyoLogo(),
+                const SizedBox(
+                    height: 20), // Agregar espacio en lugar de Spacer
+                const Text(
+                  'Iniciar sesión',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Ingresa tus datos para acceder a tu cuenta',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                const Text(
+                  'Ingresa tus datos para acceder a tu cuenta',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
                 CustomEmailOrNumberField(
-                    label: 'Correo, número o teléfono',
-                    controller: _identifierController,
-                    maxLength: 100),
+                  label: 'Correo, número o teléfono',
+                  controller: _identifierController,
+                  maxLength: 100,
+                ),
                 const SizedBox(height: 16),
                 PasswordField(
                     controller: _passwordController, label: "Contraseña"),
@@ -119,24 +114,7 @@ class LoginPageState extends State<LoginPage> {
                         ),
                       );
                     },
-                    style: ButtonStyle(
-                      overlayColor: WidgetStateProperty.all(Colors.transparent),
-                      foregroundColor:
-                          WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.hovered)) {
-                          return const Color.fromARGB(255, 0, 107, 214);
-                        }
-                        return const Color.fromARGB(255, 0, 107, 214);
-                      }),
-                      animationDuration: const Duration(milliseconds: 100),
-                    ),
-                    child: const Text(
-                      '¿Olvidaste tu contraseña?',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        decorationColor: Color.fromARGB(255, 0, 107, 214),
-                      ),
-                    ),
+                    child: const Text('¿Olvidaste tu contraseña?'),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -165,49 +143,44 @@ class LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       color: const Color.fromARGB(255, 34, 34, 34),
                       decoration: TextDecoration.underline,
-                      decorationColor: const Color.fromARGB(255, 34, 34, 34),
                       fontSize: 13,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 30),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text.rich(
+                      TextSpan(
+                        text: '¿No tienes una cuenta? ',
+                        style: const TextStyle(fontSize: 14),
+                        children: [
+                          TextSpan(
+                            text: 'Regístrate',
+                            style: const TextStyle(
+                              color: Color(0xFF6A6A6A),
+                              decoration: TextDecoration.underline,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.of(context).pushReplacement(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, _, __) =>
+                                        const RegisterPage(),
+                                  ),
+                                );
+                              },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text.rich(
-                  TextSpan(
-                    text: '¿No tienes una cuenta? ',
-                    style: const TextStyle(
-                        color: Color.fromARGB(255, 34, 34, 34), fontSize: 14),
-                    children: [
-                      TextSpan(
-                        text: 'Regístrate',
-                        style: const TextStyle(
-                          color: Color(0xFF6A6A6A),
-                          decoration: TextDecoration.underline,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Navigator.of(context).pushReplacement(
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation1, animation2) =>
-                                        const RegisterPage(),
-                                transitionDuration: Duration.zero,
-                                reverseTransitionDuration: Duration.zero,
-                              ),
-                            );
-                          },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
