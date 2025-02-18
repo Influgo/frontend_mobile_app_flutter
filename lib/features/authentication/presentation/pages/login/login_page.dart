@@ -81,8 +81,7 @@ class LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const InfluyoLogo(),
-                const SizedBox(
-                    height: 20), // Agregar espacio en lugar de Spacer
+                const SizedBox(height: 20),
                 const Text(
                   'Iniciar sesión',
                   style: TextStyle(

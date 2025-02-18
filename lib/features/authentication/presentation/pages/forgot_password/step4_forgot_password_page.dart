@@ -57,7 +57,7 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
               child: SizedBox(
-                width: double.infinity, // Hace que el botón ocupe todo el ancho
+                width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF222222),

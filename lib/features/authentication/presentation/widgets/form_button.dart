@@ -18,8 +18,7 @@ class FormButton extends StatelessWidget {
       onPressed: isEnabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor:
-            isEnabled ? Colors.black : Colors.grey[300], // Color del texto
+        backgroundColor: isEnabled ? Colors.black : Colors.grey[300],
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),

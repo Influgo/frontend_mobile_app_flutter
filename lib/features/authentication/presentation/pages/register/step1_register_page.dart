@@ -189,8 +189,6 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
       }
     });
     FocusScope.of(context).unfocus();
-    // COMENTAR
-    //RegisterPage.goToNextStep(context);
   }
 
   @override

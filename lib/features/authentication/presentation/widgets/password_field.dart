@@ -28,7 +28,7 @@ class PasswordFieldState extends State<PasswordField> {
       obscureText: _obscureText,
       onChanged: widget.onChanged,
       decoration: InputDecoration(
-        labelText: widget.label, // Usar el texto personalizado
+        labelText: widget.label,
         labelStyle: const TextStyle(color: Colors.grey),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
