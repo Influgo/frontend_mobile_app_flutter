@@ -20,11 +20,32 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
   String? _newPasswordError;
   String? _confirmPasswordError;
 
+  bool _hasMinLength = false;
+  bool _hasUpperLower = false;
+  bool _hasSpecialChar = false;
+
   @override
   void dispose() {
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _newPasswordController.addListener(_validatePasswordRules);
+  }
+
+  void _validatePasswordRules() {
+    String password = _newPasswordController.text;
+
+    setState(() {
+      _hasMinLength = password.length >= 8 && password.length <= 20;
+      _hasUpperLower = RegExp(r'(?=.*[a-z])(?=.*[A-Z])').hasMatch(password);
+      _hasSpecialChar =
+          RegExp(r'(?=.*[!@#$%^&*(),.?":{}|<>])').hasMatch(password);
+    });
   }
 
   Future<void> _savePassword() async {
@@ -69,6 +90,26 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
         });
       }
     });
+  }
+
+  Widget _buildRequirementRow(String text, bool isValid) {
+    return Row(
+      children: [
+        Icon(
+          isValid ? Icons.check_circle : Icons.cancel,
+          color: isValid ? Colors.green : Colors.grey,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -137,68 +178,19 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
-                                  color: Colors.grey),
+                                  color: Colors.grey[600]),
                             ),
                             SizedBox(height: 16),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 8.0, right: 8.0, top: 8.0),
-                                  child: Icon(Icons.circle, size: 8),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    'Entre 8 y 20 caracteres',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.grey),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _buildRequirementRow(
+                                'Entre 8 y 20 caracteres', _hasMinLength),
                             SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 8.0, right: 8.0, top: 8.0),
-                                  child: Icon(Icons.circle, size: 8),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    'Al menos 1 letra mayúscula y 1 letra minúscula',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.grey),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _buildRequirementRow(
+                                'Al menos 1 letra mayúscula y 1 letra minúscula',
+                                _hasUpperLower),
                             SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 8.0, right: 8.0, top: 8.0),
-                                  child: Icon(Icons.circle, size: 8),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    '1 o más caracteres especiales',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.grey),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _buildRequirementRow(
+                                '1 o más caracteres especiales',
+                                _hasSpecialChar),
                           ],
                         ),
                       ),
