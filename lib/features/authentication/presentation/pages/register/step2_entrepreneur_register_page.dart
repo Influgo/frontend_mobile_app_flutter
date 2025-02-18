@@ -107,11 +107,10 @@ class _Step2EntrepreneurRegisterPageState
       businessNicknameEmpty = businessNicknameController.text.trim().isEmpty
           ? 'Nickname del emprendimiento es requerido'
           : null;
-      rucEmpty = rucController.text.trim().isEmpty
-          ? 'RUC es requerido'
-          : (rucController.text.trim().length != 11
-              ? 'RUC debe tener 11 dígitos'
-              : null);
+      rucEmpty = rucController.text.trim().isNotEmpty &&
+              rucController.text.trim().length != 11
+          ? 'RUC debe tener 11 dígitos'
+          : null;
 
       if (!showInstagramField && !showTiktokField) {
         socialMediaEmpty =
