@@ -71,7 +71,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             physics: const NeverScrollableScrollPhysics(),
             children: _pages,
           ),
-          if (_currentStep >= 0)
+          if (_currentStep >= 0 && _currentStep < 3)
             SafeArea(
               child: Positioned(
                 top: 30,
