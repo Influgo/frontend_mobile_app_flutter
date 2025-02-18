@@ -46,9 +46,9 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
 
   Future<void> _loadSavedImage() async {
     final prefs = await SharedPreferences.getInstance();
-    final imagePath = prefs.getString('saved_image_path_doc_front');
-    if (imagePath != null && File(imagePath).existsSync()) {
-      final imageBytes = await File(imagePath).readAsBytes();
+    final frontDocImagePath = prefs.getString('saved_image_path_doc_front');
+    if (frontDocImagePath != null && File(frontDocImagePath).existsSync()) {
+      final imageBytes = await File(frontDocImagePath).readAsBytes();
       setState(() {
         _capturedImageBytes = imageBytes;
       });
@@ -57,12 +57,12 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
 
   Future<void> _saveImage(Uint8List imageBytes) async {
     final directory = await getApplicationDocumentsDirectory();
-    final imagePath = '${directory.path}/document_front.jpg';
-    final imageFile = File(imagePath);
+    final frontDocImagePath = '${directory.path}/document_front.jpg';
+    final imageFile = File(frontDocImagePath);
     await imageFile.writeAsBytes(imageBytes);
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('saved_image_path_doc_front', imagePath);
+    await prefs.setString('saved_image_path_doc_front', frontDocImagePath);
   }
 
   @override
