@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_name_field.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_field.dart';
 import 'package:flutter/gestures.dart';
 

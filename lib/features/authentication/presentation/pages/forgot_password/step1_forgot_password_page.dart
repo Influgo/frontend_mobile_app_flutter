@@ -48,8 +48,7 @@ class _Step1ForgotPasswordPageState extends State<Step1ForgotPasswordPage> {
     setState(() => isLoading = true);
 
     try {
-      // Comentar la sgte linea para hacer pruebas sin conexion
-      //await forgotPasswordUseCase.execute(emailController.text.trim());
+      await forgotPasswordUseCase.execute(emailController.text.trim());
       await _saveEmailLocally();
       if (mounted) widget.onNextStep();
     } on ServerException catch (e) {

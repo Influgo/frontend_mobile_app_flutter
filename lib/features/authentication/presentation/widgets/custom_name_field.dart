@@ -24,7 +24,7 @@ class CustomNameField extends StatelessWidget {
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
         FilteringTextInputFormatter.allow(
-          RegExp(r"[a-zA-Z' -]"),
+          RegExp(r"[a-zA-ZñÑ' -]"),
         ),
       ],
       onChanged: (value) {
