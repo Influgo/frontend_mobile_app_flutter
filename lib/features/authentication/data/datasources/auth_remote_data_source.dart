@@ -47,10 +47,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  @override
   Future<http.Response> requestCheckToken(String token) async {
     final url = Uri.parse('${APIHelper.buildUrl(checkTokenEndpoint)}/$token');
 
-    final response = await client.post(
+    final response = await client.get(
       url,
       headers: {'Content-Type': 'application/json'},
     );

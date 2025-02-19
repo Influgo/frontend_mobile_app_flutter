@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/api_endpoints.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/api_helper.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_email_or_number_field.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
@@ -35,8 +37,7 @@ class LoginPageState extends State<LoginPage> {
       "password": password,
     };
 
-    final url = Uri.parse(
-        'https://influyo-testing.ryzeon.me/api/v1/authentication/login');
+    final url = Uri.parse(APIHelper.buildUrl(loginEndpoint).toString());
 
     try {
       final response = await http.post(

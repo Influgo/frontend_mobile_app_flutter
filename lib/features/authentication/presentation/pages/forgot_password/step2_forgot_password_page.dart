@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/core/di/injection_container.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/domain/usecases/check_token_usecase.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/domain/usecases/forgot_password_usecase.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
@@ -27,7 +28,7 @@ class _Step2ForgotPasswordPageState extends State<Step2ForgotPasswordPage> {
   );
 
   late final ForgotPasswordUseCase _forgotPasswordUseCase;
-  //late final CheckTokenUseCase _checkTokenUseCase;
+  late final CheckTokenUseCase _checkTokenUseCase;
   String userEmail = '';
   bool showError = false;
   Timer? _timer;
@@ -38,7 +39,7 @@ class _Step2ForgotPasswordPageState extends State<Step2ForgotPasswordPage> {
   void initState() {
     super.initState();
     _forgotPasswordUseCase = getIt<ForgotPasswordUseCase>();
-    //_checkTokenUseCase = getIt<CheckTokenUseCase>();
+    _checkTokenUseCase = getIt<CheckTokenUseCase>();
     _loadSavedEmail();
     _startTimer();
   }
@@ -118,7 +119,6 @@ class _Step2ForgotPasswordPageState extends State<Step2ForgotPasswordPage> {
     }
   }
 
-/*/
   Future<void> _validateAndContinue() async {
     final allFilled =
         controllers.every((controller) => controller.text.length == 1);
@@ -141,24 +141,11 @@ class _Step2ForgotPasswordPageState extends State<Step2ForgotPasswordPage> {
             const SnackBar(content: Text('Error en el servidor')),
           );
         }
-        // Descomentar la sgte linea para hacer pruebas sin conexion
-        ForgotPasswordPage.goToNextStep(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${e.toString()}')),
         );
       }
-    } else {
-      setState(() => showError = true);
-    }
-  }*/
-  void _validateAndContinue() {
-    final allFilled =
-        controllers.every((controller) => controller.text.length == 1);
-
-    if (allFilled) {
-      _saveVerificationCode();
-      ForgotPasswordPage.goToNextStep(context);
     } else {
       setState(() => showError = true);
     }

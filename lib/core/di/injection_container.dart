@@ -1,6 +1,7 @@
 import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/domain/usecases/check_token_usecase.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/domain/usecases/forgot_password_usecase.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -24,5 +25,9 @@ void _setupAuthDependencies() {
 
   getIt.registerFactory<ForgotPasswordUseCase>(
     () => ForgotPasswordUseCase(repository: getIt<AuthRepository>()),
+  );
+
+  getIt.registerFactory<CheckTokenUseCase>(
+    () => CheckTokenUseCase(repository: getIt<AuthRepository>()),
   );
 }

@@ -1,9 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/api_endpoints.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/api_helper.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/error_text_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_field.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_requirement_row.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class Step3ForgotPasswordPage extends StatefulWidget {
   const Step3ForgotPasswordPage({super.key});
@@ -48,14 +53,37 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
     });
   }
 
-  Future<void> _savePassword() async {
+  Future<void> _resetPassword() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('new_password', _newPasswordController.text);
-      print('Contraseña guardada exitosamente');
+      final userIdentifier = prefs.getString('email_forgot_password');
+      final token = prefs.getString('verification_code_forgot_password');
+      final password = _newPasswordController.text;
+
+      if (userIdentifier == null || token == null) {
+        throw Exception(
+            'No se encontraron datos necesarios en SharedPreferences');
+      }
+
+      final response = await http.post(
+        Uri.parse(APIHelper.buildUrl(resetPasswordEndpoint).toString()),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "userIdentifier": userIdentifier,
+          "password": password,
+          "token": token
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Contraseña cambiada exitosamente');
+        if (mounted) ForgotPasswordPage.goToNextStep(context);
+      } else {
+        print('Error al cambiar contraseña: ${response.body}');
+        throw Exception('Error al cambiar la contraseña');
+      }
     } catch (e) {
-      print('Error al guardar contraseña: $e');
-      throw Exception('Error al guardar la contraseña');
+      print('Error en la solicitud: $e');
     }
   }
 
@@ -85,31 +113,9 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
       }
 
       if (_newPasswordError == null && _confirmPasswordError == null) {
-        _savePassword().then((_) {
-          if (mounted) ForgotPasswordPage.goToNextStep(context);
-        });
+        _resetPassword();
       }
     });
-  }
-
-  Widget _buildRequirementRow(String text, bool isValid) {
-    return Row(
-      children: [
-        Icon(
-          isValid ? Icons.check_circle : Icons.cancel,
-          color: isValid ? Colors.green : Colors.grey,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
   }
 
   @override
@@ -181,16 +187,21 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
                                   color: Colors.grey[600]),
                             ),
                             SizedBox(height: 16),
-                            _buildRequirementRow(
-                                'Entre 8 y 20 caracteres', _hasMinLength),
+                            PasswordRequirementRow(
+                              text: 'Entre 8 y 20 caracteres',
+                              isValid: _hasMinLength,
+                            ),
                             SizedBox(height: 8),
-                            _buildRequirementRow(
-                                'Al menos 1 letra mayúscula y 1 letra minúscula',
-                                _hasUpperLower),
+                            PasswordRequirementRow(
+                              text:
+                                  'Al menos 1 letra mayúscula y 1 letra minúscula',
+                              isValid: _hasUpperLower,
+                            ),
                             SizedBox(height: 8),
-                            _buildRequirementRow(
-                                '1 o más caracteres especiales',
-                                _hasSpecialChar),
+                            PasswordRequirementRow(
+                              text: '1 o más caracteres especiales',
+                              isValid: _hasSpecialChar,
+                            ),
                           ],
                         ),
                       ),
