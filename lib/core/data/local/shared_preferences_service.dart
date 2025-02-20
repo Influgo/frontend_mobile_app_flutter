@@ -1,4 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class SharedPreferencesService {
   Future<void> clearStoredValues() async {
@@ -26,5 +28,29 @@ class SharedPreferencesService {
     await prefs.remove('show_youtube_field_register');
     await prefs.remove('show_twitch_field_register');
     await prefs.remove('saved_image_path_doc_front');
+    await prefs.remove('saved_image_path_doc_back');
+
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final photoNames = [
+        'document_front.jpg',
+        'document_back.jpg',
+        'selfie_register.jpg'
+      ];
+
+      for (final photoName in photoNames) {
+        final filePath = '${directory.path}/$photoName';
+        final file = File(filePath);
+
+        if (await file.exists()) {
+          await file.delete();
+          print('$photoName eliminada exitosamente');
+        } else {
+          print('$photoName no se encontró para eliminar');
+        }
+      }
+    } catch (e) {
+      print('Error al intentar eliminar las fotos: $e');
+    }
   }
 }

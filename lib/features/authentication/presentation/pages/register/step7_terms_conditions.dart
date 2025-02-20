@@ -53,7 +53,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
     await prefs.remove('show_youtube_field_register');
     await prefs.remove('show_twitch_field_register');
     await prefs.remove('saved_image_path_doc_front');
-    await prefs.remove('saved_image_path_doc_rev');
+    await prefs.remove('saved_image_path_doc_back');
   }
 
   Future<void> deleteStoredPhotos() async {
@@ -61,7 +61,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
       final directory = await getApplicationDocumentsDirectory();
       final photoNames = [
         'document_front.jpg',
-        'document_rev.jpg',
+        'document_back.jpg',
         'selfie_register.jpg'
       ];
 
@@ -122,8 +122,8 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
           } catch (e) {
             logger.e('Error en la validación de imágenes: $e');
           }
-          _deleteLocalData();
           deleteStoredPhotos();
+          _deleteLocalData();
           RegisterPage.goToNextStep(context);
         }
       } else {
