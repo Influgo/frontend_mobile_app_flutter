@@ -9,6 +9,7 @@ import '../../widgets/custom_email_field.dart';
 import '../../widgets/custom_number_field.dart';
 import '../../widgets/password_field.dart';
 import '../../widgets/error_text_widget.dart';
+import 'package:http/http.dart' as http;
 
 class Step1RegisterPage extends StatefulWidget {
   final String profile;
@@ -87,9 +88,34 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         'document_type_register', selectedDocumentType ?? 'dni');
   }
 
+  Future<bool> validateEmail(String email) async {
+    final response = await http.get(Uri.parse(
+        'https://influyo-testing.ryzeon.me/api/v1/users/check-email/$email'));
+    String emailStatusCode = response.statusCode.toString();
+    print('Response status code for email: $emailStatusCode');
+    return response.statusCode == 400;
+  }
+
+  Future<bool> validateDocument(String document) async {
+    final response = await http.get(Uri.parse(
+        'https://influyo-testing.ryzeon.me/api/v1/users/check-document/$document'));
+    String documentStatusCode = response.statusCode.toString();
+    print('Response status code for document: $documentStatusCode');
+    return response.statusCode == 400;
+  }
+
+  Future<bool> validateCellphone(String cellphone) async {
+    final response = await http.get(Uri.parse(
+        'https://influyo-testing.ryzeon.me/api/v1/users/check-cellphone/$cellphone'));
+    String cellphoneStatusCode = response.statusCode.toString();
+    print('Response status code for cellphone: $cellphoneStatusCode');
+    return response.statusCode == 400;
+  }
+
   void validateAndContinue() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('acceptTermsAndConditions', false);
+
     setState(() {
       firstNameError = firstNameController.text.trim().isEmpty
           ? 'Nombres es requerido'
@@ -100,6 +126,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
       documentTypeError = selectedDocumentType == null
           ? 'Tipo de documento de identidad es requerido'
           : null;
+
       if (selectedDocumentType == 'dni') {
         documentError = dniController.text.trim().isEmpty
             ? 'N° de Documento es requerido'
@@ -121,12 +148,18 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
       } else {
         documentError = null;
       }
-      emailError = emailController.text.trim().isEmpty
-          ? 'Correo es requerido'
-          : (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                  .hasMatch(emailController.text.trim())
-              ? 'Correo no es válido'
-              : null);
+
+      final email = emailController.text.trim();
+
+      if (email.isEmpty) {
+        emailError = 'Correo es requerido';
+      } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+          .hasMatch(email)) {
+        emailError = 'Correo no es válido';
+      } else {
+        emailError = null;
+      }
+
       phoneError = phoneController.text.trim().isEmpty
           ? 'Celular es requerido'
           : (phoneController.text.trim().length != 9
@@ -156,29 +189,57 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
       } else {
         confirmPasswordError = null;
       }
+    });
 
-      if ([
-        firstNameError,
-        lastNameError,
-        documentTypeError,
-        documentError,
-        emailError,
-        phoneError,
-        passwordError,
-        confirmPasswordError
-      ].every((error) => error == null)) {
+    if ([
+      firstNameError,
+      lastNameError,
+      documentTypeError,
+      documentError,
+      emailError,
+      phoneError,
+      passwordError,
+      confirmPasswordError
+    ].every((error) => error == null)) {
+      final email = emailController.text.trim();
+      final document = selectedDocumentType == 'dni'
+          ? dniController.text.trim()
+          : selectedDocumentType == 'pasaporte'
+              ? passportController.text.trim()
+              : carnetController.text.trim();
+      final cellphone = phoneController.text.trim();
+
+      final isEmailValid = await validateEmail(email);
+      final isDocumentValid = await validateDocument(document);
+      final isCellphoneValid = await validateCellphone(cellphone);
+
+      if (!isEmailValid) {
+        setState(() {
+          emailError = 'El correo ya está registrado';
+        });
+      }
+
+      if (!isDocumentValid) {
+        setState(() {
+          documentError = 'El documento ya está registrado';
+        });
+      }
+
+      if (!isCellphoneValid) {
+        setState(() {
+          phoneError = 'El celular ya está registrado';
+        });
+      }
+
+      if (isEmailValid && isDocumentValid && isCellphoneValid) {
         var logger = Logger();
         Map<String, dynamic> requestBody = {
           "names": firstNameController.text.trim(),
           "lastNames": lastNameController.text.trim(),
           "identificationType": selectedDocumentType == 'dni' ? 1 : 0,
-          "identificationNumber": selectedDocumentType == 'dni'
-              ? dniController.text.trim()
-              : selectedDocumentType == 'pasaporte'
-                  ? passportController.text.trim()
-                  : carnetController.text.trim(),
-          "email": emailController.text.trim(),
-          "phoneNumber": phoneController.text.trim(),
+          "identificationNumber": document,
+          "email": email,
+          "phoneNumber": cellphone,
           "password": passwordController.text.trim(),
         };
         logger.i('Request Body: $requestBody');
@@ -187,7 +248,8 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
       }
-    });
+    }
+
     FocusScope.of(context).unfocus();
   }
 
