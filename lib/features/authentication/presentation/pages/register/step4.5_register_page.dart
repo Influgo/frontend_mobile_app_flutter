@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -8,6 +7,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:logger/logger.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Step4_5RegisterPage extends StatefulWidget {
   final Function(Uint8List) onImageCaptured;
@@ -19,71 +19,47 @@ class Step4_5RegisterPage extends StatefulWidget {
 }
 
 class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
-  CameraController? _cameraController;
   Uint8List? _capturedImageBytes;
-  bool _isCameraInitialized = false;
   final Logger logger = Logger();
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
     _loadSavedImage();
-    _takePhotoAutomatically();
-  }
-
-  Future<void> _initializeCamera() async {
-    final cameras = await availableCameras();
-    if (cameras.isNotEmpty) {
-      _cameraController = CameraController(cameras[0], ResolutionPreset.high);
-      await _cameraController!.initialize();
-      await _cameraController!
-          .lockCaptureOrientation(DeviceOrientation.portraitUp);
-      setState(() {
-        _isCameraInitialized = true;
-      });
-    }
   }
 
   Future<void> _loadSavedImage() async {
     final prefs = await SharedPreferences.getInstance();
-    final imagePath = prefs.getString('saved_image_path_doc_rev');
-    if (imagePath != null && File(imagePath).existsSync()) {
-      final imageBytes = await File(imagePath).readAsBytes();
+    final backDocImagePath = prefs.getString('saved_image_path_doc_back');
+    if (backDocImagePath != null && File(backDocImagePath).existsSync()) {
+      final imageBytes = await File(backDocImagePath).readAsBytes();
       setState(() {
         _capturedImageBytes = imageBytes;
       });
-      logger
-          .i('Imagen cargada desde almacenamiento: ${imageBytes.length} bytes');
-    }
-  }
-
-  Future<void> _takePhotoAutomatically() async {
-    if (_cameraController != null && _cameraController!.value.isInitialized) {
-      final image = await _cameraController!.takePicture();
-      final bytes = await image.readAsBytes();
-      await _saveImage(bytes);
-      setState(() {
-        _capturedImageBytes = bytes;
-      });
-      logger.i('Imagen tomada automáticamente: ${bytes.length} bytes');
     }
   }
 
   Future<void> _saveImage(Uint8List imageBytes) async {
     final directory = await getApplicationDocumentsDirectory();
-    final imagePath = '${directory.path}/document_rev.jpg';
-    final imageFile = File(imagePath);
+    final backDocImagePath = '${directory.path}/document_back.jpg';
+    final imageFile = File(backDocImagePath);
     await imageFile.writeAsBytes(imageBytes);
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('saved_image_path_doc_rev', imagePath);
+    await prefs.setString('saved_image_path_doc_back', backDocImagePath);
   }
 
-  @override
-  void dispose() {
-    _cameraController?.dispose();
-    super.dispose();
+  Future<void> _takePicture() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      await _saveImage(bytes);
+      setState(() {
+        _capturedImageBytes = bytes;
+      });
+    }
   }
 
   void validateAndContinue() {
@@ -91,7 +67,7 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
       logger.i(
           'La imagen reversa capturada con éxito: ${_capturedImageBytes!.length} bytes');
       widget.onImageCaptured(_capturedImageBytes!);
-      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 5);
+      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 4);
     } else {
       logger.e('La imagen reversa es null');
     }
@@ -127,15 +103,7 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: _capturedImageBytes == null
-                        ? _isCameraInitialized
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Transform.rotate(
-                                  angle: 1.5708,
-                                  child: CameraPreview(_cameraController!),
-                                ),
-                              )
-                            : const Center(child: CircularProgressIndicator())
+                        ? Container()
                         : Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey, width: 2),
@@ -157,30 +125,9 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
             left: 30,
             right: 30,
             child: ElevatedButton(
-              onPressed: () async {
-                if (_cameraController != null &&
-                    _cameraController!.value.isInitialized) {
-                  if (_capturedImageBytes == null) {
-                    final image = await _cameraController!.takePicture();
-                    final bytes = await image.readAsBytes();
-                    await _saveImage(bytes);
-                    setState(() {
-                      _capturedImageBytes = bytes;
-                    });
-                    logger.i(
-                        'La imagen reversa capturada: ${bytes.length} bytes');
-                  } else {
-                    setState(() {
-                      _capturedImageBytes = null;
-                      _initializeCamera();
-                    });
-                  }
-                }
-              },
+              onPressed: _takePicture,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _capturedImageBytes == null
-                    ? const Color(0xFF222222)
-                    : const Color(0xFF222222),
+                backgroundColor: const Color(0xFF222222),
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
