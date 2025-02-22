@@ -47,15 +47,18 @@ class _Step2InfluencerRegisterPageState
 
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
-    instagramController.text = prefs.getString('instagram_register') ?? '';
-    tiktokController.text = prefs.getString('tiktok_register') ?? '';
-    youtubeController.text = prefs.getString('youtube_register') ?? '';
-    twitchController.text = prefs.getString('twitch_register') ?? '';
-    showInstagramField =
-        prefs.getBool('show_instagram_field_register') ?? false;
-    showTiktokField = prefs.getBool('show_tiktok_field_register') ?? false;
-    showYoutubeField = prefs.getBool('show_youtube_field_register') ?? false;
-    showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
+
+    setState(() {
+      instagramController.text = prefs.getString('instagram_register') ?? '';
+      tiktokController.text = prefs.getString('tiktok_register') ?? '';
+      youtubeController.text = prefs.getString('youtube_register') ?? '';
+      twitchController.text = prefs.getString('twitch_register') ?? '';
+      showInstagramField =
+          prefs.getBool('show_instagram_field_register') ?? false;
+      showTiktokField = prefs.getBool('show_tiktok_field_register') ?? false;
+      showYoutubeField = prefs.getBool('show_youtube_field_register') ?? false;
+      showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
+    });
   }
 
   Future<void> _saveDataLocally() async {

@@ -9,7 +9,7 @@ class Step8RegisterPage extends StatelessWidget {
     super.key,
     this.title = 'Tu perfil está en revisión',
     this.subtitle =
-        'Te avisaremos de su aprobación dentro de\n12hrs hábiles. Por mientras explora lo que te ofrece Influyo!',
+        'Te avisaremos de su aprobación dentro de\n24hrs hábiles. Por mientras explora lo que te ofrece Influyo!',
     this.buttonText = 'Explorar',
   });
   @override
