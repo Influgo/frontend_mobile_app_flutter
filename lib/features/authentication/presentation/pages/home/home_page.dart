@@ -29,33 +29,87 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explora',
+
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white, 
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              spreadRadius: 0,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0), 
+          child: BottomNavigationBar(
+            items: List.generate(5, (index) {
+              List<IconData> icons = [
+                Icons.explore,
+                Icons.calendar_today,
+                Icons.event,
+                Icons.chat,
+                Icons.person
+              ];
+              List<String> labels = [
+                'Explora',
+                'Calendario',
+                'Eventos',
+                'Chat',
+                'Perfil'
+              ];
+
+              bool isSelected = _selectedIndex == index;
+
+              return BottomNavigationBarItem(
+                icon: isSelected
+                    ? ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return LinearGradient(
+                            colors: [
+                              Color(0xFFC20B0C),
+                              Color(0xFF7E0F9D),
+                              Color(0xFF2616C7)
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds);
+                        },
+                        child: Icon(
+                          icons[index],
+                          color: Colors.white,
+                        ),
+                      )
+                    : Icon(icons[index], color: Colors.black),
+                label: labels[index],
+              );
+            }),
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.black,
+            unselectedItemColor: Colors.black,
+            onTap: _onItemTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedLabelStyle: TextStyle(
+              foreground: Paint()
+                ..shader = LinearGradient(
+                  colors: [
+                    Color(0xFFC20B0C),
+                    Color(0xFF7E0F9D),
+                    Color(0xFF2616C7)
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(Rect.fromLTWH(0.0, 0.0, 100.0, 20.0)),
+            ),
+            unselectedLabelStyle: TextStyle(color: Colors.black),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Calendario',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Eventos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
+        ),
       ),
+     
     );
   }
 }
