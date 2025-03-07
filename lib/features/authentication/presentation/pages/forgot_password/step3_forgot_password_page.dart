@@ -194,7 +194,7 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
                             SizedBox(height: 8),
                             PasswordRequirementRow(
                               text:
-                                  'Al menos 1 letra mayúscula y 1 letra minúscula',
+                                  'Al menos 1 letra mayúscula y 1 letra\n minúscula',
                               isValid: _hasUpperLower,
                             ),
                             SizedBox(height: 8),
