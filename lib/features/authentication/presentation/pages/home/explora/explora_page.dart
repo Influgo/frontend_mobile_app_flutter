@@ -1,47 +1,76 @@
-import 'package:flutter/material.dart';
 
-class ExploraPage extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+class ExploraPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(110),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Buscar',
-                            prefixIcon: Icon(Icons.search),
-                            filled: true,
-                            fillColor: Color(0xFFEDEFF1),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
+  _ExploraPageState createState() => _ExploraPageState();
+}
+
+class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+@override
+Widget build(BuildContext context) {
+  return DefaultTabController(
+    length: 2,
+    child: Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(90),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0, left: 16.0, right: 16.0, bottom: 10.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: ' Buscar',
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 15.0),
+                        child: Icon(Icons.search),
                       ),
-                      SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(Icons.notifications),
-                        onPressed: () {},
+                      filled: true,
+                      fillColor: Color(0xFFEDEFF1),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
                       ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 8), // Reducimos el espacio entre la barra y los filtros
-                ],
+                ),
+                SizedBox(width: 8),
+               InkWell(
+                onTap: () {},
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: SvgPicture.asset(
+                    'assets/icons/notificationsicon.svg',
+                    width: 22,
+                    height: 22,
+                  ),
+                ),
               ),
+              ],
             ),
           ),
         ),
+      ),
+
         body: Column(
           children: [
             SingleChildScrollView(
@@ -57,29 +86,86 @@ class ExploraPage extends StatelessWidget {
                 ],
               ),
             ),
-            TabBar(
-              labelPadding: EdgeInsets.symmetric(horizontal: 16.0),
-              indicator: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFC20B0C),
-                    Color(0xFF7E0F9D),
-                    Color(0xFF2616C7),
+            Column(
+              children: [
+                TabBar(
+                  controller: _tabController,
+                  unselectedLabelColor: Colors.grey,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicatorColor: Colors.transparent,
+                  tabs: [
+                    Tab(
+                      child: _tabController.index == 0
+                          ? ShaderMask(
+                              shaderCallback: (bounds) {
+                                return LinearGradient(
+                                  colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
+                                ).createShader(bounds);
+                              },
+                              child: Text(
+                                'Influencers',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          : Text(
+                              'Influencers',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                    ),
+                    Tab(
+                      child: _tabController.index == 1
+                          ? ShaderMask(
+                              shaderCallback: (bounds) {
+                                return LinearGradient(
+                                  colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
+                                ).createShader(bounds);
+                              },
+                              child: Text(
+                                'Emprendimientos',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          : Text(
+                              'Emprendimientos',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                    ),
                   ],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
                 ),
-              ),
-              tabs: [
-                _buildGradientTab('Influencers'),
-                _buildGradientTab('Emprendimientos'),
+                Stack(
+                  children: [
+                    Container(
+                      height: 2, 
+                      color: Colors.grey[300],
+                    ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        double tabWidth = constraints.maxWidth / 2;
+                        return AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          margin: EdgeInsets.only(left: _tabController.index * tabWidth),
+                          width: tabWidth,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
+           
             Expanded(
               child: TabBarView(
+                controller: _tabController,
                 children: [
-                  Center(child: Text('Contenido de Influencers')),
-                  Center(child: Text('Contenido de Emprendimientos')),
+                  _buildNoResultsContent(),
+                  _buildNoResultsContent(),
                 ],
               ),
             ),
@@ -88,25 +174,36 @@ class ExploraPage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildGradientTab(String text) {
-    return Tab(
-      child: ShaderMask(
-        shaderCallback: (bounds) {
-          return LinearGradient(
-            colors: [
-              Color(0xFFC20B0C),
-              Color(0xFF7E0F9D),
-              Color(0xFF2616C7),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ).createShader(bounds);
-        },
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white),
-        ),
+  
+  Widget _buildNoResultsContent() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/images/noSearchResults.png',
+            width: 180,
+            height: 180,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Ups...',
+            style: TextStyle(
+              fontSize: 20,            
+            ),
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              'No encontramos resultados que coincidan con tus criterios de búsqueda. Prueba con otros.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -125,7 +222,12 @@ class ExploraPage extends StatelessWidget {
           ),
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
-        child: Icon(icon),
+        child: SvgPicture.asset(
+          'assets/icons/filtericon.svg',
+          width: 18,
+          height: 18,
+          color: Colors.black,
+        ),
       ),
     );
   }

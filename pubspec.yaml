@@ -55,6 +55,14 @@ flutter:
 
   assets:
     - assets/images/influyo_logo.png
+    - assets/images/noSearchResults.png
     - assets/images/review.gif
     - assets/images/check.gif
     - assets/icons/logo_app_influyo.svg
+    - assets/icons/filtericon.svg
+    - assets/icons/exploraicon.svg
+    - assets/icons/calendarioicon.svg
+    - assets/icons/eventosicon.svg
+    - assets/icons/chaticon.svg
+    - assets/icons/perfilicon.svg
+    - assets/icons/notificationsicon.svg
