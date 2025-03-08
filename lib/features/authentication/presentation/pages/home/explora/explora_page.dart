@@ -182,8 +182,8 @@ Widget build(BuildContext context) {
         children: [
           Image.asset(
             'assets/images/noSearchResults.png',
-            width: 180,
-            height: 180,
+            width: 160,
+            height: 160,
           ),
           SizedBox(height: 16),
           Text(
