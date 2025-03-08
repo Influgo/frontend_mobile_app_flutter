@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/core/constants/api_endpoints.dart';
 import 'package:frontend_mobile_app_flutter/core/utils/api_helper.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_email_or_number_field.dart';
 import 'package:logger/logger.dart';
 import 'package:http/http.dart' as http;
@@ -53,7 +54,9 @@ class LoginPageState extends State<LoginPage> {
       logger.i('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        _showSnackBar("Credenciales correctas, bienvenido a influyo!");
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
       } else if (response.statusCode == 400) {
         _showSnackBar("Credenciales incorrectas");
       } else {
