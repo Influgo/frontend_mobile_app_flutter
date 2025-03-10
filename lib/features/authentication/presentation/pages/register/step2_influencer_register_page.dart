@@ -22,6 +22,7 @@ class _Step2InfluencerRegisterPageState
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController twitchController = TextEditingController();
+  bool isProcessing = false;
 
   final FocusNode instagramFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
@@ -83,6 +84,10 @@ class _Step2InfluencerRegisterPageState
   }
 
   void validateAndContinue() {
+    if (isProcessing) return;
+    setState(() {
+      isProcessing = true;
+    });
     setState(() {
       if (!showInstagramField && !showTiktokField) {
         socialMediaEmpty =
@@ -161,6 +166,9 @@ class _Step2InfluencerRegisterPageState
         FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
       }
+    });
+    setState(() {
+      isProcessing = false;
     });
   }
 

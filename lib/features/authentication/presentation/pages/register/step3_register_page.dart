@@ -14,6 +14,7 @@ class Step3RegisterPage extends StatefulWidget {
 
 class _Step3RegisterPageState extends State<Step3RegisterPage> {
   bool _acceptTermsAndConditions = false;
+  bool isProcessing = false;
 
   @override
   void initState() {
@@ -35,6 +36,10 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
   }
 
   void validateAndContinue() {
+    if (isProcessing) return;
+    setState(() {
+      isProcessing = true;
+    });
     if (_acceptTermsAndConditions) {
       RegisterPage.goToNextStep(context);
     } else {
@@ -43,6 +48,9 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
             content: Text('Debes aceptar el Tratamiento de datos personales.')),
       );
     }
+    setState(() {
+      isProcessing = false;
+    });
   }
 
   @override

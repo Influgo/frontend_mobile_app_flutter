@@ -30,6 +30,7 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  bool isProcessing = false;
 
   final RegExp emailRegExp = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
@@ -113,6 +114,10 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
   }
 
   void validateAndContinue() async {
+    if (isProcessing) return;
+    setState(() {
+      isProcessing = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('acceptTermsAndConditions', false);
 
@@ -249,6 +254,10 @@ class _Step1RegisterPageState extends State<Step1RegisterPage> {
         RegisterPage.goToNextStep(context);
       }
     }
+
+    setState(() {
+      isProcessing = false;
+    });
 
     FocusScope.of(context).unfocus();
   }

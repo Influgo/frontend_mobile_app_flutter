@@ -29,6 +29,7 @@ class _Step2EntrepreneurRegisterPageState
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController twitchController = TextEditingController();
+  bool isProcessing = false;
 
   final FocusNode instagramFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
@@ -103,6 +104,10 @@ class _Step2EntrepreneurRegisterPageState
   }
 
   void validateAndContinue() {
+    if (isProcessing) return;
+    setState(() {
+      isProcessing = true;
+    });
     setState(() {
       businessNameEmpty = businessNameController.text.trim().isEmpty
           ? 'Nombre del emprendimiento es requerido'
@@ -198,6 +203,9 @@ class _Step2EntrepreneurRegisterPageState
         FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
       }
+    });
+    setState(() {
+      isProcessing = false;
     });
   }
 
