@@ -29,8 +29,8 @@ class SecurityPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          buildSecurityOption(context, 'Eliminar cuenta', EditProfilePage()), // Redirige a DeleteAccount()
-          buildSecurityOption(context, 'Cambiar contraseña', Step3ForgotPasswordPage()), // Redirige a Step3()
+          buildSecurityOption(context, 'Eliminar cuenta', EditProfilePage()), 
+          buildSecurityOption(context, 'Cambiar contraseña', Step3ForgotPasswordPage()), 
         ],
       ),
     );
@@ -48,11 +48,11 @@ class SecurityPage extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => page), // Redirige a la página correspondiente
+              MaterialPageRoute(builder: (context) => page), 
             );
           },
         ),
-        if (title != 'Cambiar contraseña') // Evita la línea debajo del último elemento
+        if (title != 'Cambiar contraseña') 
           Divider(height: 1, thickness: 1),
       ],
     );
