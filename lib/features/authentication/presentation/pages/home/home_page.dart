@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/explora/explora_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,10 +15,11 @@ class _HomePageState extends State<HomePage> {
 
   static final List<Widget> _pages = <Widget>[
     ExploraPage(),
+
     Center(child: Text('Calendario')),
     Center(child: Text('Eventos')),
     Center(child: Text('Chat')),
-    Center(child: Text('Perfil')),
+    ProfileScreen(),
   ];
 
   // Lista de rutas para los iconos SVG

@@ -6,13 +6,15 @@ class EntrepreneurProfilePage extends StatefulWidget {
   const EntrepreneurProfilePage({Key? key}) : super(key: key);
 
   @override
-  _EntrepreneurProfilePageState createState() => _EntrepreneurProfilePageState();
+  _EntrepreneurProfilePageState createState() =>
+      _EntrepreneurProfilePageState();
 }
 
 class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
   final TextEditingController businessNameController = TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
-  final TextEditingController representativeController = TextEditingController();
+  final TextEditingController representativeController =
+      TextEditingController();
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
@@ -43,7 +45,6 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
       alignment: Alignment.center,
       clipBehavior: Clip.none,
       children: [
-
         GestureDetector(
           onTap: () => _showImagePickerDialog(false),
           child: Stack(
@@ -58,7 +59,6 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
             ],
           ),
         ),
-
         Positioned(
           bottom: -40,
           child: GestureDetector(
@@ -79,7 +79,8 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
                   child: CircleAvatar(
                     backgroundColor: Colors.black54,
                     radius: 18,
-                    child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                    child:
+                        Icon(Icons.camera_alt, color: Colors.white, size: 20),
                   ),
                 ),
               ],
@@ -144,7 +145,8 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
     );
   }
 
-  Widget buildTextField(String label, TextEditingController controller, {bool isFullWidth = true}) {
+  Widget buildTextField(String label, TextEditingController controller,
+      {bool isFullWidth = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: SizedBox(
@@ -166,8 +168,20 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0, // Quita la sombra
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          onPressed: () {
+            Navigator.pop(context); // Regresar a la pantalla anterior
+          },
+        ),
+      ),
       body: SingleChildScrollView(
+        
         child: Column(
+          
           children: [
             buildProfileSection(),
             const SizedBox(height: 50),
@@ -176,11 +190,12 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  buildTextField('Nombre del emprendimiento', businessNameController),
-                  buildTextField('Nickname del emprendimiento', nicknameController),
+                  buildTextField(
+                      'Nombre del emprendimiento', businessNameController),
+                  buildTextField(
+                      'Nickname del emprendimiento', nicknameController),
                   Row(
                     children: [
-                      
                       Column(
                         children: [
                           const Text('Mostrar públicamente?'),
@@ -196,8 +211,8 @@ class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
                       ),
                     ],
                   ),
-                  buildTextField('Resumen del emprendimiento', summaryController),
-               
+                  buildTextField(
+                      'Resumen del emprendimiento', summaryController),
                 ],
               ),
             ),

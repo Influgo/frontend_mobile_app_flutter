@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/entrepreneur/entrepreneur_profile_page.dart';
-
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/security/security_page.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration.zero, () {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white, 
+      ));
+    });
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          }
+          ,
         ),
         titleSpacing: 0,
-        
         title: Text(
           'Perfil',
           style: TextStyle(
@@ -28,7 +40,12 @@ class ProfileScreen extends StatelessWidget {
             child: IconButton(
               icon:
                   Icon(Icons.notifications_none, color: Colors.black, size: 20),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+              },
             ),
           ),
         ],
@@ -49,9 +66,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 12),
                   Expanded(
-                    
                     child: Column(
-                      
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -160,15 +175,15 @@ class ProfileScreen extends StatelessWidget {
 
   void navigateToPage(BuildContext context, String option) {
     final Map<String, Widget> routes = {
-      'Perfil del emprendimiento': EntrepreneurProfilePage(), 
-      'Métodos de pago': EditProfilePage(), 
-      'Historial de pagos': EditProfilePage(), 
-      'Seguridad': EditProfilePage(), 
-      'Faltas': EditProfilePage(), 
-      'Centro de ayuda': EditProfilePage(), 
-      'Reportar un problema': EditProfilePage(), 
-      'Término y condiciones': EditProfilePage(), 
-      'Cerrar sesión': EditProfilePage(), 
+      'Perfil del emprendimiento': EntrepreneurProfilePage(),
+      'Métodos de pago': EditProfilePage(),
+      'Historial de pagos': EditProfilePage(),
+      'Seguridad': SecurityPage(),
+      'Faltas': EditProfilePage(),
+      'Centro de ayuda': EditProfilePage(),
+      'Reportar un problema': EditProfilePage(),
+      'Término y condiciones': EditProfilePage(),
+      'Cerrar sesión': EditProfilePage(),
     };
 
     if (routes.containsKey(option)) {
