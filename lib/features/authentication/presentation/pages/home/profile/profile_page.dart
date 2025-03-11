@@ -175,7 +175,7 @@ class ProfileScreen extends StatelessWidget {
 
   void navigateToPage(BuildContext context, String option) {
     final Map<String, Widget> routes = {
-      'Perfil del emprendimiento': EntrepreneurProfilePage(),
+      'Perfil del emprendimiento': EntrepreneurshipProfilePage(),
       'Métodos de pago': EditProfilePage(),
       'Historial de pagos': EditProfilePage(),
       'Seguridad': SecurityPage(),
