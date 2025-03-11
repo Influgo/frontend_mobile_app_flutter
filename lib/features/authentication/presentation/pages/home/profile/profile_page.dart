@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/entrepreneurship/entrepreneur_profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/entrepreneurship/entrepreneurship_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/security/security_page.dart';
 
 class ProfileScreen extends StatelessWidget {
