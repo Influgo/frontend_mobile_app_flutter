@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class EntrepreneurProfilePage extends StatefulWidget {
-  const EntrepreneurProfilePage({Key? key}) : super(key: key);
+class EntrepreneurshipProfilePage extends StatefulWidget {
+  const EntrepreneurshipProfilePage({Key? key}) : super(key: key);
 
   @override
-  _EntrepreneurProfilePageState createState() =>
-      _EntrepreneurProfilePageState();
+  _EntrepreneurshipProfilePageState createState() =>
+      _EntrepreneurshipProfilePageState();
 }
 
-class _EntrepreneurProfilePageState extends State<EntrepreneurProfilePage> {
+class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePage> {
   final TextEditingController businessNameController = TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
   final TextEditingController representativeController =
