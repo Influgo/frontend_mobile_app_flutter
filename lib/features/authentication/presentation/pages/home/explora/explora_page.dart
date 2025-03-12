@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 class ExploraPage extends StatefulWidget {
   @override
   _ExploraPageState createState() => _ExploraPageState();
@@ -8,6 +8,7 @@ class ExploraPage extends StatefulWidget {
 
 class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String _selectedCategory = "Todos"; 
 
   @override
   void initState() {
@@ -24,68 +25,55 @@ class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStat
     super.dispose();
   }
 
-@override
-Widget build(BuildContext context) {
-  return DefaultTabController(
-    length: 2,
-    child: Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(90),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 16.0, right: 16.0, bottom: 10.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: ' Buscar',
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(left: 15.0),
-                        child: Icon(Icons.search),
-                      ),
-                      filled: true,
-                      fillColor: Color(0xFFEDEFF1),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(90),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20.0, left: 16.0, right: 16.0, bottom: 10.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: ' Buscar',
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 15.0),
+                          child: Icon(Icons.search),
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFEDEFF1),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: 8),
-               InkWell(
-                onTap: () {},
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 5.0),
-                  child: SvgPicture.asset(
-                    'assets/icons/notificationsicon.svg',
-                    width: 22,
-                    height: 22,
+                  SizedBox(width: 8),
+                  InkWell(
+                    onTap: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 5.0),
+                      child: SvgPicture.asset(
+                        'assets/icons/notificationsicon.svg',
+                        width: 22,
+                        height: 22,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ],
-            ),
-          ),
-        ),
-      ),
-
-        body: Column(
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildFilterButton(Icons.filter_list),
-                  _buildCategoryButton('Todos', isActive: true),
-                  _buildCategoryButton('Moda y Belleza'),
-                  _buildCategoryButton('Viajes'),
-                  _buildCategoryButton('Arte'),
-                  _buildCategoryButton('Fitness'),
                 ],
               ),
             ),
+          ),
+        ),
+
+        body: Column(
+          children: [
             Column(
               children: [
                 TabBar(
@@ -94,48 +82,14 @@ Widget build(BuildContext context) {
                   indicatorSize: TabBarIndicatorSize.label,
                   indicatorColor: Colors.transparent,
                   tabs: [
-                    Tab(
-                      child: _tabController.index == 0
-                          ? ShaderMask(
-                              shaderCallback: (bounds) {
-                                return LinearGradient(
-                                  colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
-                                ).createShader(bounds);
-                              },
-                              child: Text(
-                                'Influencers',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            )
-                          : Text(
-                              'Influencers',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                    ),
-                    Tab(
-                      child: _tabController.index == 1
-                          ? ShaderMask(
-                              shaderCallback: (bounds) {
-                                return LinearGradient(
-                                  colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
-                                ).createShader(bounds);
-                              },
-                              child: Text(
-                                'Emprendimientos',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            )
-                          : Text(
-                              'Emprendimientos',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                    ),
+                    _buildTabItem('Influencers', 0),
+                    _buildTabItem('Emprendimientos', 1),
                   ],
                 ),
                 Stack(
                   children: [
                     Container(
-                      height: 2, 
+                      height: 2,
                       color: Colors.grey[300],
                     ),
                     LayoutBuilder(
@@ -159,13 +113,13 @@ Widget build(BuildContext context) {
                 ),
               ],
             ),
-           
+
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildNoResultsContent(),
-                  _buildNoResultsContent(),
+                  _buildTabContent(),
+                  _buildTabContent(),
                 ],
               ),
             ),
@@ -174,7 +128,43 @@ Widget build(BuildContext context) {
       ),
     );
   }
-  
+
+  Widget _buildTabContent() {
+    return Column(
+      children: [
+        _buildScrollableFilters(),
+        Expanded(child: _buildNoResultsContent()),
+      ],
+    );
+  }
+
+  Widget _buildScrollableFilters() {
+    List<String> categorias = [
+      "Todos", "Moda y Belleza", "Viajes", "Arte", "Fitness", "Cultura", "Tecnología", 
+      "Gastronomía", "Deportes", "Negocios", "Cine", "Música"
+    ];
+
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 12.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: BouncingScrollPhysics(),
+        child: Row(
+          children: [
+            _buildFilterButton(),
+            ...List.generate(categorias.length, (index) {
+              return _buildCategoryButton(
+                categorias[index], 
+                isActive: categorias[index] == _selectedCategory,
+                isLast: index == categorias.length - 1
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildNoResultsContent() {
     return Center(
       child: Column(
@@ -189,7 +179,7 @@ Widget build(BuildContext context) {
           Text(
             'Ups...',
             style: TextStyle(
-              fontSize: 20,            
+              fontSize: 20,
             ),
           ),
           SizedBox(height: 8),
@@ -208,9 +198,9 @@ Widget build(BuildContext context) {
     );
   }
 
-  Widget _buildFilterButton(IconData icon) {
+  Widget _buildFilterButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 8.0),
       child: ElevatedButton(
         onPressed: () {},
         style: ElevatedButton.styleFrom(
@@ -224,19 +214,23 @@ Widget build(BuildContext context) {
         ),
         child: SvgPicture.asset(
           'assets/icons/filtericon.svg',
-          width: 18,
-          height: 18,
-          color: Colors.black,
+          width: 14, 
+          height: 14, 
+          colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
         ),
       ),
     );
   }
 
-  Widget _buildCategoryButton(String text, {bool isActive = false}) {
+  Widget _buildCategoryButton(String text, {bool isActive = false, bool isLast = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+      padding: EdgeInsets.only(left: 4.0, right: isLast ? 16.0 : 4.0),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          setState(() {
+            _selectedCategory = text; 
+          });
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: isActive ? Colors.black : Colors.white,
           foregroundColor: isActive ? Colors.white : Colors.black,
@@ -248,6 +242,27 @@ Widget build(BuildContext context) {
         ),
         child: Text(text),
       ),
+    );
+  }
+
+  Widget _buildTabItem(String title, int index) {
+    return Tab(
+      child: _tabController.index == index
+          ? ShaderMask(
+              shaderCallback: (bounds) {
+                return LinearGradient(
+                  colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
+                ).createShader(bounds);
+              },
+              child: Text(
+                title,
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          : Text(
+              title,
+              style: TextStyle(color: Colors.grey),
+            ),
     );
   }
 }

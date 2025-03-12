@@ -65,4 +65,7 @@ flutter:
     - assets/icons/eventosicon.svg
     - assets/icons/chaticon.svg
     - assets/icons/perfilicon.svg
-    - assets/icons/notificationsicon.svg
+    - assets/icons/notificationsicon.svg    
+    - assets/icons/closeicon.svg
+    - assets/icons/revisionicon.svg 
+

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/explora/explora_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/modals/account_under_review_modal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,17 +13,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool userUnderReview = true; 
 
   static final List<Widget> _pages = <Widget>[
     ExploraPage(),
-
     Center(child: Text('Calendario')),
     Center(child: Text('Eventos')),
     Center(child: Text('Chat')),
     ProfileScreen(),
   ];
 
-  // Lista de rutas para los iconos SVG
   final List<String> _iconPaths = [
     'assets/icons/exploraicon.svg',
     'assets/icons/calendarioicon.svg',
@@ -35,6 +35,26 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
     });
+
+    if ((index == 1 || index == 3) && userUnderReview) {
+      Future.delayed(Duration(milliseconds: 300), () {
+        _showAccountUnderReviewModal();
+      });
+    }
+  }
+
+  void _showAccountUnderReviewModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AccountUnderReviewModal(
+          onClose: () {
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -101,36 +121,36 @@ class _HomePageState extends State<HomePage> {
                 label: labels[index],
               );
             }),
-             currentIndex: _selectedIndex,
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.black,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      selectedFontSize: 12,
-      unselectedFontSize: 12,
-      iconSize: 24,
-      selectedLabelStyle: TextStyle(
-        height: 1.5,
-        foreground: Paint()
-          ..shader = LinearGradient(
-            colors: [
-              Color(0xFFC20B0C),
-              Color(0xFF7E0F9D),
-              Color(0xFF2616C7)
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ).createShader(Rect.fromLTWH(0.0, 0.0, 100.0, 20.0)),
-      ),
-      unselectedLabelStyle: TextStyle(
-        color: Colors.black,
-        height: 1.5,
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.black,
+            unselectedItemColor: Colors.black,
+            onTap: _onItemTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedFontSize: 12,
+            unselectedFontSize: 12,
+            iconSize: 24,
+            selectedLabelStyle: TextStyle(
+              height: 1.5,
+              foreground: Paint()
+                ..shader = LinearGradient(
+                  colors: [
+                    Color(0xFFC20B0C),
+                    Color(0xFF7E0F9D),
+                    Color(0xFF2616C7)
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(Rect.fromLTWH(0.0, 0.0, 100.0, 20.0)),
+            ),
+            unselectedLabelStyle: TextStyle(
+              color: Colors.black,
+              height: 1.5,
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
