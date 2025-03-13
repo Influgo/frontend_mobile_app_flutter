@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 class ExploraPage extends StatefulWidget {
+  const ExploraPage({super.key});
+
   @override
   _ExploraPageState createState() => _ExploraPageState();
 }
