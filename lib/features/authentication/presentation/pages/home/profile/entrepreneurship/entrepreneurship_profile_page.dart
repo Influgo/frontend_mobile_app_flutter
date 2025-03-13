@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class EntrepreneurshipProfilePage extends StatefulWidget {
   const EntrepreneurshipProfilePage({super.key});
@@ -105,7 +106,7 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
             width: double.infinity,
             height: 180,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: Color(0xFFC4C4C4),
               image: _coverImage != null
                   ? DecorationImage(
                       fit: BoxFit.cover,
@@ -113,35 +114,95 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
                     )
                   : null,
             ),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Icon(Icons.camera_alt, color: Colors.black, size: 30),
+            child: Center(
+              child: SvgPicture.asset(
+                'assets/icons/cameraoutlineicon.svg',
+                width: 30,
+                height: 30,
+                color: Colors.black,
               ),
             ),
           ),
         ),
+
+        Positioned(
+          right: 15,
+          bottom: -15, 
+          child: GestureDetector(
+            onTap: () => _showImagePickerDialog(false),
+            child: CircleAvatar(
+              radius: 16,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 14,
+                backgroundColor: Color(0xFFB0B0B0), 
+                child: SvgPicture.asset(
+                  'assets/icons/camerafillicon.svg',
+                  width: 16,
+                  height: 16,
+                  color: Colors.black, 
+                ),
+              ),
+            ),
+          ),
+        ),
+
         Positioned(
           left: 20,
           bottom: -40,
           child: GestureDetector(
             onTap: () => _showImagePickerDialog(true),
-            child: CircleAvatar(
-              radius: 44,
-              backgroundColor: Colors.white,
-              child: CircleAvatar(
-                radius: 40,
-                backgroundColor: Color(0xFFC4C4C4),
-                backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
-                child: _profileImage == null ? Icon(Icons.camera_alt, color: Colors.black, size: 28) : null,
-              ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 56,
+                    backgroundColor: Color(0xFFC4C4C4),
+                    backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                    child: _profileImage == null
+                        ? SvgPicture.asset(
+                            'assets/icons/cameraoutlineicon.svg',
+                            width: 30,
+                            height: 30,
+                            color: Colors.black,
+                          )
+                        : null,
+                  ),
+                ),
+
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () => _showImagePickerDialog(true),
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Colors.white,
+                      child: CircleAvatar(
+                        radius: 14,
+                        backgroundColor: Color(0xFFB0B0B0),
+                        child: SvgPicture.asset(
+                          'assets/icons/camerafillicon.svg',
+                          width: 16,
+                          height: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ],
     );
   }
+
+
 
   Widget buildTextField(String label, TextEditingController controller, {int maxLines = 1}) {
     return Padding(
@@ -186,25 +247,30 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
   }
 
   Widget buildSwitch() {
-    return Row(
+    return Column(
       children: [
+      Row(
+        children: [
         Transform.scale(
           scale: 0.8,
           child: Switch(
-            value: isPublic,
-            activeColor: Colors.blue,
-            onChanged: (value) {
-              setState(() {
-                isPublic = value;
-              });
-            },
+          value: isPublic,
+          activeColor: Colors.blue,
+          onChanged: (value) {
+            setState(() {
+            isPublic = value;
+            });
+          },
           ),
         ),
         const SizedBox(width: 5),
         const Text(
           "¿Mostrar públicamente?",
-          style: TextStyle(fontSize: 14, color: Colors.black),
+          style: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w500),
         ),
+        ],
+      ),
+      const SizedBox(height: 10),
       ],
     );
   }
@@ -213,14 +279,23 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+     appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        leading: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Color(0xFFEFEFEF), 
+              borderRadius: BorderRadius.circular(8), 
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -238,7 +313,34 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
             Row(children: [buildSwitch()]),
             const SizedBox(height: 10),
 
-            const Text("Detalle del emprendimiento", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400)),
+            const Text("Detalle del emprendimiento", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 10),
+
+            const Text("Categoría principal", style: TextStyle(fontSize: 14, color: Colors.black)),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              value: selectedCategory,
+              decoration: InputDecoration(
+                labelText: "Categoría principal",
+                labelStyle: TextStyle(fontSize: 14, color: Colors.black),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+              ),
+              items: categories.map((String category) {
+                return DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedCategory = newValue;
+                });
+              },
+            ),
+
             const SizedBox(height: 10),
 
             buildTextField('Resumen del emprendimiento', summaryController),
@@ -300,7 +402,7 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
 
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             const Text("Enfoque de tu emprendimiento", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 10),
 
@@ -331,18 +433,22 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
             const SizedBox(height: 16),
             buildImageUploadButton(),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
               onPressed: () {},
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: EdgeInsets.symmetric(vertical: 20),
+              backgroundColor: Colors.black,
+              padding: EdgeInsets.symmetric(vertical: 24),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               ),
               child: const Text("Guardar cambios", style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
+            const SizedBox(height: 20),
       
           ],
         ),

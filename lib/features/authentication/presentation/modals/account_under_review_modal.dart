@@ -45,10 +45,24 @@ class AccountUnderReviewModal extends StatelessWidget {
 
                 SizedBox(height: 10),
 
-                SvgPicture.asset(
-                  'assets/icons/revisionicon.svg',
-                  width: 140, 
-                  height: 140, 
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                  SvgPicture.asset(
+                    'assets/icons/revisionicon.svg',
+                    width: 140,
+                    height: 140,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 30.0), // Added bottom padding
+                    child: Image.asset(
+                    'assets/images/review.gif',
+                    width: 280,
+                    height: null,
+                    fit: BoxFit.contain,
+                    ),
+                  ),
+                  ],
                 ),
 
                 SizedBox(height: 15),
@@ -84,28 +98,26 @@ class AccountUnderReviewModal extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                  onPressed: onClose,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF222222), 
-                    shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5), 
+                    onPressed: onClose,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF222222), 
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5), 
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 24),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                  ),
-                  child: Text(
-                    'Aceptar',
-                    style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                    color: Colors.white, 
+                    child: Text(
+                      'Aceptar',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                        color: Colors.white, 
+                      ),
                     ),
-                  ),
                   ),
                 ),
                 SizedBox(height: 5),
-
-
               ],
             ),
           ),

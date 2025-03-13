@@ -68,4 +68,5 @@ flutter:
     - assets/icons/notificationsicon.svg    
     - assets/icons/closeicon.svg
     - assets/icons/revisionicon.svg 
-
+    - assets/icons/cameraoutlineicon.svg 
+    - assets/icons/camerafillicon.svg 
