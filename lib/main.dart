@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/core/data/local/shared_preferences_service.dart';
 import 'package:frontend_mobile_app_flutter/core/di/injection_container.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
+// import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
+// import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,8 +42,10 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Influyo!',
           theme: ThemeData(
+        
             primarySwatch: Colors.blue,
             fontFamily: 'Poppins',
+            
             textTheme: const TextTheme(
               titleLarge: TextStyle(
                 fontSize: 26,
@@ -53,10 +58,14 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
+          
           initialRoute: '/login',
           routes: {
             '/login': (context) =>
-                _buildRotatedScreen(const LoginPage(), isLandscape),
+                // _buildRotatedScreen(const LoginPage(), isLandscape),
+                // ProfileScreen(),
+                HomePage(),
+              
             '/register': (context) =>
                 _buildRotatedScreen(const RegisterPage(), isLandscape),
           },
