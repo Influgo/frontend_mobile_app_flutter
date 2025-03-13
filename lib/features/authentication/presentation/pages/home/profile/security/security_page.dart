@@ -4,6 +4,8 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
 
 class SecurityPage extends StatelessWidget {
+  const SecurityPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

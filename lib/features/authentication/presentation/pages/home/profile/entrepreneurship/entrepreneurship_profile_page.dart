@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class EntrepreneurshipProfilePage extends StatefulWidget {
-  const EntrepreneurshipProfilePage({Key? key}) : super(key: key);
+  const EntrepreneurshipProfilePage({super.key});
 
   @override
   _EntrepreneurshipProfilePageState createState() =>
