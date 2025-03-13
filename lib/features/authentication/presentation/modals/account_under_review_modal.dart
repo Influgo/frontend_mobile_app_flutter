@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class AccountUnderReviewModal extends StatelessWidget {
   final VoidCallback onClose;
 
-  const AccountUnderReviewModal({Key? key, required this.onClose}) : super(key: key);
+  const AccountUnderReviewModal({super.key, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
