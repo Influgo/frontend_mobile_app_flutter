@@ -47,7 +47,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 13),
+            padding: const EdgeInsets.only(right: 20),
             child: IconButton(
               icon: const Icon(Icons.notifications_none,
                   color: Colors.black, size: 20),
@@ -169,7 +169,12 @@ class ProfileScreen extends StatelessWidget {
                     }
                   },
                 ),
-                if (index < items.length - 1) const Divider(height: 1, thickness: 1),
+                if (index < items.length - 1)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(height: 1, thickness: 1),
+                  ),
+
               ],
             );
           }),

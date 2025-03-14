@@ -58,6 +58,7 @@ flutter:
     - assets/images/noSearchResults.png
     - assets/images/review.gif
     - assets/images/check.gif
+    - assets/images/delete.png
     - assets/icons/logo_app_influyo.svg
     - assets/icons/filtericon.svg
     - assets/icons/exploraicon.svg
@@ -67,5 +68,6 @@ flutter:
     - assets/icons/perfilicon.svg
     - assets/icons/notificationsicon.svg    
     - assets/icons/closeicon.svg
-    - assets/icons/revisionicon.svg 
+    - assets/icons/revisionicon.svg
+
 

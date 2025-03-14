@@ -5,6 +5,8 @@ import 'package:frontend_mobile_app_flutter/core/di/injection_container.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 
+import 'features/authentication/presentation/pages/home/home_page.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,8 +62,8 @@ class MyApp extends StatelessWidget {
           initialRoute: '/login',
           routes: {
             '/login': (context) =>
-                _buildRotatedScreen(const LoginPage(), isLandscape),
-                // HomePage(),
+               // _buildRotatedScreen(const LoginPage(), isLandscape),
+            HomePage(),
               
             '/register': (context) =>
                 _buildRotatedScreen(const RegisterPage(), isLandscape),

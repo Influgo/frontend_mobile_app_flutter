@@ -41,31 +41,35 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
   }
 
   Widget buildExpansionTile(String question, String answer) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12, width: 1)),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16),
-          childrenPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
-          title: Text(
-            question,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black),
-          ),
-          trailing: const Icon(Icons.expand_more, color: Colors.black, size: 20),
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                answer,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.black12, width: 1)),
+        ),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: EdgeInsets.zero, // Evita doble padding
+            childrenPadding: const EdgeInsets.only(left: 0, right: 0, bottom: 12),
+            title: Text(
+              question,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black),
             ),
-          ],
+            trailing: const Icon(Icons.expand_more, color: Colors.black, size: 20),
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  answer,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 }

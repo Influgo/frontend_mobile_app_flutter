@@ -3,6 +3,9 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart'; 
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
 
+import 'delete_account/delete_account_page.dart';
+import 'delete_account/success_page.dart';
+
 class SecurityPage extends StatelessWidget {
   const SecurityPage({super.key});
 
@@ -31,8 +34,8 @@ class SecurityPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          buildSecurityOption(context, 'Eliminar cuenta', EditProfilePage()), 
-          buildSecurityOption(context, 'Cambiar contraseña', Step3ForgotPasswordPage()), 
+          buildSecurityOption(context, 'Eliminar cuenta', DeleteAccountPage()),
+          buildSecurityOption(context, 'Cambiar contraseña', DeleteAccountSuccessPage()),
         ],
       ),
     );

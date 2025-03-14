@@ -160,7 +160,7 @@ class _ReportProblemPageState extends State<ReportProblemPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   padding: EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                 ),
                 child: Text('Enviar reporte', style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
