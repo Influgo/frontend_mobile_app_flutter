@@ -11,6 +11,16 @@ class EntrepreneurshipProfilePage extends StatefulWidget {
       _EntrepreneurshipProfilePageState();
 }
 
+Widget ErrorTextWidget({required String error}) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0),
+    child: Text(
+      error,
+      style: TextStyle(color: Colors.red, fontSize: 12),
+    ),
+  );
+}
+
 class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePage> {
   final TextEditingController businessNameController = TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
@@ -24,12 +34,23 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
   final TextEditingController addressController = TextEditingController();
   final TextEditingController focusController = TextEditingController();
 
+  final FocusNode instagramFocusNode = FocusNode();
+  final FocusNode tiktokFocusNode = FocusNode();
+  final FocusNode youtubeFocusNode = FocusNode();
+  final FocusNode twitchFocusNode = FocusNode();
+
   bool isPublic = true;
   bool showInstagramField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
   bool showTwitchField = false;
   List<String> focusTags = [];
+
+  String? socialMediaEmpty;
+  String? instagramEmpty;
+  String? tiktokEmpty;
+  String? youtubeEmpty;
+  String? twitchEmpty;
 
 
   String? selectedCategory;
@@ -279,25 +300,28 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-     appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Color(0xFFEFEFEF), 
-              borderRadius: BorderRadius.circular(8), 
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+    appBar: AppBar(
+       backgroundColor: Colors.white,
+       elevation: 0,
+       leading: Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFFEFEFEF), 
+          borderRadius: BorderRadius.circular(8), 
+        ),
+        child: IconButton(
+          icon: const Padding(
+         padding: EdgeInsets.only(left: 5.0),
+         child: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           ),
+          onPressed: () {
+         Navigator.pop(context);
+          },
         ),
       ),
+       ),
+     ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Column(
@@ -316,7 +340,6 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
             const Text("Detalle del emprendimiento", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 10),
 
-            const Text("Categoría principal", style: TextStyle(fontSize: 14, color: Colors.black)),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
               value: selectedCategory,
@@ -347,17 +370,124 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
             buildTextField('Descripción del emprendimiento', descriptionController, maxLines: 3),
 
             const SizedBox(height: 20),
-
             const Text("Redes sociales", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 10),
-            buildTextField("Instagram", instagramController),
-            buildTextField("Tiktok", tiktokController),
-            buildTextField("Youtube", youtubeController),
-            buildTextField("Twitch", twitchController),
 
-            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Instagram', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                Radio<bool>(
+                  value: true,
+                  groupValue: showInstagramField ? true : null,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      showInstagramField = !showInstagramField;
+                    });
+                    if (showInstagramField) {
+                      Future.delayed(Duration(milliseconds: 100), () {
+                        FocusScope.of(context).requestFocus(instagramFocusNode);
+                      });
+                    }
+                  },
+                  activeColor: Colors.black,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (showInstagramField) ...[
+              buildTextField('Cuenta de Instagram', instagramController),
+              if (instagramEmpty != null) ErrorTextWidget(error: instagramEmpty!),
+              const SizedBox(height: 8),
+            ],
+            const Divider(color: Colors.grey, thickness: 0.3), 
 
-            const Text("Modalidad del emprendimiento", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Tiktok', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                Radio<bool>(
+                  value: true,
+                  groupValue: showTiktokField ? true : null,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      showTiktokField = !showTiktokField;
+                    });
+                    if (showTiktokField) {
+                      Future.delayed(Duration(milliseconds: 100), () {
+                        FocusScope.of(context).requestFocus(tiktokFocusNode);
+                      });
+                    }
+                  },
+                  activeColor: Colors.black,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (showTiktokField) ...[
+              buildTextField('Usuario de Tiktok', tiktokController),
+            ],
+
+            const SizedBox(height: 16),
+            const Text('Otras redes sociales (opcional)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 16),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Youtube', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                Radio<bool>(
+                  value: true,
+                  groupValue: showYoutubeField ? true : null,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      showYoutubeField = !showYoutubeField;
+                    });
+                    if (showYoutubeField) {
+                      Future.delayed(Duration(milliseconds: 100), () {
+                        FocusScope.of(context).requestFocus(youtubeFocusNode);
+                      });
+                    }
+                  },
+                  activeColor: Colors.black,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (showYoutubeField) ...[
+              buildTextField('Canal de Youtube', youtubeController),
+            ],
+            const Divider(color: Colors.grey, thickness: 0.3), 
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Twitch', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                Radio<bool>(
+                  value: true,
+                  groupValue: showTwitchField ? true : null,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      showTwitchField = !showTwitchField;
+                    });
+                    if (showTwitchField) {
+                      Future.delayed(Duration(milliseconds: 100), () {
+                        FocusScope.of(context).requestFocus(twitchFocusNode);
+                      });
+                    }
+                  },
+                  activeColor: Colors.black,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (showTwitchField) ...[
+              buildTextField('Canal de Twitch', twitchController),
+            ],
+
+          const SizedBox(height: 20),
+
+          const Text("Modalidad del emprendimiento", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             Row(
               children: [
                 Radio(
@@ -385,6 +515,7 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
                 const Text("Virtual"),
               ],
             ),
+
             const SizedBox(height: 20),
             buildTextField("Dirección del emprendimiento", addressController),
 
@@ -437,13 +568,15 @@ class _EntrepreneurshipProfilePageState extends State<EntrepreneurshipProfilePag
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              padding: EdgeInsets.symmetric(vertical: 24),
-              shape: RoundedRectangleBorder(
+                backgroundColor: Colors.black,
+                padding: EdgeInsets.symmetric(vertical: 24),
+                shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-              ),
+                ),
               ),
               child: const Text("Guardar cambios", style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
