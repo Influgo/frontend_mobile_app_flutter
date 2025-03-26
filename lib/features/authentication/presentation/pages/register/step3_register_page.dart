@@ -80,7 +80,7 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Saca una foto a tu DNI',
+                          'Toma una foto a tu documento de identidad',
                           style: TextStyle(
                               fontSize: 22, fontWeight: FontWeight.w500),
                         ),
@@ -103,6 +103,24 @@ class _Step3RegisterPageState extends State<Step3RegisterPage> {
                               color: Colors.grey),
                         ),
                         SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 8.0, right: 8.0, top: 8.0),
+                              child: Icon(Icons.circle, size: 8),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'Puedes usar tu DNI, pasaporte o carné de extranjería.',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

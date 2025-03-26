@@ -134,7 +134,7 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Ingresa contraseña',
+                      'Ingresa tu nueva contraseña',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
