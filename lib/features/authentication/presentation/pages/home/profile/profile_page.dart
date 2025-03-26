@@ -101,7 +101,7 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const EditProfilePage()),
+                          builder: (context) =>  EditProfilePage(userId: '1')),
                     );
                   },
                 ),
@@ -186,10 +186,10 @@ class ProfileScreen extends StatelessWidget {
   void navigateToPage(BuildContext context, String option) {
     final Map<String, Widget> routes = {
       'Perfil del emprendimiento': const EntrepreneurshipProfilePage(),
-      'Métodos de pago': const EditProfilePage(),
-      'Historial de pagos': const EditProfilePage(),
+      'Métodos de pago': const EntrepreneurshipProfilePage(),
+      'Historial de pagos': const EntrepreneurshipProfilePage(),
       'Seguridad': const SecurityPage(),
-      'Faltas': const EditProfilePage(),
+      'Faltas': const EntrepreneurshipProfilePage(),
       'Centro de ayuda': const HelpCenterPage(),
       'Reportar un problema': const ReportProblemPage(),
       'Término y condiciones': const TermsAndConditionsPage(),

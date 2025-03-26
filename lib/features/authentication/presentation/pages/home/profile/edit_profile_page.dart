@@ -1,69 +1,117 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  final String userId;
+
+  const EditProfilePage({super.key, required this.userId});
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController dniController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
+  String? initialName, initialLastName, initialDni, initialEmail, initialPhone;
   bool isEditing = false;
   bool showSuccessMessage = false;
 
   @override
   void initState() {
     super.initState();
-
+    fetchUserData();
   }
 
+  Future<void> fetchUserData() async {
+    final String url =
+        'https://influyo-testing.ryzeon.me/api/v1/account/${widget.userId}';
 
-  // void fetchUserData() async {
- 
-  //   // final userData = await userRepository.getUserProfile();
-  //   // setState(() {
-  //   //   nameController.text = userData.name;
-  //   //   dniController.text = userData.dni;
-  //   //   emailController.text = userData.email;
-  //   //   phoneController.text = userData.phone;
-  //   // });
-  // }
+    try {
+      final response = await http.patch(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          initialName = nameController.text = data['user'] ?? '';
+          initialLastName = lastNameController.text = data['lastName'] ?? '';
+          initialDni = dniController.text = data['dni'] ?? '';
+          initialEmail = emailController.text = data['email'] ?? '';
+          initialPhone = phoneController.text = data['phone'] ?? '';
+        });
+      } else {
+        showSnackBar('Error al obtener los datos');
+      }
+    } catch (e) {
+      print('Error: $e');
+      showSnackBar('Error de conexión');
+    }
+
+  }
 
   void checkForChanges() {
     setState(() {
-
-      isEditing = nameController.text.isNotEmpty ||
-          dniController.text.isNotEmpty ||
-          emailController.text.isNotEmpty ||
-          phoneController.text.isNotEmpty;
+      isEditing = nameController.text != initialName ||
+          lastNameController.text != initialLastName ||
+          dniController.text != initialDni ||
+          emailController.text != initialEmail ||
+          phoneController.text != initialPhone;
     });
   }
 
-  void saveChanges() {
+  Future<void> updateProfile() async {
+    final String url =
+        'https://influyo-testing.ryzeon.me/api/v1/account/${widget.userId}';
 
-    // userRepository.updateProfile(
-    //   name: nameController.text,
-    //   dni: dniController.text,
-    //   email: emailController.text,
-    //   phone: phoneController.text,
-    // );
-    
-    setState(() {
-      isEditing = false;
-      showSuccessMessage = true;
-    });
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        showSuccessMessage = false;
-      });
-    });
+    final Map<String, String> headers = {'Content-Type': 'application/json'};
+    final Map<String, String> body = {
+      'user': nameController.text,
+      'lastName': lastNameController.text,
+      'dni': dniController.text,
+      'phone': phoneController.text,
+      'email': emailController.text,
+    };
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          initialName = nameController.text;
+          initialLastName = lastNameController.text;
+          initialDni = dniController.text;
+          initialEmail = emailController.text;
+          initialPhone = phoneController.text;
+          isEditing = false;
+          showSuccessMessage = true;
+        });
+
+        Future.delayed(Duration(seconds: 2), () {
+          setState(() {
+            showSuccessMessage = false;
+          });
+        });
+      } else {
+        showSnackBar('Error al actualizar el perfil');
+      }
+    } catch (e) {
+      showSnackBar('No se pudo conectar con el servidor');
+    }
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -75,15 +123,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()),
-            );
+            Navigator.pop(context);
           },
         ),
         titleSpacing: 0,
         title: Text(
-          'Perfil',
+          'Editar Perfil',
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.w500, fontSize: 20),
         ),
@@ -108,9 +153,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: [
-                          Color(0xFFC20B0C), // Rojo oscuro
-                          Color(0xFF7E0F9D), // Morado
-                          Color(0xFF2616C7), // Azul
+                          Color(0xFFC20B0C),
+                          Color(0xFF7E0F9D),
+                          Color(0xFF2616C7),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -123,6 +168,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             SizedBox(height: 20),
             buildTextField('Nombre completo', nameController),
+            buildTextField('Apellido', lastNameController),
             buildTextField('DNI', dniController),
             buildTextField('Correo', emailController),
             buildTextField('Celular', phoneController),
@@ -149,7 +195,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               width: double.infinity,
               margin: EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
-                onPressed: isEditing ? saveChanges : null,
+                onPressed: isEditing ? updateProfile : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isEditing ? Colors.black : Colors.grey,
                   padding: EdgeInsets.symmetric(vertical: 16),
@@ -180,7 +226,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         decoration: InputDecoration(
           labelText: label,
           labelStyle:
-              TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+          TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey),
             borderRadius: BorderRadius.circular(5),

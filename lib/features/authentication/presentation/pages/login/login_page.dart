@@ -11,6 +11,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_field.dart';
 import 'package:flutter/gestures.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -54,9 +55,30 @@ class LoginPageState extends State<LoginPage> {
       logger.i('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+        // Decodificar la respuesta JSON
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        // Extraer el token 
+        String token = responseData['token'] ?? '';
+        String userIdentifier = responseData['userIdentifier'] ?? '';
+        String userId = responseData['userId']?.toString() ?? '';
+        if (token.isNotEmpty) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          logger.i('Token almacenado exitosamente');
+          await prefs.setString('userIdentifier', userIdentifier);
+          logger.i('userIdentifier almacenado exitosamente');
+          await prefs.setString('userId', userId);
+          logger.i('userId almacenado exitosamente');
+          logger.i('Token: $token');
+          logger.i('userIdentifier: $userIdentifier');
+          logger.i('userId: $userId');
+          
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          _showSnackBar("Error al obtener el token");
+        }
       } else if (response.statusCode == 400) {
         _showSnackBar("Credenciales incorrectas");
       } else {
