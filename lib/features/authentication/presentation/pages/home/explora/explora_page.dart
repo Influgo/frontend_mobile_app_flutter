@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_tab_item.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/tab_content.dart';
 
 class ExploraPage extends StatefulWidget {
   const ExploraPage({super.key});
@@ -8,9 +10,10 @@ class ExploraPage extends StatefulWidget {
   _ExploraPageState createState() => _ExploraPageState();
 }
 
-class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStateMixin {
+class _ExploraPageState extends State<ExploraPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedCategory = "Todos"; 
+  String _selectedCategory = "Todos";
 
   @override
   void initState() {
@@ -36,7 +39,8 @@ class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStat
           preferredSize: Size.fromHeight(90),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 16.0, right: 16.0, bottom: 10.0),
+              padding: const EdgeInsets.only(
+                  top: 20.0, left: 16.0, right: 16.0, bottom: 10.0),
               child: Row(
                 children: [
                   Expanded(
@@ -73,7 +77,6 @@ class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStat
             ),
           ),
         ),
-
         body: Column(
           children: [
             Column(
@@ -84,8 +87,14 @@ class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStat
                   indicatorSize: TabBarIndicatorSize.label,
                   indicatorColor: Colors.transparent,
                   tabs: [
-                    _buildTabItem('Influencers', 0),
-                    _buildTabItem('Emprendimientos', 1),
+                    CustomTabItem(
+                        title: 'Influencers',
+                        index: 0,
+                        tabController: _tabController),
+                    CustomTabItem(
+                        title: 'Emprendimientos',
+                        index: 1,
+                        tabController: _tabController),
                   ],
                 ),
                 Stack(
@@ -100,12 +109,17 @@ class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStat
                         return AnimatedContainer(
                           duration: Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
-                          margin: EdgeInsets.only(left: _tabController.index * tabWidth),
+                          margin: EdgeInsets.only(
+                              left: _tabController.index * tabWidth),
                           width: tabWidth,
                           height: 2,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
+                              colors: [
+                                Color(0xFFC20B0C),
+                                Color(0xFF7E0F9D),
+                                Color(0xFF2616C7)
+                              ],
                             ),
                           ),
                         );
@@ -115,156 +129,18 @@ class _ExploraPageState extends State<ExploraPage> with SingleTickerProviderStat
                 ),
               ],
             ),
-
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [
-                  _buildTabContent(),
-                  _buildTabContent(),
+                children: const [
+                  TabContent(),
+                  TabContent(),
                 ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildTabContent() {
-    return Column(
-      children: [
-        _buildScrollableFilters(),
-        Expanded(child: _buildNoResultsContent()),
-      ],
-    );
-  }
-
-  Widget _buildScrollableFilters() {
-    List<String> categorias = [
-      "Todos", "Moda y Belleza", "Viajes", "Arte", "Fitness", "Cultura", "Tecnología", 
-      "Gastronomía", "Deportes", "Negocios", "Cine", "Música"
-    ];
-
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12.0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
-        child: Row(
-          children: [
-            _buildFilterButton(),
-            ...List.generate(categorias.length, (index) {
-              return _buildCategoryButton(
-                categorias[index], 
-                isActive: categorias[index] == _selectedCategory,
-                isLast: index == categorias.length - 1
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNoResultsContent() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/noSearchResults.png',
-            width: 160,
-            height: 160,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Ups...',
-            style: TextStyle(
-              fontSize: 20,
-            ),
-          ),
-          SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              'No encontramos resultados que coincidan con tus criterios de búsqueda. Prueba con otros.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.grey[600],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterButton() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: Colors.black),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        child: SvgPicture.asset(
-          'assets/icons/filtericon.svg',
-          width: 14, 
-          height: 14, 
-          colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryButton(String text, {bool isActive = false, bool isLast = false}) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4.0, right: isLast ? 16.0 : 4.0),
-      child: ElevatedButton(
-        onPressed: () {
-          setState(() {
-            _selectedCategory = text; 
-          });
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isActive ? Colors.black : Colors.white,
-          foregroundColor: isActive ? Colors.white : Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.black),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        child: Text(text),
-      ),
-    );
-  }
-
-  Widget _buildTabItem(String title, int index) {
-    return Tab(
-      child: _tabController.index == index
-          ? ShaderMask(
-              shaderCallback: (bounds) {
-                return LinearGradient(
-                  colors: [Color(0xFFC20B0C), Color(0xFF7E0F9D), Color(0xFF2616C7)],
-                ).createShader(bounds);
-              },
-              child: Text(
-                title,
-                style: TextStyle(color: Colors.white),
-              ),
-            )
-          : Text(
-              title,
-              style: TextStyle(color: Colors.grey),
-            ),
     );
   }
 }
