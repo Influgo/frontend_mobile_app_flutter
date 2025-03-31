@@ -11,6 +11,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/password_field.dart';
 import 'package:flutter/gestures.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -54,9 +55,30 @@ class LoginPageState extends State<LoginPage> {
       logger.i('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+        // Decodificar la respuesta JSON
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        // Extraer el token 
+        String token = responseData['token'] ?? '';
+        String userIdentifier = responseData['userIdentifier'] ?? '';
+        String userId = responseData['userId']?.toString() ?? '';
+        if (token.isNotEmpty) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          logger.i('Token almacenado exitosamente');
+          await prefs.setString('userIdentifier', userIdentifier);
+          logger.i('userIdentifier almacenado exitosamente');
+          await prefs.setString('userId', userId);
+          logger.i('userId almacenado exitosamente');
+          logger.i('Token: $token');
+          logger.i('userIdentifier: $userIdentifier');
+          logger.i('userId: $userId');
+          
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          _showSnackBar("Error al obtener el token");
+        }
       } else if (response.statusCode == 400) {
         _showSnackBar("Credenciales incorrectas");
       } else {
@@ -73,119 +95,127 @@ class LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const InfluyoLogo(),
-                const SizedBox(height: 20),
-                const Text(
-                  'Iniciar sesión',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Ingresa tus datos para acceder a tu cuenta',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 32),
-                CustomEmailOrNumberField(
-                  label: 'Correo, número o teléfono',
-                  controller: _identifierController,
-                  maxLength: 100,
-                ),
-                const SizedBox(height: 16),
-                PasswordField(
-                    controller: _passwordController, label: "Contraseña"),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const ForgotPasswordPage(),
-                        ),
-                      );
-                    },
-                    child: const Text('¿Olvidaste tu contraseña?'),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _validateAndLogin,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      backgroundColor: const Color.fromARGB(255, 34, 34, 34),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    child: const Text(
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distribuye los elementos
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const InfluyoLogo(),
+                    const SizedBox(height: 20),
+                    const Text(
                       'Iniciar sesión',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Ingresar como invitado',
-                    style: TextStyle(
-                      color: const Color.fromARGB(255, 34, 34, 34),
-                      decoration: TextDecoration.underline,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 30),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text.rich(
-                      TextSpan(
-                        text: '¿No tienes una cuenta? ',
-                        style: const TextStyle(fontSize: 14),
-                        children: [
-                          TextSpan(
-                            text: 'Regístrate',
-                            style: const TextStyle(
-                              color: Color(0xFF6A6A6A),
-                              decoration: TextDecoration.underline,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.of(context).pushReplacement(
-                                  PageRouteBuilder(
-                                    pageBuilder: (context, _, __) =>
-                                        const RegisterPage(),
-                                  ),
-                                );
-                              },
-                          ),
-                        ],
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Ingresa tus datos para acceder a tu cuenta',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 32),
+                    CustomEmailOrNumberField(
+                      label: 'Correo, número o teléfono',
+                      controller: _identifierController,
+                      maxLength: 100,
+                    ),
+                    const SizedBox(height: 16),
+                    PasswordField(
+                      controller: _passwordController,
+                      label: "Contraseña",
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const ForgotPasswordPage(),
+                            ),
+                          );
+                        },
+                        child: const Text('¿Olvidaste tu contraseña?'),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _validateAndLogin,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          backgroundColor: const Color.fromARGB(255, 34, 34, 34),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        child: const Text(
+                          'Iniciar sesión',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Ingresar como invitado',
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 34, 34, 34),
+                          decoration: TextDecoration.underline,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text.rich(
+                TextSpan(
+                  text: '¿No tienes una cuenta? ',
+                  style: const TextStyle(fontSize: 14),
+                  children: [
+                    TextSpan(
+                      text: 'Regístrate',
+                      style: const TextStyle(
+                        color: Color(0xFF6A6A6A),
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.of(context).pushReplacement(
+                            PageRouteBuilder(
+                              pageBuilder: (context, _, __) => const RegisterPage(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

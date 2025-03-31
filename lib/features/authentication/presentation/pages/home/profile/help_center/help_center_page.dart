@@ -25,7 +25,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
         title: const Text(
           'Centro de ayuda',
           style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.w400, fontSize: 20),
+              color: Colors.black, fontWeight: FontWeight.w500, fontSize: 20),
         ),
       ),
       body: ListView(

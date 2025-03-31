@@ -53,4 +53,22 @@ class SharedPreferencesService {
       print('Error al intentar eliminar las fotos: $e');
     }
   }
+  // Guardar token
+  Future<void> saveToken(String token) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+  }
+    // Guardar User ID
+  Future<void> saveUserId(String id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_id', id);  
+  }
+  // Borrar todos los valores almacenados
+  Future<void> clearStoredValue() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token'); 
+    await prefs.remove('user_id');
+  }
+
+
 }
