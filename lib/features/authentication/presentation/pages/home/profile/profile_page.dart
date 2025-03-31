@@ -101,7 +101,7 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>  EditProfilePage(userId: '1')),
+                          builder: (context) => EditProfilePage(userId: '1')),
                     );
                   },
                 ),
@@ -174,7 +174,6 @@ class ProfileScreen extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: Divider(height: 1, thickness: 1),
                   ),
-
               ],
             );
           }),
@@ -205,8 +204,6 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
-
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -217,75 +214,94 @@ class ProfileScreen extends StatelessWidget {
             // Fondo borroso
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              // Nivel de desenfoque
               child: Container(
-                color: Colors.black.withOpacity(0.3), // Oscurecer el fondo
+                color: Colors.black.withOpacity(0.3),
               ),
             ),
             Center(
               child: AlertDialog(
                 backgroundColor: Colors.white,
-                // Color de fondo del pop-up
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 title: Column(
                   children: [
-                    const Icon(Icons.warning_amber_rounded,
-                        color: Colors.amber, size: 40),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(242, 201, 76, 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.warning_rounded,
+                        color: Colors.amber,
+                        size: 40,
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     const Text(
                       '¿Seguro que deseas cerrar sesión?',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
                       ),
                     ),
                   ],
                 ),
-                actionsAlignment: MainAxisAlignment.spaceEvenly,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
-                        side: const BorderSide(color: Colors.black, width: 1),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 58),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                              side: const BorderSide(
+                                color: Colors.black,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            'No, regresar',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
                       ),
-
-                    ),
-                    child: const Text(
-                      'No, regresar',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            minimumSize: const Size(double.infinity, 58),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          child: const Text(
+                            'Sí, cerrar',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      'Sí, cerrar',
-                      style: TextStyle(
-                          color: Colors.white),
-                    ),
+                    ],
                   ),
                 ],
               ),

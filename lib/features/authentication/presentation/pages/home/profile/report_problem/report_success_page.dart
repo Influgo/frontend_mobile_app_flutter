@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
 
-class DeleteAccountSuccessPage extends StatelessWidget {
-  const DeleteAccountSuccessPage({super.key});
+class ReportSuccessPage extends StatelessWidget {
+  const ReportSuccessPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +16,6 @@ class DeleteAccountSuccessPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
                 const Spacer(),
                 // Círculo con el GIF
                 Container(
@@ -45,7 +36,7 @@ class DeleteAccountSuccessPage extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 const Text(
-                  'Tu cuenta ha sido eliminada exitosamente',
+                  'Tu reporte se ha enviado con éxito',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -55,8 +46,7 @@ class DeleteAccountSuccessPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 // Mensaje secundario
                 const Text(
-                  'Te extrañaremos. Si decides regresar, estaremos aquí para ayudarte a impulsar tu emprendimiento.\n\n'
-                      'Gracias por haber sido parte de Influyo!',
+                  'Gracias por apoyar en la mejora de Influyo!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -76,15 +66,14 @@ class DeleteAccountSuccessPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.of(context).pushAndRemoveUntil(
+                      Navigator.pushReplacement(
+                        context,
                         MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                            (route) => false,
+                            builder: (context) => const HomePage()),
                       );
                     },
                     child: const Text(
-                      'Volver a Iniciar sesión',
+                      'Regresar',
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
