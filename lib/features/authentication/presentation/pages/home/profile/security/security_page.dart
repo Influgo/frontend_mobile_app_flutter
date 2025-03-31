@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step3_forgot_password_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart'; 
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
 
 import 'delete_account/delete_account_page.dart';
@@ -35,7 +35,8 @@ class SecurityPage extends StatelessWidget {
       body: ListView(
         children: [
           buildSecurityOption(context, 'Eliminar cuenta', DeleteAccountPage()),
-          buildSecurityOption(context, 'Cambiar contraseña', DeleteAccountSuccessPage()),
+          buildSecurityOption(
+              context, 'Cambiar contraseña', DeleteAccountSuccessPage()),
         ],
       ),
     );
@@ -45,20 +46,27 @@ class SecurityPage extends StatelessWidget {
     return Column(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
           title: Text(
             title,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
           ),
-          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+          trailing: const Icon(Icons.arrow_forward_ios,
+              size: 16, color: Colors.black),
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => page), 
+              MaterialPageRoute(builder: (context) => page),
             );
           },
         ),
-        if (title != 'Cambiar contraseña') 
-          Divider(height: 1, thickness: 1),
+      
+        if (title != 'Cambiar contraseña')
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.0),
+          child: Divider(height: 1, thickness: 1),
+        ),
+          
       ],
     );
   }
