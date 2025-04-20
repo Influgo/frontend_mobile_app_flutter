@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NoResultsContent extends StatelessWidget {
-  const NoResultsContent({Key? key}) : super(key: key);
+  const NoResultsContent({super.key});
 
   @override
   Widget build(BuildContext context) {

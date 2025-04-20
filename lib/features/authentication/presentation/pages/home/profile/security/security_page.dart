@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step3_forgot_password_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
 
 import 'delete_account/delete_account_page.dart';
@@ -60,13 +58,11 @@ class SecurityPage extends StatelessWidget {
             );
           },
         ),
-      
         if (title != 'Cambiar contraseña')
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: Divider(height: 1, thickness: 1),
-        ),
-          
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Divider(height: 1, thickness: 1),
+          ),
       ],
     );
   }

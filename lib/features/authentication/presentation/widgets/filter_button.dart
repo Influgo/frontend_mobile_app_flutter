@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class FilterButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const FilterButton({Key? key, required this.onPressed}) : super(key: key);
+  const FilterButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {

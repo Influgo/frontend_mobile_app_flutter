@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_tab_item.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/tab_content.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/tab_content_entrepreneurships.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/tab_content_influencers.dart';
 
 class ExploraPage extends StatefulWidget {
   const ExploraPage({super.key});
@@ -13,7 +14,7 @@ class ExploraPage extends StatefulWidget {
 class _ExploraPageState extends State<ExploraPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  String _selectedCategory = "Todos";
+  final String _selectedCategory = "Todos";
 
   @override
   void initState() {
@@ -36,20 +37,21 @@ class _ExploraPageState extends State<ExploraPage>
       length: 2,
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(90),
+          preferredSize: Size.fromHeight(50),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 20.0, left: 16.0, right: 16.0, bottom: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
+                      textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        hintText: ' Buscar',
+                        hintText: 'Buscar perfil',
                         prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: 15.0),
-                          child: Icon(Icons.search),
+                          padding: const EdgeInsets.all(5.0),
+                          child: Icon(Icons.search, size: 20),
                         ),
                         filled: true,
                         fillColor: Color(0xFFEDEFF1),
@@ -57,6 +59,8 @@ class _ExploraPageState extends State<ExploraPage>
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
                         ),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 0),
                       ),
                     ),
                   ),
@@ -133,8 +137,8 @@ class _ExploraPageState extends State<ExploraPage>
               child: TabBarView(
                 controller: _tabController,
                 children: const [
-                  TabContent(),
-                  TabContent(),
+                  TabContentInfluencers(),
+                  TabContentEntrepreneurships(),
                 ],
               ),
             ),

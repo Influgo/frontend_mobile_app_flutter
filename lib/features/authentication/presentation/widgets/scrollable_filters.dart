@@ -5,19 +5,22 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 class ScrollableFilters extends StatefulWidget {
   final String selectedCategory;
   final Function(String) onCategorySelected;
+  final List<String>? categories;
 
   const ScrollableFilters({
-    Key? key,
+    super.key,
     required this.selectedCategory,
     required this.onCategorySelected,
-  }) : super(key: key);
+    this.categories,
+  });
 
   @override
   _ScrollableFiltersState createState() => _ScrollableFiltersState();
 }
 
 class _ScrollableFiltersState extends State<ScrollableFilters> {
-  List<String> categorias = [
+  // Default categories if none are provided
+  final List<String> _defaultCategories = [
     "Todos",
     "Moda y Belleza",
     "Viajes",
@@ -34,8 +37,12 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
 
   @override
   Widget build(BuildContext context) {
+    // Use provided categories or default ones
+    final List<String> categoriesToShow =
+        widget.categories ?? _defaultCategories;
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -46,13 +53,13 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
                 // Acción cuando se presiona el botón de filtro
               },
             ),
-            ...List.generate(categorias.length, (index) {
+            ...List.generate(categoriesToShow.length, (index) {
               return CategoryButton(
-                text: categorias[index],
-                isActive: categorias[index] == widget.selectedCategory,
-                isLast: index == categorias.length - 1,
+                text: categoriesToShow[index],
+                isActive: categoriesToShow[index] == widget.selectedCategory,
+                isLast: index == categoriesToShow.length - 1,
                 onPressed: () {
-                  widget.onCategorySelected(categorias[index]);
+                  widget.onCategorySelected(categoriesToShow[index]);
                 },
               );
             }),

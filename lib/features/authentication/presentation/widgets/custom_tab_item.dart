@@ -6,11 +6,11 @@ class CustomTabItem extends StatelessWidget {
   final TabController tabController;
 
   const CustomTabItem({
-    Key? key,
+    super.key,
     required this.title,
     required this.index,
     required this.tabController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
