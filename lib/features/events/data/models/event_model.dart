@@ -46,13 +46,28 @@ class S3File {
 
 class MediaFile {
   final String? url;
+  final bool expired;
+  final DateTime? expiresAt;
 
-  MediaFile({this.url});
+  MediaFile({this.url, this.expired = false, this.expiresAt});
 
   factory MediaFile.fromJson(Map<String, dynamic> json) {
     return MediaFile(
-      url: json['url'] ?? json['tempUrl'],
+      url: json['tempUrl'] ?? json['url'],
+      expired: json['expired'] ?? false,
+      expiresAt: json['expiresAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['expiresAt'])
+          : null,
     );
+  }
+
+  bool get isUrlValid {
+    // Check if URL exists, is not expired according to the flag,
+    // and hasn't passed its expiration date
+    if (url == null) return false;
+    if (expired) return false;
+    if (expiresAt != null && DateTime.now().isAfter(expiresAt!)) return false;
+    return true;
   }
 }
 

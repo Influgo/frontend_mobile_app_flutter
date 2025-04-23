@@ -17,8 +17,13 @@ class EventDetailPage extends StatelessWidget {
     final String formattedTimeRange =
         '${timeFormat.format(event.eventDetailsStartDateEvent)} – ${timeFormat.format(event.eventDetailsEndDateEvent)}';
 
-    final String imageUrl = event.s3File?.url ??
+    // In EventDetailPage.build method:
+    final String defaultImageUrl =
         'https://cdn.pixabay.com/photo/2024/11/25/10/38/mountains-9223041_1280.jpg';
+
+    final String imageUrl = (event.s3File?.isUrlValid == true)
+        ? event.s3File!.url!
+        : defaultImageUrl;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,14 +39,24 @@ class EventDetailPage extends StatelessWidget {
           children: [
             // Imagen superior
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                imageUrl,
-                width: double.infinity,
-                height: 180,
-                fit: BoxFit.cover,
-              ),
-            ),
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: 180,
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported,
+                            size: 50, color: Colors.grey),
+                      ),
+                    );
+                  },
+                )),
             const SizedBox(height: 16),
 
             // Nombre del evento
@@ -99,13 +114,6 @@ class EventDetailPage extends StatelessWidget {
               "${event.jobDetailsPayFare} soles",
               style: const TextStyle(fontSize: 14),
             ),
-
-            /*const SizedBox(height: 24),
-            _sectionTitle("Ubicación"),
-            Text(
-              event.eventLocation ?? 'Ubicación no especificada',
-              style: const TextStyle(fontSize: 14),
-            ),*/
           ],
         ),
       ),

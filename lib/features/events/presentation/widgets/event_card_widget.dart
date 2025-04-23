@@ -13,10 +13,14 @@ class EventCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     initializeDateFormatting('es', null);
 
+    // In EventCardWidget.build method:
     final String defaultImageUrl =
         'https://cdn.pixabay.com/photo/2024/11/25/10/38/mountains-9223041_1280.jpg';
 
-    final imageUrl = event.s3File?.url ?? defaultImageUrl;
+// Use the URL only if it's valid, otherwise use the default
+    final imageUrl = (event.s3File?.isUrlValid == true)
+        ? event.s3File!.url!
+        : defaultImageUrl;
 
     final DateFormat startDateFormat = DateFormat('d MMM yyyy', 'es');
     final String formattedStartDate =

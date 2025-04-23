@@ -135,4 +135,31 @@ class EventService {
       throw Exception('Failed to load filtered events: ${response.statusCode}');
     }
   }
+
+  Future<String?> refreshImageUrl(int eventId, int s3FileId) async {
+    final token = await _getToken();
+    if (token == null) {
+      throw Exception('No authentication token found');
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/entities/events/$eventId/media/$s3FileId/refresh'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return jsonResponse['tempUrl'];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error refreshing image URL: ${e.toString()}');
+      return null;
+    }
+  }
 }
