@@ -2,13 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/edit_profile_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/entrepreneurship/entrepreneurship_profile_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/help_center/help_center_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/report_problem/report_problem_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/security/security_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/terms_and_condition/terms_and_condition_page.dart';
+import 'package:frontend_mobile_app_flutter/features/shared/presentation/pages/home_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/edit_profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/help_center/help_center_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/report_problem/report_problem_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/security/security_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/terms_and_condition/terms_and_condition_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 
 class ProfileScreen extends StatelessWidget {

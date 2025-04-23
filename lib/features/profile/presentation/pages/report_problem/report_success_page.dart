@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/home_page.dart';
+import 'package:frontend_mobile_app_flutter/features/shared/presentation/pages/home_page.dart';
 
 class ReportSuccessPage extends StatelessWidget {
   const ReportSuccessPage({super.key});

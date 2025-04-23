@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/entrepreneurship/data/models/entrepreneurship_model.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 
 class BusinessCardWidget extends StatelessWidget {
   final Entrepreneurship entrepreneurship;

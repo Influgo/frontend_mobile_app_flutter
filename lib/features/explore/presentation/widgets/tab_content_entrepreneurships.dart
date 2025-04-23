@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/entrepreneurship/data/models/entrepreneurship_model.dart';
-import 'package:frontend_mobile_app_flutter/features/entrepreneurship/data/services/entrepreneurship_service.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/business_card_widget.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/horizontal_cards_section.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/scrollable_filters.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/no_results_content.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/services/entrepreneurship_service.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/business_card_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/horizontal_cards_section.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/scrollable_filters.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/no_results_content.dart';
 
 class TabContentEntrepreneurships extends StatefulWidget {
   const TabContentEntrepreneurships({super.key});

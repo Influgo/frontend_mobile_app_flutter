@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/profile_page.dart';
 
 import 'delete_account/delete_account_page.dart';
 import 'delete_account/success_page.dart';

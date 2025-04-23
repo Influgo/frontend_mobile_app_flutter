@@ -1,0 +1,154 @@
+import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/event_card_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
+import 'package:frontend_mobile_app_flutter/features/events/data/services/event_service.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/horizontal_event_cards_section.dart';
+
+class EventsPage extends StatefulWidget {
+  const EventsPage({super.key});
+
+  @override
+  _EventsPageState createState() => _EventsPageState();
+}
+
+class _EventsPageState extends State<EventsPage> {
+  final EventService _service = EventService();
+  bool _isLoading = true;
+  String? _errorMessage;
+  List<Event> _events = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
+
+  Future<void> _fetchEvents() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await _service.getEvents();
+      setState(() {
+        _events = response.content;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error al cargar los eventos: ${e.toString()}';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Buscar',
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.search),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 12),
+            IconButton(
+              icon: Icon(Icons.notifications_outlined),
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+      body: _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_errorMessage != null) {
+      return Center(child: Text(_errorMessage!));
+    }
+
+    if (_events.isEmpty) {
+      return Center(child: Text("No se encontraron eventos"));
+    }
+
+    final recentEvents = List<Event>.from(_events)
+      ..sort((a, b) =>
+          b.eventDetailsStartDateEvent.compareTo(a.eventDetailsStartDateEvent));
+
+    final mostRecent = recentEvents.take(5).toList();
+
+    final bestPaid = List<Event>.from(_events)
+      ..sort((a, b) => b.jobDetailsPayFare.compareTo(a.jobDetailsPayFare));
+
+    final highestPaying = bestPaid.take(5).toList();
+
+    final mostDemanded = List<Event>.from(_events)
+      ..sort((a, b) =>
+          b.jobDetailsQuantityOfPeople.compareTo(a.jobDetailsQuantityOfPeople));
+
+    final mostRequestedEvents = mostDemanded.take(5).toList();
+
+    return RefreshIndicator(
+      onRefresh: _fetchEvents,
+      child: ListView(
+        padding: const EdgeInsets.only(top: 16, left: 2, right: 2),
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          if (highestPaying.isNotEmpty)
+            Align(
+              alignment: Alignment.topLeft,
+              child: HorizontalEventCardsSection(
+                title: "Mejor remunerados",
+                cards: highestPaying
+                    .map((e) => EventCardWidget(event: e))
+                    .toList(),
+              ),
+            ),
+          const SizedBox(height: 16),
+          if (mostRecent.isNotEmpty)
+            Align(
+              alignment: Alignment.topLeft,
+              child: HorizontalEventCardsSection(
+                title: "Más recientes",
+                cards:
+                    mostRecent.map((e) => EventCardWidget(event: e)).toList(),
+              ),
+            ),
+          const SizedBox(height: 16),
+          if (mostRequestedEvents.isNotEmpty)
+            Align(
+              alignment: Alignment.topLeft,
+              child: HorizontalEventCardsSection(
+                title: "Más solicitados",
+                cards: mostRequestedEvents
+                    .map((e) => EventCardWidget(event: e))
+                    .toList(),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

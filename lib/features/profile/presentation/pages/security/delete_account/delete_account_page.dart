@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/security/delete_account/success_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/security/delete_account/success_page.dart';
 
 class DeleteAccountPage extends StatelessWidget {
   const DeleteAccountPage({super.key});
@@ -47,7 +47,7 @@ class DeleteAccountPage extends StatelessWidget {
 
       if (response.statusCode == 200) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.clear(); 
+        await prefs.clear();
 
         Navigator.pushReplacement(
           context,

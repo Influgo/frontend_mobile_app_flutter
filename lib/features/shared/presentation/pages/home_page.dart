@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/explora/explora_page.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/pages/explora_page.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/events_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/modals/account_under_review_modal.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,12 +14,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  bool userUnderReview = true; 
+  bool userUnderReview = true;
 
   static final List<Widget> _pages = <Widget>[
     ExploraPage(),
     Center(child: Text('Calendario')),
-    Center(child: Text('Eventos')),
+    EventsPage(),
     Center(child: Text('Chat')),
     ProfileScreen(),
   ];
@@ -61,10 +62,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white, 
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0), 
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
           child: BottomNavigationBar(
             items: List.generate(5, (index) {
               List<String> labels = [
@@ -108,14 +108,16 @@ class _HomePageState extends State<HomePage> {
                             _iconPaths[index],
                             width: 24,
                             height: 24,
-                            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            colorFilter:
+                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           ),
                         )
                       : SvgPicture.asset(
                           _iconPaths[index],
                           width: 24,
                           height: 24,
-                          colorFilter: ColorFilter.mode(Colors.black, BlendMode.srcIn),
+                          colorFilter:
+                              ColorFilter.mode(Colors.black, BlendMode.srcIn),
                         ),
                 ),
                 label: labels[index],

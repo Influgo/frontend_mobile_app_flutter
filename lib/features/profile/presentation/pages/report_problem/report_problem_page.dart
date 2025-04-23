@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/home/profile/report_problem/report_success_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/report_problem/report_success_page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;

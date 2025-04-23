@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/business_card_widget.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/horizontal_cards_section.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/scrollable_filters.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/no_results_content.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/business_card_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/horizontal_cards_section.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/scrollable_filters.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/no_results_content.dart';
 
 class TabContentInfluencers extends StatefulWidget {
   const TabContentInfluencers({super.key});

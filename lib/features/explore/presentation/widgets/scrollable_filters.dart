@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/category_button.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/filter_button.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/filter_button.dart';
 
 class ScrollableFilters extends StatefulWidget {
   final String selectedCategory;

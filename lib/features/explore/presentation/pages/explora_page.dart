@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_tab_item.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/tab_content_entrepreneurships.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/tab_content_influencers.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/tab_content_entrepreneurships.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/tab_content_influencers.dart';
 
 class ExploraPage extends StatefulWidget {
   const ExploraPage({super.key});
