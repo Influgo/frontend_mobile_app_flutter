@@ -1,4 +1,3 @@
-import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:flutter/foundation.dart';
 
 class EventResponse {

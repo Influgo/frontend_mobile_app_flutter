@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/core/data/local/shared_preferences_service.dart';
 import 'package:frontend_mobile_app_flutter/core/di/injection_container.dart';
-import 'package:frontend_mobile_app_flutter/features/shared/presentation/pages/home_page.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/add_event_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 
@@ -63,6 +63,7 @@ class MyApp extends StatelessWidget {
             //HomePage(),
             '/register': (context) =>
                 _buildRotatedScreen(const RegisterPage(), isLandscape),
+            '/add-event': (context) => const AddEventPage(),
           },
         );
       },

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/events/domain/repositories/event_repository_impl.dart';
+import 'package:frontend_mobile_app_flutter/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/event_card_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/services/event_service.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/horizontal_event_cards_section.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/custom_fab_widget.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -23,6 +26,8 @@ class _EventsPageState extends State<EventsPage> {
     _fetchEvents();
   }
 
+  final _useCase = GetEventsUseCase(EventRepositoryImpl(EventService()));
+
   Future<void> _fetchEvents() async {
     setState(() {
       _isLoading = true;
@@ -30,9 +35,9 @@ class _EventsPageState extends State<EventsPage> {
     });
 
     try {
-      final response = await _service.getEvents();
+      final events = await _useCase();
       setState(() {
-        _events = response.content;
+        _events = events;
         _isLoading = false;
       });
     } catch (e) {
@@ -77,6 +82,12 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
       body: _buildContent(),
+      floatingActionButton: CustomFAB(
+        onPressed: () {
+          Navigator.pushNamed(context, '/add-event');
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 

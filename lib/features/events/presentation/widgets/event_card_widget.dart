@@ -50,7 +50,7 @@ class EventCardWidget extends StatelessWidget {
       } else {
         final int weeksRemaining = (daysRemaining / 7).ceil();
         remainingTime =
-            "en ${weeksRemaining} sem${weeksRemaining != 1 ? 's' : ''}";
+            "en $weeksRemaining sem${weeksRemaining != 1 ? 's' : ''}";
       }
     }
 
