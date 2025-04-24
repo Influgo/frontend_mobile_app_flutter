@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/card_info_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/pill_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/section_title_widget.dart';
 
 class EventDetailPage extends StatelessWidget {
   final Event event;
@@ -17,7 +20,6 @@ class EventDetailPage extends StatelessWidget {
     final String formattedTimeRange =
         '${timeFormat.format(event.eventDetailsStartDateEvent)} – ${timeFormat.format(event.eventDetailsEndDateEvent)}';
 
-    // In EventDetailPage.build method:
     final String defaultImageUrl =
         'https://cdn.pixabay.com/photo/2024/11/25/10/38/mountains-9223041_1280.jpg';
 
@@ -26,138 +28,127 @@ class EventDetailPage extends StatelessWidget {
         : defaultImageUrl;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalles del Evento'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Imagen superior
-            ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  imageUrl,
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: 180,
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported,
-                            size: 50, color: Colors.grey),
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: EdgeInsets.zero,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  child: Image.network(
+                    imageUrl,
+                    width: double.infinity,
+                    height: 174,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: 220,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(Icons.image_not_supported,
+                              size: 50, color: Colors.grey),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        event.eventName,
+                        style: const TextStyle(fontSize: 20),
                       ),
-                    );
-                  },
-                )),
-            const SizedBox(height: 16),
-
-            // Nombre del evento
-            Text(
-              event.eventName,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Text(
+                            '$formattedDate – en 1 semana',
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
+                          ),
+                          PillWidget("evento virtual"),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      SectionTitleWidget("Acerca de"),
+                      Text(
+                        event.eventDescription,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 24),
+                      SectionTitleWidget("Detalles del evento"),
+                      Text(
+                        '$formattedDate de $formattedTimeRange',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 24),
+                      SectionTitleWidget("Tipo de publicidad"),
+                      CardInfoWidget(
+                        title: "Publicidad virtual",
+                        subtitle:
+                            "Publicidad que se puede realizar desde cualquier lugar (no requiere la presencia física del influencer).",
+                      ),
+                      const SizedBox(height: 24),
+                      SectionTitleWidget("Trabajo a realizar"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("• Requisito 1"),
+                            Text("• Requisito 2"),
+                            Text("• Requisito 3"),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      SectionTitleWidget("Monto por persona"),
+                      Text(
+                        "${event.jobDetailsPayFare} soles",
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 24),
+                      SectionTitleWidget("Ubicación"),
+                      Text(
+                        "Jr. Enrique Barreda 234 Urb Las Palmeras, La Molina, Lima- Perú",
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 4),
-            Text(
-              '$formattedDate – en 1 semana',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            _pill("evento virtual"),
-
-            const SizedBox(height: 24),
-            _sectionTitle("Acerca de"),
-            Text(
-              event.eventDescription,
-              style: const TextStyle(fontSize: 14),
-            ),
-
-            const SizedBox(height: 24),
-            _sectionTitle("Detalles del evento"),
-            Text(
-              '$formattedDate de $formattedTimeRange',
-              style: const TextStyle(fontSize: 14),
-            ),
-
-            const SizedBox(height: 24),
-            _sectionTitle("Tipo de publicidad"),
-            _cardInfo(
-              "Publicidad virtual",
-              "Publicidad que se puede realizar desde cualquier lugar (no requiere la presencia física del influencer).",
-            ),
-
-            const SizedBox(height: 24),
-            _sectionTitle("Trabajo a realizar"),
-            const Padding(
-              padding: EdgeInsets.only(left: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("• Requisito 1"),
-                  Text("• Requisito 2"),
-                  Text("• Requisito 3"),
-                ],
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            left: 10,
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFEFEF),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                icon: const Padding(
+                  padding: EdgeInsets.only(left: 5.0),
+                  child:
+                      Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
             ),
-
-            const SizedBox(height: 24),
-            _sectionTitle("Monto por persona"),
-            Text(
-              "${event.jobDetailsPayFare} soles",
-              style: const TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _sectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-    );
-  }
-
-  Widget _cardInfo(String title, String subtitle) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xfff3f4f6),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          const SizedBox(height: 4),
-          Text(subtitle, style: const TextStyle(fontSize: 12)),
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _pill(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.purple[50],
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.purple, fontSize: 12),
       ),
     );
   }
