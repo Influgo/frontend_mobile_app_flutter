@@ -34,10 +34,14 @@ class _Step4ForgotPasswordPageState extends State<Step4ForgotPasswordPage> {
                 children: [
                   const CustomCheckmarkSimple(),
                   const SizedBox(height: 32),
-                  const Text(
-                    'Tu contraseña se ha guardado con éxito',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-                    textAlign: TextAlign.center,
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14.0),
+                    child: Text(
+                      'Tu contraseña se ha guardado con éxito',
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   const Padding(
                     padding:

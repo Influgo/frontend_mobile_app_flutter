@@ -118,120 +118,77 @@ class _Step3ForgotPasswordPageState extends State<Step3ForgotPasswordPage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
-            child: Column(
-              children: [
-                const InfluyoLogo(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 30, left: 16, right: 16),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 30),
+                    const InfluyoLogo(),
+                    const SizedBox(height: 30),
+                    const Text(
                       'Ingresa tu nueva contraseña',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
+                    Text(
                       'Por favor, introduce tu nueva contraseña',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      PasswordField(
-                        controller: _newPasswordController,
-                        label: "Contraseña",
-                      ),
-                      if (_newPasswordError != null)
-                        ErrorTextWidget(error: _newPasswordError!),
-                      const SizedBox(height: 16),
-                      PasswordField(
-                        controller: _confirmPasswordController,
-                        label: "Confirmar contraseña",
-                      ),
-                      if (_confirmPasswordError != null)
-                        ErrorTextWidget(error: _confirmPasswordError!),
-                      const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Recuerda que tu contraseña debe incluir:',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey[600]),
-                            ),
-                            SizedBox(height: 16),
-                            PasswordRequirementRow(
-                              text: 'Entre 8 y 20 caracteres',
-                              isValid: _hasMinLength,
-                            ),
-                            SizedBox(height: 8),
-                            PasswordRequirementRow(
-                              text:
-                                  'Al menos 1 letra mayúscula y 1 letra\n minúscula',
-                              isValid: _hasUpperLower,
-                            ),
-                            SizedBox(height: 8),
-                            PasswordRequirementRow(
-                              text: '1 o más caracteres especiales',
-                              isValid: _hasSpecialChar,
-                            ),
-                          ],
+                    const SizedBox(height: 32),
+                    PasswordField(controller: _newPasswordController, label: "Contraseña"),
+                    if (_newPasswordError != null)
+                      ErrorTextWidget(error: _newPasswordError!),
+                    const SizedBox(height: 16),
+                    PasswordField(controller: _confirmPasswordController, label: "Confirmar contraseña"),
+                    if (_confirmPasswordError != null)
+                      ErrorTextWidget(error: _confirmPasswordError!),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Recuerda que tu contraseña debe incluir:',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.grey[600]),
+                    ),
+                    const SizedBox(height: 16),
+                    PasswordRequirementRow(text: 'Entre 8 y 20 caracteres', isValid: _hasMinLength),
+                    const SizedBox(height: 8),
+                    PasswordRequirementRow(text: 'Al menos 1 letra mayúscula y 1 letra\n minúscula', isValid: _hasUpperLower),
+                    const SizedBox(height: 8),
+                    PasswordRequirementRow(text: '1 o más caracteres especiales', isValid: _hasSpecialChar),
+                    const Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF222222),
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        onPressed: _validateAndChangePassword,
+                        child: const Text(
+                          'Cambiar contraseña',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 30,
-            right: 30,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF222222),
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+                    ),
+                  ],
                 ),
               ),
-              onPressed: _validateAndChangePassword,
-              child: const Text(
-                'Cambiar contraseña',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
             ),
-          )
-        ],
+          );
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 }
