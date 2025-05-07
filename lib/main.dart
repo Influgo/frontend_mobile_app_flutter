@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend_mobile_app_flutter/core/data/local/shared_preferences_service.dart';
 import 'package:frontend_mobile_app_flutter/core/di/injection_container.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/forgot_password/step3_forgot_password_page.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/add_event_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
@@ -34,9 +33,6 @@ class MyApp extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isLandscape =
-            MediaQuery.of(context).orientation == Orientation.landscape;
-
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Influyo!',
@@ -57,20 +53,12 @@ class MyApp extends StatelessWidget {
           ),
           initialRoute: '/login',
           routes: {
-            '/login': (context) =>
-                // _buildRotatedScreen(const LoginPage(), isLandscape),
-                Step3ForgotPasswordPage(),
-            //HomePage(),
-            '/register': (context) =>
-                _buildRotatedScreen(const RegisterPage(), isLandscape),
+            '/login': (context) => LoginPage(),
+            '/register': (context) => const RegisterPage(),
             '/add-event': (context) => const AddEventPage(),
           },
         );
       },
     );
-  }
-
-  Widget _buildRotatedScreen(Widget child, bool isLandscape) {
-    return isLandscape ? RotatedBox(quarterTurns: -1, child: child) : child;
   }
 }
