@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:frontend_mobile_app_flutter/features/shared/presentation/pages/home_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
@@ -48,6 +48,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       userId = storedUserId;
 
+      await _fetchUserData(token);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      debugPrint('Error al cargar perfil: $e');
+    }
+  }
+
+  Future<void> _fetchUserData(String token) async {
+    try {
       final response = await http.get(
         Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$userId'),
         headers: {
@@ -180,13 +191,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 IconButton(
                   icon: const Icon(Icons.arrow_forward_ios,
                       color: Colors.black, size: 16),
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    // Navegar a EditProfilePage y esperar el resultado
+                    final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
                               EditProfilePage(userId: userId)),
                     );
+
+                    // Si hay cambios guardados (result == true), recargar el perfil
+                    if (result == true) {
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      final prefs = await SharedPreferences.getInstance();
+                      final token = prefs.getString('token');
+
+                      if (token != null) {
+                        await _fetchUserData(token);
+                      } else {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    }
                   },
                 ),
               ],

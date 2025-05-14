@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EntrepreneurshipProfilePage extends StatefulWidget {
   const EntrepreneurshipProfilePage({super.key});
@@ -16,7 +19,7 @@ Widget ErrorTextWidget({required String error}) {
     padding: const EdgeInsets.only(top: 8.0),
     child: Text(
       error,
-      style: TextStyle(color: Colors.red, fontSize: 12),
+      style: const TextStyle(color: Colors.red, fontSize: 12),
     ),
   );
 }
@@ -35,6 +38,7 @@ class _EntrepreneurshipProfilePageState
   final TextEditingController twitchController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController focusController = TextEditingController();
+  final TextEditingController rucController = TextEditingController();
 
   final FocusNode instagramFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
@@ -47,6 +51,7 @@ class _EntrepreneurshipProfilePageState
   bool showYoutubeField = false;
   bool showTwitchField = false;
   List<String> focusTags = [];
+  List<String> addressList = [];
 
   String? socialMediaEmpty;
   String? instagramEmpty;
@@ -65,9 +70,39 @@ class _EntrepreneurshipProfilePageState
 
   String selectedModality = "Presencial";
 
+  bool isLoading = false;
+  bool isSaving = false;
+  String? token;
+  int? entrepreneurId;
+
   File? _profileImage;
   File? _coverImage;
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializar isPublic explícitamente para asegurar que nunca sea null
+    isPublic = true;
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        token = prefs.getString('token');
+        // Podríamos obtener el entrepreneurId de SharedPreferences si está almacenado
+        // O bien podemos obtenerlo al cargar el perfil desde el API
+      });
+
+      // Aquí podrías cargar datos actuales si es necesario
+      // fetchEntrepreneurData();
+    } catch (e) {
+      print('❌ Error cargando token: $e');
+      showSnackBar('Error al cargar datos de autenticación');
+    }
+  }
 
   Future<void> _pickImage(ImageSource source, bool isProfile) async {
     final pickedFile = await _picker.pickImage(source: source);
@@ -88,6 +123,16 @@ class _EntrepreneurshipProfilePageState
       setState(() {
         focusTags.add(text);
         focusController.clear();
+      });
+    }
+  }
+
+  void _addAddress() {
+    String address = addressController.text.trim();
+    if (address.isNotEmpty) {
+      setState(() {
+        addressList.add(address);
+        addressController.clear();
       });
     }
   }
@@ -122,6 +167,154 @@ class _EntrepreneurshipProfilePageState
     );
   }
 
+  Future<bool> saveEntrepreneurshipProfile() async {
+    setState(() {
+      isSaving = true;
+    });
+
+    try {
+      final url = Uri.parse(
+          'https://influyo-testing.ryzeon.me/api/v1/entities/entrepreneur/update');
+
+      // Asegurar que isPublic no sea null
+      if (isPublic == null) {
+        isPublic = false; // Valor por defecto si de alguna manera es null
+      }
+
+      // Construir el cuerpo de la petición
+      final Map<String, dynamic> body = {
+        // Siempre incluir showOwnerName de forma explícita con un valor booleano
+        'showOwnerName': isPublic
+      };
+
+      print('🔍 Valor de isPublic: $isPublic');
+      print('🔍 Tipo de isPublic: ${isPublic.runtimeType}');
+
+      // ID del emprendedor (esto debe venir del backend o de SharedPreferences)
+      if (entrepreneurId != null) {
+        body['id'] = entrepreneurId;
+      }
+
+      if (businessNameController.text.isNotEmpty) {
+        body['entrepreneurshipInformationEntrepreneurshipName'] =
+            businessNameController.text;
+      }
+
+      if (nicknameController.text.isNotEmpty) {
+        body['entrepreneurshipInformationEntrepreneursNickname'] =
+            nicknameController.text;
+      }
+
+      if (rucController.text.isNotEmpty) {
+        body['entrepreneurshipInformationEntrepreneurshipRUC'] =
+            rucController.text;
+      }
+
+      if (selectedCategory != null) {
+        body['entrepreneurshipInformationCategory'] = selectedCategory;
+      }
+
+      if (summaryController.text.isNotEmpty) {
+        body['entrepreneurshipInformationSummary'] = summaryController.text;
+      }
+
+      if (descriptionController.text.isNotEmpty) {
+        body['entrepreneurshipInformationDescription'] =
+            descriptionController.text;
+      }
+
+      // Tipo de dirección (modalidad)
+      if (selectedModality.isNotEmpty) {
+        body['entrepreneurAddressAddressType'] = selectedModality;
+      }
+
+      // Enfoques (etiquetas)
+      if (focusTags.isNotEmpty) {
+        body['entrepreneurFocus'] = focusTags;
+      }
+
+      // Direcciones
+      if (addressList.isNotEmpty) {
+        body['entrepreneurAddresses'] = addressList;
+      }
+
+      // Información de redes sociales si están habilitadas
+      Map<String, dynamic> socials = {};
+
+      if (showInstagramField && instagramController.text.isNotEmpty) {
+        socials['instagram'] = instagramController.text;
+      }
+
+      if (showTiktokField && tiktokController.text.isNotEmpty) {
+        socials['tiktok'] = tiktokController.text;
+      }
+
+      if (showYoutubeField && youtubeController.text.isNotEmpty) {
+        socials['youtube'] = youtubeController.text;
+      }
+
+      if (showTwitchField && twitchController.text.isNotEmpty) {
+        socials['twitch'] = twitchController.text;
+      }
+
+      if (socials.isNotEmpty) {
+        body['socials'] = socials;
+      }
+
+      print('📤 Actualizando perfil de emprendimiento');
+      print('📤 URL: $url');
+      print('📤 Body: ${jsonEncode(body)}');
+
+      // Ver si hay algún problema en la serialización JSON
+      String bodyJson = jsonEncode(body);
+      print('📤 Body JSON serializado: $bodyJson');
+
+      // Comprobar si showOwnerName existe en el JSON y es de tipo booleano
+      Map<String, dynamic> decodedBody = jsonDecode(bodyJson);
+      print('📤 showOwnerName en JSON: ${decodedBody['showOwnerName']}');
+      print(
+          '📤 Tipo de showOwnerName en JSON: ${decodedBody['showOwnerName'].runtimeType}');
+
+      final response = await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: bodyJson,
+      );
+
+      print('📥 Response status code: ${response.statusCode}');
+      print('📥 Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('✅ Perfil actualizado con éxito');
+        return true;
+      } else {
+        print(
+            '❌ Error al actualizar el perfil. Código: ${response.statusCode}');
+        print('❌ Respuesta: ${response.body}');
+        showSnackBar(
+            'Error al actualizar el perfil: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('❌ Error updating profile: $e');
+      showSnackBar('Error de conexión: $e');
+      return false;
+    } finally {
+      setState(() {
+        isSaving = false;
+      });
+    }
+  }
+
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   Widget buildProfileSection() {
     return Stack(
       alignment: Alignment.bottomLeft,
@@ -133,7 +326,7 @@ class _EntrepreneurshipProfilePageState
             width: double.infinity,
             height: 180,
             decoration: BoxDecoration(
-              color: Color(0xFFC4C4C4),
+              color: const Color(0xFFC4C4C4),
               image: _coverImage != null
                   ? DecorationImage(
                       fit: BoxFit.cover,
@@ -161,7 +354,7 @@ class _EntrepreneurshipProfilePageState
               backgroundColor: Colors.white,
               child: CircleAvatar(
                 radius: 14,
-                backgroundColor: Color(0xFFB0B0B0),
+                backgroundColor: const Color(0xFFB0B0B0),
                 child: SvgPicture.asset(
                   'assets/icons/camerafillicon.svg',
                   width: 16,
@@ -185,7 +378,7 @@ class _EntrepreneurshipProfilePageState
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
                     radius: 56,
-                    backgroundColor: Color(0xFFC4C4C4),
+                    backgroundColor: const Color(0xFFC4C4C4),
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
                         : null,
@@ -209,7 +402,7 @@ class _EntrepreneurshipProfilePageState
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: 14,
-                        backgroundColor: Color(0xFFB0B0B0),
+                        backgroundColor: const Color(0xFFB0B0B0),
                         child: SvgPicture.asset(
                           'assets/icons/camerafillicon.svg',
                           width: 16,
@@ -229,19 +422,21 @@ class _EntrepreneurshipProfilePageState
   }
 
   Widget buildTextField(String label, TextEditingController controller,
-      {int maxLines = 1}) {
+      {int maxLines = 1, FocusNode? focusNode}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
+        focusNode: focusNode,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(fontSize: 14, color: Colors.black),
+          labelStyle: const TextStyle(fontSize: 14, color: Colors.black),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
         ),
       ),
     );
@@ -250,7 +445,53 @@ class _EntrepreneurshipProfilePageState
   Widget buildFocusTags() {
     return Wrap(
       spacing: 8,
-      children: focusTags.map((tag) => Chip(label: Text(tag))).toList(),
+      children: focusTags
+          .map((tag) => Chip(
+                label: Text(tag),
+                onDeleted: () {
+                  setState(() {
+                    focusTags.remove(tag);
+                  });
+                },
+              ))
+          .toList(),
+    );
+  }
+
+  Widget buildAddressList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (addressList.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text(
+            "Direcciones agregadas:",
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 5),
+          ...addressList
+              .map((address) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(address),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, size: 18, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              addressList.remove(address);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ))
+              .toList(),
+          const SizedBox(height: 10),
+        ],
+      ],
     );
   }
 
@@ -264,7 +505,7 @@ class _EntrepreneurshipProfilePageState
           border: Border.all(color: Colors.black),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Center(
+        child: const Center(
           child: Icon(Icons.add, size: 30),
         ),
       ),
@@ -326,6 +567,7 @@ class _EntrepreneurshipProfilePageState
                             businessNameController),
                         buildTextField(
                             'Nickname del emprendimiento', nicknameController),
+                        buildTextField('RUC del emprendimiento', rucController),
                         buildTextField('Nombre del representante',
                             representativeController),
                         Row(children: [buildSwitch()]),
@@ -339,12 +581,12 @@ class _EntrepreneurshipProfilePageState
                           value: selectedCategory,
                           decoration: InputDecoration(
                             labelText: "Categoría principal",
-                            labelStyle:
-                                TextStyle(fontSize: 14, color: Colors.black),
+                            labelStyle: const TextStyle(
+                                fontSize: 14, color: Colors.black),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                                 vertical: 14, horizontal: 12),
                           ),
                           items: categories.map((String category) {
@@ -358,6 +600,7 @@ class _EntrepreneurshipProfilePageState
                               selectedCategory = newValue;
                             });
                           },
+                          hint: const Text('Seleccione una categoría'),
                         ),
                         const SizedBox(height: 10),
                         buildTextField(
@@ -384,8 +627,8 @@ class _EntrepreneurshipProfilePageState
                                   showInstagramField = !showInstagramField;
                                 });
                                 if (showInstagramField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
                                     FocusScope.of(context)
                                         .requestFocus(instagramFocusNode);
                                   });
@@ -398,7 +641,8 @@ class _EntrepreneurshipProfilePageState
                         const SizedBox(height: 8),
                         if (showInstagramField) ...[
                           buildTextField(
-                              'Cuenta de Instagram', instagramController),
+                              'Cuenta de Instagram', instagramController,
+                              focusNode: instagramFocusNode),
                           if (instagramEmpty != null)
                             ErrorTextWidget(error: instagramEmpty!),
                           const SizedBox(height: 8),
@@ -418,8 +662,8 @@ class _EntrepreneurshipProfilePageState
                                   showTiktokField = !showTiktokField;
                                 });
                                 if (showTiktokField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
                                     FocusScope.of(context)
                                         .requestFocus(tiktokFocusNode);
                                   });
@@ -431,7 +675,8 @@ class _EntrepreneurshipProfilePageState
                         ),
                         const SizedBox(height: 8),
                         if (showTiktokField) ...[
-                          buildTextField('Usuario de Tiktok', tiktokController),
+                          buildTextField('Usuario de Tiktok', tiktokController,
+                              focusNode: tiktokFocusNode),
                         ],
                         const SizedBox(height: 16),
                         const Text('Otras redes sociales (opcional)',
@@ -452,8 +697,8 @@ class _EntrepreneurshipProfilePageState
                                   showYoutubeField = !showYoutubeField;
                                 });
                                 if (showYoutubeField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
                                     FocusScope.of(context)
                                         .requestFocus(youtubeFocusNode);
                                   });
@@ -465,7 +710,8 @@ class _EntrepreneurshipProfilePageState
                         ),
                         const SizedBox(height: 8),
                         if (showYoutubeField) ...[
-                          buildTextField('Canal de Youtube', youtubeController),
+                          buildTextField('Canal de Youtube', youtubeController,
+                              focusNode: youtubeFocusNode),
                         ],
                         const Divider(color: Colors.grey, thickness: 0.3),
                         Row(
@@ -482,8 +728,8 @@ class _EntrepreneurshipProfilePageState
                                   showTwitchField = !showTwitchField;
                                 });
                                 if (showTwitchField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
+                                  Future.delayed(
+                                      const Duration(milliseconds: 100), () {
                                     FocusScope.of(context)
                                         .requestFocus(twitchFocusNode);
                                   });
@@ -495,7 +741,8 @@ class _EntrepreneurshipProfilePageState
                         ),
                         const SizedBox(height: 8),
                         if (showTwitchField) ...[
-                          buildTextField('Canal de Twitch', twitchController),
+                          buildTextField('Canal de Twitch', twitchController,
+                              focusNode: twitchFocusNode),
                         ],
                         const SizedBox(height: 20),
                         const Text("Modalidad del emprendimiento",
@@ -534,16 +781,17 @@ class _EntrepreneurshipProfilePageState
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: _addAddress,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: BorderSide(color: Colors.black),
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              side: const BorderSide(color: Colors.black),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
                             child: const Text("Agregar dirección",
                                 style: TextStyle(color: Colors.black)),
                           ),
                         ),
+                        buildAddressList(),
                         const SizedBox(height: 40),
                         const Text("Enfoque de tu emprendimiento",
                             style: TextStyle(
@@ -556,8 +804,8 @@ class _EntrepreneurshipProfilePageState
                             onPressed: _addFocusTag,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: BorderSide(color: Colors.black),
-                              padding: EdgeInsets.symmetric(vertical: 16),
+                              side: const BorderSide(color: Colors.black),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
                             child: const Text("Agregar enfoque",
                                 style: TextStyle(color: Colors.black)),
@@ -581,19 +829,41 @@ class _EntrepreneurshipProfilePageState
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+                            onPressed: isSaving
+                                ? null
+                                : () async {
+                                    bool success =
+                                        await saveEntrepreneurshipProfile();
+                                    if (success) {
+                                      showSnackBar(
+                                          'Perfil actualizado con éxito');
+                                      Future.delayed(const Duration(seconds: 1),
+                                          () {
+                                        Navigator.pop(context);
+                                      });
+                                    }
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
-                              padding: EdgeInsets.symmetric(vertical: 24),
+                              padding: const EdgeInsets.symmetric(vertical: 24),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              disabledBackgroundColor: Colors.grey,
                             ),
-                            child: const Text("Guardar cambios",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16)),
+                            child: isSaving
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text("Guardar cambios",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16)),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -609,7 +879,7 @@ class _EntrepreneurshipProfilePageState
             left: 10,
             child: Container(
               decoration: BoxDecoration(
-                color: Color(0xFFEFEFEF),
+                color: const Color(0xFFEFEFEF),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: IconButton(
