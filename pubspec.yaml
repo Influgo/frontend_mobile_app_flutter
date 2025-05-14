@@ -27,6 +27,12 @@ dependencies:
   path_provider: ^2.1.5
   intl: ^0.18.0
 
+  # conexion a internet 
+  connectivity_plus: ^6.1.3
+
+  # animaciones
+  lottie: ^2.7.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

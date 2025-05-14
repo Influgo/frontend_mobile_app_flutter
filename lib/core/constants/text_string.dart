@@ -1,0 +1,5 @@
+class AppTexts {
+
+  // constansts texts
+
+}
