@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:frontend_mobile_app_flutter/features/shared/presentation/pages/home_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
@@ -11,8 +14,74 @@ import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/terms_and_condition/terms_and_condition_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String fullName = '';
+  String? profileImageUrl;
+  String userId = '';
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedUserId = prefs.getString('userId');
+      final token = prefs.getString('token');
+
+      if (storedUserId == null || token == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      userId = storedUserId;
+
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        setState(() {
+          fullName = '${data['names']} ${data['lastNames']}';
+
+          if (data['profileImage'] != null &&
+              data['profileImage']['url'] != null) {
+            profileImageUrl = data['profileImage']['url'];
+          }
+
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        debugPrint('Error al cargar perfil: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      debugPrint('Error al cargar perfil: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,23 +137,37 @@ class ProfileScreen extends StatelessWidget {
             color: Colors.white,
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 30,
-                  // backgroundImage: NetworkImage(''),
-                ),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : CircleAvatar(
+                        radius: 30,
+                        backgroundImage: profileImageUrl != null
+                            ? NetworkImage(profileImageUrl!)
+                            : null,
+                        child: profileImageUrl == null
+                            ? const Icon(Icons.person,
+                                size: 30, color: Colors.grey)
+                            : null,
+                      ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Eliza Maria Torres Vargas',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Text(
+                      isLoading
+                          ? const SizedBox(
+                              width: 100,
+                              height: 16,
+                              child: LinearProgressIndicator(),
+                            )
+                          : Text(
+                              fullName.isNotEmpty ? fullName : 'Usuario',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                      const Text(
                         'Ver perfil',
                         style: TextStyle(
                           fontSize: 14,
@@ -101,7 +184,8 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => EditProfilePage(userId: '1')),
+                          builder: (context) =>
+                              EditProfilePage(userId: userId)),
                     );
                   },
                 ),
