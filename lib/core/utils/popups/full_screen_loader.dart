@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/colors.dart';
 import '../helpers/helper_functions.dart';
 import '../loaders/animation_loader.dart';
 
@@ -11,14 +11,18 @@ class AppFullScreenLoader {
   /// Parameters:
   ///   - text: The text to be displayed in the loading dialog.
   ///   - animation: The Lottie animation to be shown.
-  static void openLoadingDialog(BuildContext context, String text, String animation) {
+  static void openLoadingDialog(
+      BuildContext context, String text, String animation) {
     showDialog(
       context: context, // Use Get.overlayContext for overlay dialogs
-      barrierDismissible: false, // The dialog can't be dismissed by tapping outside it
+      barrierDismissible:
+          false, // The dialog can't be dismissed by tapping outside it
       builder: (_) => PopScope(
         canPop: false, // Disable popping with the back button
         child: Container(
-          color: AppHelperFunctions.isDarkMode(context) ? AppColors.dark : AppColors.white,
+          color: AppHelperFunctions.isDarkMode(context)
+              ? AppColors.dark
+              : AppColors.white,
           width: double.infinity,
           height: double.infinity,
           child: Column(

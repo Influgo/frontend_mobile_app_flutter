@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../constants/colors.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/colors.dart';
 import '../helpers/helper_functions.dart';
 
 class TLoaders {
@@ -41,7 +41,8 @@ class TLoaders {
       SnackBar(
         content: Row(
           children: [
-            const Icon(CupertinoIcons.check_mark_circled_solid, color: AppColors.white),
+            const Icon(CupertinoIcons.check_mark_circled_solid,
+                color: AppColors.white),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -68,7 +69,8 @@ class TLoaders {
       SnackBar(
         content: Row(
           children: [
-            const Icon(CupertinoIcons.exclamationmark_triangle_fill, color: AppColors.white),
+            const Icon(CupertinoIcons.exclamationmark_triangle_fill,
+                color: AppColors.white),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

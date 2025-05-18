@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/core/utils/constants/colors.dart';
-import 'package:frontend_mobile_app_flutter/core/utils/constants/sizes.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/colors.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/sizes.dart';
 import 'package:lottie/lottie.dart';
-
 
 /// A widget for displaying an animated loading indicator with optional text and action button.
 class AppAnimationLoaderWidget extends StatelessWidget {
@@ -35,7 +34,9 @@ class AppAnimationLoaderWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Lottie.asset(animation, width: MediaQuery.of(context).size.width * 0.8), // Display Lottie animation
+          Lottie.asset(animation,
+              width: MediaQuery.of(context).size.width *
+                  0.8), // Display Lottie animation
           const SizedBox(height: AppSizes.defaultSpace),
           Text(
             text,
@@ -48,10 +49,14 @@ class AppAnimationLoaderWidget extends StatelessWidget {
                   width: 250,
                   child: OutlinedButton(
                     onPressed: onActionPressed,
-                    style: OutlinedButton.styleFrom(backgroundColor: AppColors.dark),
+                    style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.dark),
                     child: Text(
                       actionText!,
-                      style: Theme.of(context).textTheme.bodyMedium!.apply(color: AppColors.light),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .apply(color: AppColors.light),
                     ),
                   ),
                 )
