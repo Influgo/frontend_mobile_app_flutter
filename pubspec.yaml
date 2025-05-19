@@ -26,8 +26,11 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   path_provider: ^2.1.5
   intl: ^0.18.0
+  google_maps_flutter: ^2.2.0
+  geolocator: ^9.0.2
+  google_places_flutter: ^2.0.9
 
-  # conexion a internet 
+  # conexion a internet
   connectivity_plus: ^6.1.3
 
   # animaciones
