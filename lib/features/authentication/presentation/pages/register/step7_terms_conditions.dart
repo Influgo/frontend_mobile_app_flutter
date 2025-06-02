@@ -218,7 +218,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
                         number: '8',
                         title: 'Contacto',
                         description:
-                            'Si tienes alguna pregunta o inquietud sobre estos términos, contáctanos a través de [correo electrónico/contacto en la app].',
+                            'Si tienes alguna pregunta o inquietud sobre estos términos, contáctanos a través de soporte@influyo.com.pe.',
                       ),
                     ],
                   ),
