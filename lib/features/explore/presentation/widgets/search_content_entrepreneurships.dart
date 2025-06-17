@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/services/entrepreneurship_service.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/services/recent_searches_service.dart';
 
 class SearchContentEntrepreneurships extends StatefulWidget {
   final String searchQuery;
@@ -18,10 +19,27 @@ class SearchContentEntrepreneurships extends StatefulWidget {
 class _SearchContentEntrepreneurshipsState
     extends State<SearchContentEntrepreneurships> {
   final EntrepreneurshipService _service = EntrepreneurshipService();
+  final RecentSearchesService _recentSearchesService = RecentSearchesService();
   List<Entrepreneurship> _searchResults = [];
+  List<RecentSearch> _recentSearches = [];
   bool _isLoading = false;
   String? _errorMessage;
   String _lastSearchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentSearches();
+  }
+
+  // Cargar búsquedas recientes
+  Future<void> _loadRecentSearches() async {
+    final recentSearches = await _recentSearchesService.getRecentSearches();
+    setState(() {
+      _recentSearches =
+          recentSearches.where((s) => s.type == 'entrepreneur').toList();
+    });
+  }
 
   @override
   void didUpdateWidget(SearchContentEntrepreneurships oldWidget) {
@@ -35,6 +53,7 @@ class _SearchContentEntrepreneurshipsState
           _searchResults.clear();
           _errorMessage = null;
         });
+        _loadRecentSearches(); // Recargar búsquedas recientes
       } else {
         _performSearch();
       }
@@ -50,7 +69,7 @@ class _SearchContentEntrepreneurshipsState
     });
 
     try {
-      // Usar el método de búsqueda (lo crearemos después)
+      // Usar el método de búsqueda
       final response = await _service.searchEntrepreneurships(
         name: widget.searchQuery.trim(),
       );
@@ -73,9 +92,11 @@ class _SearchContentEntrepreneurshipsState
 
   @override
   Widget build(BuildContext context) {
-    // Mostrar estado vacío cuando no hay query
+    // Mostrar estado vacío o búsquedas recientes cuando no hay query
     if (widget.searchQuery.isEmpty) {
-      return _buildEmptyState();
+      return _recentSearches.isEmpty
+          ? _buildEmptyState()
+          : _buildRecentSearchesState();
     }
 
     // Mostrar loading
@@ -103,7 +124,6 @@ class _SearchContentEntrepreneurshipsState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Ícono de búsqueda
             Container(
               width: 80,
               height: 80,
@@ -128,6 +148,83 @@ class _SearchContentEntrepreneurshipsState
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentSearchesState() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: _recentSearches.length,
+      itemBuilder: (context, index) {
+        final recentSearch = _recentSearches[index];
+        return _buildRecentSearchItem(recentSearch);
+      },
+    );
+  }
+
+  Widget _buildRecentSearchItem(RecentSearch recentSearch) {
+    return Container(
+      height: 31,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: () {
+          // Reutilizar la búsqueda reciente (moverla al inicio)
+          _recentSearchesService.addRecentSearch(recentSearch);
+          _loadRecentSearches();
+          print('Tap en búsqueda reciente: ${recentSearch.name}');
+          // Aquí podrías navegar a la página de detalle
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+          child: Row(
+            children: [
+              // Ícono de búsqueda reciente
+              Icon(
+                Icons.history,
+                size: 16,
+                color: Colors.grey[500],
+              ),
+              const SizedBox(width: 12),
+              // Contenido expandido
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      recentSearch.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              // Botón de eliminar
+              GestureDetector(
+                onTap: () async {
+                  await _recentSearchesService.removeRecentSearch(
+                    recentSearch.id,
+                    recentSearch.type,
+                  );
+                  _loadRecentSearches(); // Recargar la lista
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.close,
+                    size: 16,
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -212,8 +309,7 @@ class _SearchContentEntrepreneurshipsState
 
   Widget _buildResultsList() {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-          vertical: 4), // ← Padding reducido solo vertical
+      padding: const EdgeInsets.symmetric(vertical: 2),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final entrepreneurship = _searchResults[index];
@@ -224,45 +320,45 @@ class _SearchContentEntrepreneurshipsState
 
   Widget _buildSearchResultItem(Entrepreneurship entrepreneurship) {
     return Container(
-      height: 38, // ← Altura fija de 31px
-      margin:
-          const EdgeInsets.only(bottom: 2), // ← Menos margen entre elementos
+      height: 40,
+      margin: const EdgeInsets.only(bottom: 1),
       child: InkWell(
-        onTap: () {
-          // Aquí puedes navegar a la página de detalle del emprendimiento
+        onTap: () async {
+          // Guardar en búsquedas recientes
+          final recentSearch =
+              RecentSearchesService.fromEntrepreneurship(entrepreneurship);
+          await _recentSearchesService.addRecentSearch(recentSearch);
+
           print('Tap en: ${entrepreneurship.entrepreneurshipName}');
+          // Aquí puedes navegar a la página de detalle del emprendimiento
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 16, vertical: 2), // ← Padding mínimo
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
           child: Row(
             children: [
               // Avatar más pequeño
               CircleAvatar(
-                radius: 12, // ← Reducido de 25 a 12
+                radius: 12,
                 backgroundColor: Colors.grey[200],
                 backgroundImage: entrepreneurship.entrepreneurLogo?.url != null
                     ? NetworkImage(entrepreneurship.entrepreneurLogo!.url)
                     : null,
                 child: entrepreneurship.entrepreneurLogo?.url == null
-                    ? Icon(Icons.business,
-                        color: Colors.grey[500],
-                        size: 12) // ← Ícono más pequeño
+                    ? Icon(Icons.business, color: Colors.grey[500], size: 12)
                     : null,
               ),
-              const SizedBox(width: 12), // ← Espaciado reducido
+              const SizedBox(width: 12),
               // Contenido expandido
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment:
-                      MainAxisAlignment.center, // ← Centrar verticalmente
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       entrepreneurship.entrepreneurshipName,
                       style: const TextStyle(
-                        fontWeight: FontWeight.normal, // ← Quitado el bold
-                        fontSize: 14, // ← Tamaño reducido
+                        fontWeight: FontWeight.normal,
+                        fontSize: 14,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -271,7 +367,7 @@ class _SearchContentEntrepreneurshipsState
                       '@${entrepreneurship.entrepreneursNickname}',
                       style: TextStyle(
                         color: Colors.grey[600],
-                        fontSize: 10, // ← Tamaño reducido
+                        fontSize: 10,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
