@@ -3,8 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class FilterButton extends StatelessWidget {
   final VoidCallback onPressed;
+  final bool isActive; // ← NUEVO PARÁMETRO
 
-  const FilterButton({super.key, required this.onPressed});
+  const FilterButton({
+    super.key,
+    required this.onPressed,
+    this.isActive = false, // ← VALOR POR DEFECTO
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +18,9 @@ class FilterButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          // ← CAMBIO DE COLOR BASADO EN EL ESTADO
+          backgroundColor: isActive ? Colors.black : Colors.white,
+          foregroundColor: isActive ? Colors.white : Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: const BorderSide(color: Colors.black),
@@ -25,7 +31,11 @@ class FilterButton extends StatelessWidget {
           'assets/icons/filtericon.svg',
           width: 14,
           height: 14,
-          colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+            // ← CAMBIO DE COLOR DEL ÍCONO BASADO EN EL ESTADO
+            isActive ? Colors.white : Colors.black,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );
