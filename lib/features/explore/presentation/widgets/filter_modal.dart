@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/filter_constants.dart';
 
 class FilterModal extends StatefulWidget {
-  final List<String> categories;
+  final List<String>? categories; // Opcional, se usa lista interna por defecto
   final List<String> selectedCategories;
   final String selectedModality;
   final String selectedLocation;
@@ -9,7 +10,7 @@ class FilterModal extends StatefulWidget {
 
   const FilterModal({
     super.key,
-    required this.categories,
+    this.categories, // Opcional
     required this.selectedCategories,
     required this.selectedModality,
     required this.selectedLocation,
@@ -25,47 +26,44 @@ class _FilterModalState extends State<FilterModal> {
   late String _selectedModality;
   late String _selectedLocation;
 
-  // Modalidades disponibles (aunque no se usen en el filtrado real)
+  // Categorías disponibles (usa las del widget o las por defecto)
+  late final List<String> _categories;
+
+  // Modalidades disponibles
   final List<String> _modalities = ["Todos", "Presencial", "Virtual"];
 
   final List<String> _peruCities = [
-    "Lima",
+    "Amazonas",
+    "Ancash",
+    "Apurimac",
     "Arequipa",
-    "Trujillo",
-    "Chiclayo",
-    "Piura",
-    "Iquitos",
-    "Cusco",
-    "Chimbote",
-    "Huancayo",
-    "Tacna",
-    "Ica",
-    "Juliaca",
-    "Sullana",
     "Ayacucho",
     "Cajamarca",
-    "Pucallpa",
+    "Callao",
+    "Cusco",
+    "Huancavelica",
     "Huánuco",
-    "Tarapoto",
-    "Chincha",
-    "Paita",
+    "Ica",
+    "Junín",
+    "La Libertad",
+    "Lambayeque",
+    "Lima",
+    "Loreto",
+    "Madre de Dios",
+    "Moquegua",
+    "Pasco",
+    "Piura",
+    "Puno",
+    "San Martín",
+    "Tacna",
     "Tumbes",
-    "Talara",
-    "Huaraz",
-    "Jaén",
-    "Nazca",
-    "Moyobamba",
-    "Sechura",
-    "Catacaos",
-    "Lampa",
-    "Juanjuí",
-    "Casma",
-    "Tingo María"
+    "Ucayali"
   ];
 
   @override
   void initState() {
     super.initState();
+    _categories = widget.categories ?? FilterConstants.categories;
     _selectedCategories = List.from(widget.selectedCategories);
     _selectedModality = widget.selectedModality;
     _selectedLocation = widget.selectedLocation;
@@ -74,10 +72,8 @@ class _FilterModalState extends State<FilterModal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ← CAMBIO: Usar Scaffold en lugar de Container
       backgroundColor: Colors.white,
       appBar: AppBar(
-        // ← CAMBIO: Usar AppBar estándar
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -88,7 +84,7 @@ class _FilterModalState extends State<FilterModal> {
           'Filtro',
           style: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w400,
             color: Colors.black,
           ),
         ),
@@ -119,7 +115,7 @@ class _FilterModalState extends State<FilterModal> {
                     'Categorías',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -127,24 +123,39 @@ class _FilterModalState extends State<FilterModal> {
 
                   const SizedBox(height: 24),
 
-                  // Location Section
+                  // Modality Section
                   const Text(
-                    'Ubicación',
+                    'Modalidad',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Busca emprendimientos en la ciudad seleccionada',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildLocationSection(),
+                  _buildModalitySection(),
+
+                  const SizedBox(height: 24),
+
+                  // Location Section - Solo se muestra si no es Virtual
+                  if (_selectedModality != "Virtual") ...[
+                    const Text(
+                      'Ubicación',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Busca emprendimientos en la ciudad seleccionada',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildLocationSection(),
+                  ],
 
                   const SizedBox(height: 32),
                 ],
@@ -182,7 +193,7 @@ class _FilterModalState extends State<FilterModal> {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ),
@@ -198,10 +209,10 @@ class _FilterModalState extends State<FilterModal> {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: widget.categories.map((category) {
+      children: _categories.map((category) {
         final isSelected = _selectedCategories.contains(category);
         return GestureDetector(
-          onTap: () => _toggleCategory(category),
+          onTap: () => _selectCategory(category),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
@@ -213,6 +224,37 @@ class _FilterModalState extends State<FilterModal> {
             ),
             child: Text(
               category,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildModalitySection() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _modalities.map((modality) {
+        final isSelected = _selectedModality == modality;
+        return GestureDetector(
+          onTap: () => _selectModality(modality),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.black : Colors.grey[200],
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? Colors.black : Colors.grey[300]!,
+              ),
+            ),
+            child: Text(
+              modality,
               style: TextStyle(
                 color: isSelected ? Colors.white : Colors.black,
                 fontSize: 14,
@@ -254,29 +296,23 @@ class _FilterModalState extends State<FilterModal> {
     );
   }
 
-  void _toggleCategory(String category) {
+  void _selectCategory(String category) {
     setState(() {
-      if (category == "Todos") {
-        if (_selectedCategories.contains("Todos")) {
-          _selectedCategories.clear();
-        } else {
-          _selectedCategories.clear();
-          _selectedCategories.add("Todos");
-        }
-      } else {
-        if (_selectedCategories.contains(category)) {
-          _selectedCategories.remove(category);
-        } else {
-          _selectedCategories.remove("Todos");
-          _selectedCategories.add(category);
-        }
-      }
+      // Solo permitir una categoría seleccionada
+      _selectedCategories.clear();
+      _selectedCategories.add(category);
+    });
+  }
+
+  void _selectModality(String modality) {
+    setState(() {
+      _selectedModality = modality;
     });
   }
 
   void _clearFilters() {
     setState(() {
-      _selectedCategories = ["Todos"];
+      _selectedCategories.clear();
       _selectedModality = "Todos";
       _selectedLocation = "Lima";
     });
@@ -291,9 +327,10 @@ class _FilterModalState extends State<FilterModal> {
   // Helper para mostrar cuántos filtros están activos
   int _getFilterCount() {
     int count = 0;
-    if (!_selectedCategories.contains("Todos"))
-      count += _selectedCategories.length;
-    if (_selectedLocation != "Lima") count += 1;
+    if (_selectedCategories.isNotEmpty) count += 1;
+    if (_selectedModality != "Todos") count += 1;
+    if (_selectedModality != "Virtual" && _selectedLocation != "Lima")
+      count += 1;
     return count;
   }
 }

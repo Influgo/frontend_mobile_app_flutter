@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/category_button.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/filter_button.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/filter_modal.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/filter_constants.dart';
 
 class ScrollableFilters extends StatefulWidget {
   final String selectedCategory;
@@ -22,40 +23,30 @@ class ScrollableFilters extends StatefulWidget {
 }
 
 class _ScrollableFiltersState extends State<ScrollableFilters> {
+  // Categorías sincronizadas con FilterModal usando FilterConstants
   final List<String> _defaultCategories = [
     "Todos",
-    "Moda y Belleza",
-    "Viajes",
-    "Arte",
-    "Fitness",
-    "Cultura",
-    "Tecnología",
-    "Gastronomía",
-    "Deportes",
-    "Negocios",
-    "Cine",
-    "Música"
+    ...FilterConstants.categories
   ];
 
   // Estados para los filtros avanzados
-  List<String> _selectedCategories = ["Todos"];
+  List<String> _selectedCategories = [];
   String _selectedModality = "Todos";
   String _selectedLocation = "Lima";
 
   // Función para verificar si hay filtros avanzados activos
   bool _hasAdvancedFiltersActive() {
-    return !_selectedCategories.contains("Todos") ||
+    return _selectedCategories.isNotEmpty ||
         _selectedModality != "Todos" ||
         _selectedLocation != "Lima";
   }
 
-  // ← CAMBIO: Usar Navigator.push en lugar de showModalBottomSheet
   void _showFilterModal(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => FilterModal(
-          categories: widget.categories ?? _defaultCategories,
+          categories: widget.categories ?? FilterConstants.categories,
           selectedCategories: _selectedCategories,
           selectedModality: _selectedModality,
           selectedLocation: _selectedLocation,
@@ -79,14 +70,14 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
   // Función para limpiar todos los filtros
   void _clearAllFilters() {
     setState(() {
-      _selectedCategories = ["Todos"];
+      _selectedCategories = [];
       _selectedModality = "Todos";
       _selectedLocation = "Lima";
     });
 
     // Notificar al padre que se limpiaron los filtros
     if (widget.onAdvancedFiltersApplied != null) {
-      widget.onAdvancedFiltersApplied!(["Todos"], "Todos", "Lima");
+      widget.onAdvancedFiltersApplied!([], "Todos", "Lima");
     }
 
     // También limpiar el filtro básico

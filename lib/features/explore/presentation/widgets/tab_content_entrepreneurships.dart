@@ -4,6 +4,7 @@ import 'package:frontend_mobile_app_flutter/features/explore/data/services/entre
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/business_card_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/horizontal_cards_section.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/scrollable_filters.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/filter_constants.dart';
 
 class TabContentEntrepreneurships extends StatefulWidget {
   const TabContentEntrepreneurships({super.key});
@@ -20,10 +21,12 @@ class _TabContentEntrepreneurshipsState
   bool _isLoading = true;
   String? _errorMessage;
   List<Entrepreneurship> _entrepreneurships = [];
-  List<String> _categories = ["Todos"];
+
+  // Usar FilterConstants para las categorías
+  final List<String> _categories = ["Todos", ...FilterConstants.categories];
 
   // Variables para filtros avanzados
-  List<String> _advancedSelectedCategories = ["Todos"];
+  List<String> _advancedSelectedCategories = [];
   String _selectedModality = "Todos";
   String _selectedLocation = "Lima";
 
@@ -42,18 +45,8 @@ class _TabContentEntrepreneurshipsState
     try {
       final response = await _service.getEntrepreneurships(page: 0, size: 50);
 
-      final uniqueCategories = response.content
-          .map((e) => e.category)
-          .where((category) => category != 'N/A' && category.isNotEmpty)
-          .toSet()
-          .toList();
-
-      uniqueCategories.sort();
-      uniqueCategories.insert(0, "Todos");
-
       setState(() {
         _entrepreneurships = response.content;
-        _categories = uniqueCategories;
         _isLoading = false;
       });
     } catch (e) {
@@ -67,8 +60,8 @@ class _TabContentEntrepreneurshipsState
   List<Entrepreneurship> _getFilteredEntrepreneurships() {
     List<Entrepreneurship> filtered = _entrepreneurships;
 
-    // Filtrar por categoría básica
-    if (_selectedCategory != "Todos") {
+    // Filtrar por categoría básica (solo si no hay filtros avanzados activos)
+    if (_selectedCategory != "Todos" && !_hasAdvancedFiltersActive()) {
       filtered = filtered
           .where((e) =>
               e.category.toLowerCase() == _selectedCategory.toLowerCase())
@@ -76,15 +69,14 @@ class _TabContentEntrepreneurshipsState
     }
 
     // Filtrar por categorías avanzadas
-    if (!_advancedSelectedCategories.contains("Todos") &&
-        _advancedSelectedCategories.isNotEmpty) {
+    if (_advancedSelectedCategories.isNotEmpty) {
       filtered = filtered
           .where((e) => _advancedSelectedCategories
               .any((cat) => e.category.toLowerCase() == cat.toLowerCase()))
           .toList();
     }
 
-    // Filtrar por ubicación
+    // Filtrar por ubicación (solo si no es Lima)
     if (_selectedLocation != "Lima") {
       filtered = filtered.where((e) {
         return e.addresses.any((address) =>
@@ -92,7 +84,16 @@ class _TabContentEntrepreneurshipsState
       }).toList();
     }
 
+    // Filtrar por modalidad si es necesario (aquí podrías agregar lógica específica)
+    // Por ejemplo, si tienes un campo de modalidad en el modelo Entrepreneurship
+
     return filtered;
+  }
+
+  bool _hasAdvancedFiltersActive() {
+    return _advancedSelectedCategories.isNotEmpty ||
+        _selectedModality != "Todos" ||
+        _selectedLocation != "Lima";
   }
 
   void _onAdvancedFiltersApplied(
@@ -102,8 +103,8 @@ class _TabContentEntrepreneurshipsState
       _selectedModality = modality;
       _selectedLocation = location;
 
-      // ← LIMPIAR FILTRO BÁSICO CUANDO SE APLICAN FILTROS AVANZADOS
-      if (!categories.contains("Todos") || location != "Lima") {
+      // Limpiar filtro básico cuando se aplican filtros avanzados
+      if (_hasAdvancedFiltersActive()) {
         _selectedCategory = "Todos";
       }
     });
@@ -111,9 +112,19 @@ class _TabContentEntrepreneurshipsState
     // Debug log
     print('🔍 Filtros aplicados:');
     print('  Categorías: $categories');
+    print('  Modalidad: $modality');
     print('  Ubicación: $location');
     print(
         '  Resultados: ${_getFilteredEntrepreneurships().length}/${_entrepreneurships.length}');
+  }
+
+  void _clearAllFilters() {
+    setState(() {
+      _selectedCategory = "Todos";
+      _advancedSelectedCategories = [];
+      _selectedModality = "Todos";
+      _selectedLocation = "Lima";
+    });
   }
 
   @override
@@ -174,9 +185,9 @@ class _TabContentEntrepreneurshipsState
           onCategorySelected: (newCategory) {
             setState(() {
               _selectedCategory = newCategory;
-              // ← LIMPIAR FILTROS AVANZADOS CUANDO SE SELECCIONA UNA CATEGORÍA BÁSICA
+              // Limpiar filtros avanzados cuando se selecciona una categoría básica
               if (newCategory != "Todos") {
-                _advancedSelectedCategories = ["Todos"];
+                _advancedSelectedCategories = [];
                 _selectedModality = "Todos";
                 _selectedLocation = "Lima";
               }
@@ -192,43 +203,6 @@ class _TabContentEntrepreneurshipsState
               padding: const EdgeInsets.only(top: 2, left: 2, right: 2),
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                // ← COMENTADO: Indicador de filtros activos
-                /*
-                if (_hasActiveFilters())
-                  Container(
-                    margin: const EdgeInsets.all(8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue[200]!),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.filter_list, color: Colors.blue[600], size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Filtros aplicados: ${_getActiveFiltersText()}',
-                            style: TextStyle(color: Colors.blue[600], fontSize: 12),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _advancedSelectedCategories = ["Todos"];
-                              _selectedModality = "Todos";
-                              _selectedLocation = "Lima";
-                              _selectedCategory = "Todos";
-                            });
-                          },
-                          child: Icon(Icons.close, color: Colors.blue[600], size: 20),
-                        ),
-                      ],
-                    ),
-                  ),
-                */
-
                 if (filteredEntrepreneurships.isEmpty)
                   Container(
                     padding: const EdgeInsets.all(32),
@@ -238,16 +212,17 @@ class _TabContentEntrepreneurshipsState
                             size: 64, color: Colors.grey[400]),
                         const SizedBox(height: 16),
                         Text(
-                          'No se encontraron emprendimientos',
+                          'Ups...',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w400,
                             color: Colors.grey[600],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Intenta ajustar los filtros o buscar en otras categorías',
+                          'No encontramos resultados que coincidan con tus criterios de búsqueda. Prueba con otros.',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[500],
@@ -255,12 +230,13 @@ class _TabContentEntrepreneurshipsState
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          'Total disponible: ${_entrepreneurships.length} emprendimientos',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[400],
+                        ElevatedButton(
+                          onPressed: _clearAllFilters,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[300],
+                            foregroundColor: Colors.black,
                           ),
+                          child: const Text('Limpiar filtros'),
                         ),
                       ],
                     ),
@@ -311,36 +287,4 @@ class _TabContentEntrepreneurshipsState
       ],
     );
   }
-
-  // ← COMENTADO: Helpers para filtros activos
-  /*
-  bool _hasActiveFilters() {
-    return !_advancedSelectedCategories.contains("Todos") || 
-           _selectedModality != "Todos" || 
-           _selectedLocation != "Lima" ||
-           _selectedCategory != "Todos";
-  }
-
-  String _getActiveFiltersText() {
-    List<String> activeFilters = [];
-    
-    if (_selectedCategory != "Todos") {
-      activeFilters.add("Categoría: $_selectedCategory");
-    }
-    
-    if (!_advancedSelectedCategories.contains("Todos")) {
-      activeFilters.add("Categorías: ${_advancedSelectedCategories.join(', ')}");
-    }
-    
-    if (_selectedModality != "Todos") {
-      activeFilters.add("Modalidad: $_selectedModality");
-    }
-    
-    if (_selectedLocation != "Lima") {
-      activeFilters.add("Ubicación: $_selectedLocation");
-    }
-    
-    return activeFilters.join(" | ");
-  }
-  */
 }
