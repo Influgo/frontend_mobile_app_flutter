@@ -152,13 +152,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ? const CircularProgressIndicator()
                     : CircleAvatar(
                         radius: 30,
-                        backgroundImage: profileImageUrl != null
-                            ? NetworkImage(profileImageUrl!)
-                            : null,
-                        child: profileImageUrl == null
-                            ? const Icon(Icons.person,
-                                size: 30, color: Colors.grey)
-                            : null,
+                        backgroundColor: Colors.grey.shade200,
+                        child: ClipOval(
+                          child: Image.network(
+                            profileImageUrl!,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.person,
+                                  size: 30, color: Colors.grey);
+                            },
+                          ),
+                        ),
                       ),
                 const SizedBox(width: 12),
                 Expanded(

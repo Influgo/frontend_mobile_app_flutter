@@ -15,7 +15,7 @@ class ExploraPage extends StatefulWidget {
 class _ExploraPageState extends State<ExploraPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final String _selectedCategory = "Todos";
+  // final String _selectedCategory = "Todos";
 
   @override
   void initState() {
@@ -117,6 +117,8 @@ class _ExploraPageState extends State<ExploraPage>
             Column(
               children: [
                 TabBar(
+                  dividerColor: Colors.transparent,
+                  dividerHeight: 0,
                   controller: _tabController,
                   unselectedLabelColor: Colors.grey,
                   indicatorSize: TabBarIndicatorSize.label,
@@ -132,35 +134,38 @@ class _ExploraPageState extends State<ExploraPage>
                         tabController: _tabController),
                   ],
                 ),
-                Stack(
-                  children: [
-                    Container(
-                      height: 2,
-                      color: Colors.grey[300],
-                    ),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        double tabWidth = constraints.maxWidth / 2;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          margin: EdgeInsets.only(
-                              left: _tabController.index * tabWidth),
-                          width: tabWidth,
-                          height: 2,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color(0xFFC20B0C),
-                                Color(0xFF7E0F9D),
-                                Color(0xFF2616C7)
-                              ],
+                Transform.translate(
+                  offset: Offset(0, -12.0),
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 2,
+                        color: Colors.grey[300],
+                      ),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          double tabWidth = constraints.maxWidth / 2;
+                          return AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            margin: EdgeInsets.only(
+                                left: _tabController.index * tabWidth),
+                            width: tabWidth,
+                            height: 2,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xFFC20B0C),
+                                  Color(0xFF7E0F9D),
+                                  Color(0xFF2616C7)
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
