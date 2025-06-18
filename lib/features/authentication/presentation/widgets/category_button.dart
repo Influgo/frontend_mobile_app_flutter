@@ -18,18 +18,21 @@ class CategoryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(left: 4.0, right: isLast ? 16.0 : 4.0),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isActive ? Colors.black : Colors.white,
-          foregroundColor: isActive ? Colors.white : Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Colors.black),
+      child: SizedBox(
+      height: 36,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isActive ? Colors.black : Colors.white,
+            foregroundColor: isActive ? Colors.white : Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.black),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(text),
         ),
-        child: Text(text),
       ),
     );
   }

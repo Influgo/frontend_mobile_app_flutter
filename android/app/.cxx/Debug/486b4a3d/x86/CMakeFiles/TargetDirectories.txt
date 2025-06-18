@@ -1,0 +1,2 @@
+D:/abela/Documentos/Desarrollo-de-Proyectos/Proyectos-Web/Flutter/frontend_mobile_app_flutter/android/app/.cxx/Debug/486b4a3d/x86/CMakeFiles/edit_cache.dir
+D:/abela/Documentos/Desarrollo-de-Proyectos/Proyectos-Web/Flutter/frontend_mobile_app_flutter/android/app/.cxx/Debug/486b4a3d/x86/CMakeFiles/rebuild_cache.dir

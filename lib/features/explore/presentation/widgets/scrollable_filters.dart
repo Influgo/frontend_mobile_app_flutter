@@ -42,7 +42,7 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
         widget.categories ?? _defaultCategories;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),

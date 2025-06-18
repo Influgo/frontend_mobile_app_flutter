@@ -9,23 +9,27 @@ class FilterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 8.0),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(color: Colors.black),
+      padding: const EdgeInsets.only(left: 16, right: 8),
+      child: SizedBox(
+      width: 36,
+      height: 36,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.black),
+            ),
+            padding: const EdgeInsets.all(0),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        child: SvgPicture.asset(
-          'assets/icons/filtericon.svg',
-          width: 14,
-          height: 14,
-          colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+          child: SvgPicture.asset(
+            'assets/icons/filtericon.svg',
+            width: 14,
+            height: 14,
+            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+          ),
         ),
       ),
     );

@@ -12,14 +12,14 @@ class EntrepreneurshipService {
   }
 
   Future<EntrepreneurshipResponse> getEntrepreneurships(
-      {int page = 0, int size = 10}) async {
+      {int page = 0, int size = 20, String sortField = "updatedAt"}) async {
     final token = await _getToken();
     if (token == null) {
       throw Exception('No authentication token found');
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/entities/entrepreneur?page=$page&size=$size'),
+      Uri.parse('$baseUrl/entities/entrepreneur?page=$page&size=$size&sortField=$sortField'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
