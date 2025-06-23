@@ -150,22 +150,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 isLoading
                     ? const CircularProgressIndicator()
-                    : CircleAvatar(
-                        radius: 30,
-                        backgroundColor: Colors.grey.shade200,
-                        child: ClipOval(
-                          child: Image.network(
-                            profileImageUrl!,
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.person,
-                                  size: 30, color: Colors.grey);
-                            },
+                    : profileImageUrl != null
+                        ? CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.grey.shade200,
+                            child: ClipOval(
+                              child: Image.network(
+                                profileImageUrl!,
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.person,
+                                      size: 30, color: Colors.grey);
+                                },
+                              ),
+                            ),
+                          )
+                        : const CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.grey,
+                            child: Icon(Icons.person,
+                                size: 30, color: Colors.white),
                           ),
-                        ),
-                      ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
