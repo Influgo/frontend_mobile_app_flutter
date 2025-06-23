@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/services/entrepreneurship_service.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/services/recent_searches_service.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/pages/explora_detail_page.dart';
 
 class SearchContentEntrepreneurships extends StatefulWidget {
   final String searchQuery;
@@ -175,6 +176,9 @@ class _SearchContentEntrepreneurshipsState
           _loadRecentSearches();
           print('Tap en búsqueda reciente: ${recentSearch.name}');
           // Aquí podrías navegar a la página de detalle
+          /*Navigator.push(context,
+            MaterialPageRoute(builder: (_) => ExploraDetailPage(entrepreneurship: entrepreneurship))
+          );*/
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -330,7 +334,18 @@ class _SearchContentEntrepreneurshipsState
           await _recentSearchesService.addRecentSearch(recentSearch);
 
           print('Tap en: ${entrepreneurship.entrepreneurshipName}');
-          // Aquí puedes navegar a la página de detalle del emprendimiento
+
+          // Navegación a la página de detalle
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ExploraDetailPage(
+                  entrepreneurship: entrepreneurship,
+                ),
+              ),
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
