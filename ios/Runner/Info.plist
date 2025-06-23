@@ -45,5 +45,46 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- ===== SOLO CUSTOM SCHEME (SIN DOMINIO) ===== -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>influyo.custom</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>influyo</string>
+			</array>
+		</dict>
+	</array>
+	
+	<!-- ===== QUERIES PARA DETECTAR APPS ===== -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>whatsapp-business</string>
+		<string>instagram</string>
+		<string>instagram-stories</string>
+		<string>tiktok</string>
+		<string>snssdk1233</string>
+		<string>tiktokopensdk</string>
+		<string>fb</string>
+		<string>fbauth2</string>
+		<string>fb-messenger</string>
+		<string>twitter</string>
+		<string>tweetbot</string>
+		<string>tg</string>
+		<string>telegram</string>
+		<string>mailto</string>
+		<string>sms</string>
+	</array>
+	
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Influyo! necesita acceso a tu galería para compartir contenido en redes sociales.</string>
+	
+	<key>NSCameraUsageDescription</key>
+	<string>Influyo! necesita acceso a la cámara para tomar fotos y compartir contenido.</string>
+	
 </dict>
 </plist>
