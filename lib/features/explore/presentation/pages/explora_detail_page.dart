@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/pill_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../widgets/share_entrepreneurship_modal.dart'; // ← NUEVO IMPORT
 
 // Modelos placeholder para datos faltantes
 class Review {
@@ -108,7 +109,7 @@ class ExploraDetailPage extends StatelessWidget {
               ),
             ),
             actions: [
-              // Tu action estilizado
+              // ===== BOTÓN DE MÁS OPCIONES CON MENÚ =====
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -118,12 +119,48 @@ class ExploraDetailPage extends StatelessWidget {
                     color: const Color(0xFFEFEFEF),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: IconButton(
+                  child: PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert,
                         color: Colors.black, size: 20),
-                    onPressed: () {},
                     padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    color: Colors.white,
+                    elevation: 8,
+                    onSelected: (String value) {
+                      if (value == 'edit') {
+                        // TODO: Implementar editar perfil
+                      } else if (value == 'share') {
+                        _showShareModal(context);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined,
+                                color: Colors.black, size: 20),
+                            SizedBox(width: 12),
+                            Text('Editar Perfil',
+                                style: TextStyle(color: Colors.black)),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'share',
+                        child: Row(
+                          children: [
+                            Icon(Icons.share_outlined,
+                                color: Colors.black, size: 20),
+                            SizedBox(width: 12),
+                            Text('Compartir Perfil',
+                                style: TextStyle(color: Colors.black)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -272,6 +309,7 @@ class ExploraDetailPage extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16),
+
         Text(
           entrepreneurship.summary,
           style: Theme.of(context).textTheme.titleMedium,
@@ -321,10 +359,10 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.twitch.tv/$url";
                 }
 
-              // } else if (social.name.toLowerCase().contains("facebook")) {
-              //   iconData = Icons.facebook;
-              // } else if (social.name.toLowerCase().contains("twitter")) {
-              //   iconData = Icons.flutter_dash; // Placeholder
+                // } else if (social.name.toLowerCase().contains("facebook")) {
+                //   iconData = Icons.facebook;
+                // } else if (social.name.toLowerCase().contains("twitter")) {
+                //   iconData = Icons.flutter_dash; // Placeholder
               } else if (social.name.toLowerCase().contains("youtube")) {
                 iconData = Icons.play_circle_outline;
 
@@ -650,5 +688,16 @@ class ExploraDetailPage extends StatelessWidget {
       }
     }
     return Row(children: stars);
+  }
+
+  // ===== MÉTODO PARA MOSTRAR EL MODAL DE COMPARTIR =====
+  void _showShareModal(BuildContext context) {
+    ShareEntrepreneurshipModal.show(
+      context,
+      entrepreneurshipId: entrepreneurship.id?.toString() ?? 'unknown',
+      entrepreneurshipName: entrepreneurship.entrepreneurshipName,
+      summary: entrepreneurship.summary,
+      imageUrl: entrepreneurship.entrepreneurLogo?.url,
+    );
   }
 }
