@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ShareEntrepreneurshipModal {
   static void show(
@@ -203,7 +204,7 @@ class _ShareModalContent extends StatelessWidget {
     );
   }
 
-  // Iconos personalizados para cada red social
+  // Iconos con logos reales usando FontAwesome (opción recomendada)
   Widget _buildTikTokIcon() {
     return Container(
       decoration: BoxDecoration(
@@ -212,7 +213,8 @@ class _ShareModalContent extends StatelessWidget {
       ),
       child: Center(
         child: Icon(
-          Icons.music_note,
+          //Icons.music_note, // Cambiar por: FontAwesomeIcons.tiktok
+          FontAwesomeIcons.tiktok,
           color: Colors.white,
           size: 28,
         ),
@@ -236,7 +238,8 @@ class _ShareModalContent extends StatelessWidget {
       ),
       child: Center(
         child: Icon(
-          Icons.camera_alt_outlined,
+          //Icons.camera_alt_outlined, // Cambiar por: FontAwesomeIcons.instagram
+          FontAwesomeIcons.instagram,
           color: Colors.white,
           size: 28,
         ),
@@ -252,7 +255,8 @@ class _ShareModalContent extends StatelessWidget {
       ),
       child: Center(
         child: Icon(
-          Icons.chat_bubble_outline,
+          //Icons.chat_bubble_outline, // Cambiar por: FontAwesomeIcons.whatsapp
+          FontAwesomeIcons.whatsapp,
           color: Colors.white,
           size: 28,
         ),
@@ -267,13 +271,11 @@ class _ShareModalContent extends StatelessWidget {
         color: Color(0xFF1877F2),
       ),
       child: Center(
-        child: Text(
-          'f',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
+        child: Icon(
+          //Icons.facebook, // Cambiar por: FontAwesomeIcons.facebookF
+          FontAwesomeIcons.facebookF,
+          color: Colors.white,
+          size: 28,
         ),
       ),
     );
@@ -287,13 +289,11 @@ class _ShareModalContent extends StatelessWidget {
         border: Border.all(color: Colors.grey[300]!),
       ),
       child: Center(
-        child: Text(
-          'M',
-          style: TextStyle(
-            color: Color(0xFFEA4335),
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+        child: Icon(
+          //Icons.email_outlined, // Cambiar por: FontAwesomeIcons.envelope
+          FontAwesomeIcons.envelope,
+          color: Color(0xFFEA4335),
+          size: 28,
         ),
       ),
     );
