@@ -290,12 +290,20 @@ class ExploraDetailPage extends StatelessWidget {
               ),
               // SizedBox(height: 4),
               Text(
-                "Representante: ${entrepreneurship.entrepreneursNickname}",
+                "@${entrepreneurship.entrepreneursNickname}",
                 style: Theme.of(context)
                     .textTheme
                     .labelSmall
                     ?.copyWith(color: Colors.grey[600]),
               ),
+              /*SizedBox(height: 8),
+              Text(
+                "Representante: ${entrepreneurship.entrepreneursNickname}",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall
+                    ?.copyWith(color: Colors.grey[600]),
+              ),*/
               SizedBox(height: 8),
               PillWidget(entrepreneurship.category),
 
