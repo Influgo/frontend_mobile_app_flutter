@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
+import 'grid_view_page.dart'; // Importar la nueva página
 
 class HorizontalCardsSection extends StatefulWidget {
   final String title;
   final List<Widget> cards;
-  final VoidCallback? onLoadMore; // Callback para cargar más
-  final bool isLoadingMore;      // Para mostrar un indicador de carga
-  final bool hasMore;            // Para saber si se puede cargar más
+  final VoidCallback? onLoadMore;
+  final bool isLoadingMore;
+  final bool hasMore;
+
+  // Nuevas propiedades para el "Ver más"
+  final List<Entrepreneurship>?
+      allEntrepreneurships; // Lista completa para la vista cuadricular
+  final VoidCallback?
+      onLoadMoreGrid; // Callback para cargar más en la vista cuadricular
 
   const HorizontalCardsSection({
     super.key,
@@ -14,6 +22,8 @@ class HorizontalCardsSection extends StatefulWidget {
     this.onLoadMore,
     this.isLoadingMore = false,
     this.hasMore = false,
+    this.allEntrepreneurships,
+    this.onLoadMoreGrid,
   });
 
   @override
@@ -26,93 +36,111 @@ class _HorizontalCardsSectionState extends State<HorizontalCardsSection> {
   @override
   void initState() {
     super.initState();
-    // Añadimos el listener para el scroll
     _scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
-    // Es importante remover el listener y disponer el controller
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
   }
 
   void _scrollListener() {
-    // Si hay una función para cargar más, no estamos cargando actualmente,
-    // se indica que hay más datos disponibles, y el scroll está cerca del final.
     if (widget.onLoadMore != null &&
         !widget.isLoadingMore &&
         widget.hasMore &&
         _scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 100) { // Umbral de 100px desde el final
+            _scrollController.position.maxScrollExtent - 100) {
       widget.onLoadMore!();
+    }
+  }
+
+  void _navigateToGridView() {
+    if (widget.allEntrepreneurships != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GridViewPage(
+            title: widget.title,
+            entrepreneurships: widget.allEntrepreneurships!,
+            onLoadMore: widget.onLoadMoreGrid,
+            isLoadingMore: widget.isLoadingMore,
+            hasMore: widget.hasMore,
+          ),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Determinar si se debe mostrar el slot para el indicador (loader o espacio de "hasMore").
-    // Se muestra si está cargando, O si hay más datos y una función para cargar (lo que implica que la carga por scroll está habilitada).
-    bool shouldShowIndicatorSlot = widget.isLoadingMore || (widget.hasMore && widget.onLoadMore != null);
-    
-    // El itemCount será la cantidad de tarjetas + 1 si el slot del indicador debe mostrarse.
-    int effectiveItemCount = widget.cards.length + (shouldShowIndicatorSlot ? 1 : 0);
+    bool shouldShowIndicatorSlot =
+        widget.isLoadingMore || (widget.hasMore && widget.onLoadMore != null);
+    int effectiveItemCount =
+        widget.cards.length + (shouldShowIndicatorSlot ? 1 : 0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Título (mantenido como en tu código original)
+        // Título con "Ver más"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 18,
-              //fontWeight: FontWeight.bold, // Mantenido comentado como en tu original
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              // Botón "Ver más"
+              if (widget.allEntrepreneurships != null &&
+                  widget.allEntrepreneurships!.isNotEmpty)
+                GestureDetector(
+                  onTap: _navigateToGridView,
+                  child: const Text(
+                    'Ver más',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
-        const SizedBox(height: 12), // Espaciador vertical original
+        const SizedBox(height: 12),
 
         // Lista horizontal de tarjetas
         SizedBox(
-          height: 190, // Altura original del contenedor de la lista
+          height: 190,
           child: ListView.separated(
-            controller: _scrollController, // Asignar el ScrollController
-            padding: const EdgeInsets.symmetric(horizontal: 16.0), // Padding original del ListView
+            controller: _scrollController,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             scrollDirection: Axis.horizontal,
             itemCount: effectiveItemCount,
-            separatorBuilder: (context, index) => const SizedBox(width: 12), // Separador original
+            separatorBuilder: (context, index) => const SizedBox(width: 12),
             itemBuilder: (context, index) {
-              // Si el índice actual corresponde a una de las tarjetas de datos
               if (index < widget.cards.length) {
                 return SizedBox(
-                  width: 150, // Ancho original para cada tarjeta
+                  width: 150,
                   child: widget.cards[index],
                 );
-              } 
-              // Si el índice corresponde al slot del indicador (que está después de todas las tarjetas)
-              else if (shouldShowIndicatorSlot) { 
+              } else if (shouldShowIndicatorSlot) {
                 if (widget.isLoadingMore) {
-                  // Si está cargando, mostrar un CircularProgressIndicator.
-                  // Usamos un Container para darle un ancho y centrarlo.
                   return Container(
-                    width: 50, // Ancho para el área del loader
+                    width: 50,
                     alignment: Alignment.center,
                     child: const CircularProgressIndicator(strokeWidth: 2.0),
                   );
                 } else if (widget.hasMore && widget.onLoadMore != null) {
-                  // Si hay más por cargar pero NO se está cargando activamente,
-                  // mostramos un SizedBox. Esto es útil para la carga automática por scroll,
-                  // ya que asegura que haya contenido al final para que el _scrollListener
-                  // pueda detectar que se llegó al final del scroll.
-                  // Si prefirieses un botón "Cargar más" explícito, iría aquí.
-                  return const SizedBox(width: 50); // Espacio para asegurar que el scroll pueda activar el listener
+                  return const SizedBox(width: 50);
                 }
               }
-              // Fallback (no debería alcanzarse si la lógica de itemCount es correcta)
-              return const SizedBox.shrink(); 
+              return const SizedBox.shrink();
             },
           ),
         ),

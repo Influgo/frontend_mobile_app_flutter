@@ -277,32 +277,33 @@ class ExploraDetailPage extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       entrepreneurship.entrepreneurshipName,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w500),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 20, // ← Aumentado de ~14 a 16
+                          ),
                     ),
                   ),
                   SizedBox(width: 8),
                   Icon(Icons.verified,
-                      color: Colors.blue, size: 20), // Icono de verificado
+                      color: Colors.blue, size: 24), // ← Aumentado de 20 a 22
                 ],
               ),
-              // SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 "@${entrepreneurship.entrepreneursNickname}",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall
-                    ?.copyWith(color: Colors.grey[600]),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13, // ← Aumentado de ~11 a 13
+                    ),
               ),
               /*SizedBox(height: 8),
               Text(
-                "Representante: ${entrepreneurship.entrepreneursNickname}",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall
-                    ?.copyWith(color: Colors.grey[600]),
+                "@${entrepreneurship.entrepreneursNickname}",
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Colors.grey[600],
+                      fontSize: 13, // ← Aumentado de ~11 a 13
+                    ),
               ),*/
               SizedBox(height: 8),
               PillWidget(entrepreneurship.category),

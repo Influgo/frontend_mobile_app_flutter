@@ -41,6 +41,26 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
         _selectedLocation != "Lima";
   }
 
+  // Función para contar el número de filtros activos
+  int _getActiveFiltersCount() {
+    int count = 0;
+
+    // Contar categorías seleccionadas
+    count += _selectedCategories.length;
+
+    // Contar modalidad si no es "Todos"
+    if (_selectedModality != "Todos") {
+      count += 1;
+    }
+
+    // Contar ubicación si no es "Lima" (valor por defecto)
+    if (_selectedLocation != "Lima") {
+      count += 1;
+    }
+
+    return count;
+  }
+
   void _showFilterModal(BuildContext context) {
     Navigator.push(
       context,
@@ -89,6 +109,7 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
     final List<String> categoriesToShow =
         widget.categories ?? _defaultCategories;
     final bool hasAdvancedFilters = _hasAdvancedFiltersActive();
+    final int activeFiltersCount = _getActiveFiltersCount();
 
     return Container(
       padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
@@ -97,10 +118,11 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
         physics: const BouncingScrollPhysics(),
         child: Row(
           children: [
-            // FilterButton con estado visual
+            // FilterButton con estado visual y contador
             FilterButton(
               onPressed: () => _showFilterModal(context),
               isActive: hasAdvancedFilters,
+              filterCount: activeFiltersCount, // ← NUEVO PARÁMETRO
             ),
             ...List.generate(categoriesToShow.length, (index) {
               final categoryName = categoriesToShow[index];

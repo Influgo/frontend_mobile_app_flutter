@@ -49,6 +49,11 @@ class _TabContentEntrepreneurshipsState
   List<Entrepreneurship> _bestRatedDisplay = [];
   int _visibleBestRatedCount = 5;
 
+  // Listas completas para la vista cuadricular
+  List<Entrepreneurship> _allRecentSorted = [];
+  List<Entrepreneurship> _allCollaborationsSorted = [];
+  List<Entrepreneurship> _allBestRatedSorted = [];
+
   final int _itemsToLoadMore = 5;
 
   @override
@@ -188,25 +193,31 @@ class _TabContentEntrepreneurshipsState
       _mostRecentDisplay = [];
       _mostCollaborationsDisplay = [];
       _bestRatedDisplay = [];
+
+      // Limpiar las listas completas también
+      _allRecentSorted = [];
+      _allCollaborationsSorted = [];
+      _allBestRatedSorted = [];
       return;
     }
 
-    // Preparar "Más recientes"
-    final recentTemp = List<Entrepreneurship>.from(filteredEntrepreneurships)
+    // Preparar "Más recientes" - completa y display
+    _allRecentSorted = List<Entrepreneurship>.from(filteredEntrepreneurships)
       ..sort((a, b) => b.id.compareTo(a.id));
-    _mostRecentDisplay = recentTemp.take(_visibleRecentCount).toList();
+    _mostRecentDisplay = _allRecentSorted.take(_visibleRecentCount).toList();
 
-    // Preparar "Más colaboraciones"
-    final collaborationsTemp =
+    // Preparar "Más colaboraciones" - completa y display
+    _allCollaborationsSorted =
         List<Entrepreneurship>.from(filteredEntrepreneurships)
           ..sort((a, b) => b.s3Files.length.compareTo(a.s3Files.length));
     _mostCollaborationsDisplay =
-        collaborationsTemp.take(_visibleCollaborationsCount).toList();
+        _allCollaborationsSorted.take(_visibleCollaborationsCount).toList();
 
-    // Preparar "Mejor valoración" (Placeholder)
-    final ratedTemp = List<Entrepreneurship>.from(filteredEntrepreneurships)
+    // Preparar "Mejor valoración" - completa y display
+    _allBestRatedSorted = List<Entrepreneurship>.from(filteredEntrepreneurships)
       ..sort((a, b) => a.id.compareTo(b.id));
-    _bestRatedDisplay = ratedTemp.take(_visibleBestRatedCount).toList();
+    _bestRatedDisplay =
+        _allBestRatedSorted.take(_visibleBestRatedCount).toList();
   }
 
   void _onAdvancedFiltersApplied(
@@ -430,7 +441,7 @@ class _TabContentEntrepreneurshipsState
                     Align(
                       alignment: Alignment.topLeft,
                       child: HorizontalCardsSection(
-                        title: "Más recientes (${_mostRecentDisplay.length})",
+                        title: "Más recientes",
                         cards: _mostRecentDisplay
                             .map((e) => BusinessCardWidget(entrepreneurship: e))
                             .toList(),
@@ -439,6 +450,11 @@ class _TabContentEntrepreneurshipsState
                         isLoadingMore: _isLoadingMoreAll &&
                             (_visibleRecentCount > _mostRecentDisplay.length),
                         hasMore: canLoadMoreRecent,
+                        allEntrepreneurships:
+                            _allRecentSorted, // Nueva propiedad
+                        onLoadMoreGrid: canLoadMoreRecent
+                            ? _loadMoreForRecent
+                            : null, // Nueva propiedad
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -447,8 +463,7 @@ class _TabContentEntrepreneurshipsState
                     Align(
                       alignment: Alignment.topLeft,
                       child: HorizontalCardsSection(
-                        title:
-                            "Más colaboraciones (${_mostCollaborationsDisplay.length})",
+                        title: "Más colaboraciones",
                         cards: _mostCollaborationsDisplay
                             .map((e) => BusinessCardWidget(entrepreneurship: e))
                             .toList(),
@@ -459,6 +474,11 @@ class _TabContentEntrepreneurshipsState
                             (_visibleCollaborationsCount >
                                 _mostCollaborationsDisplay.length),
                         hasMore: canLoadMoreCollab,
+                        allEntrepreneurships:
+                            _allCollaborationsSorted, // Nueva propiedad
+                        onLoadMoreGrid: canLoadMoreCollab
+                            ? _loadMoreForCollaborations
+                            : null, // Nueva propiedad
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -467,7 +487,7 @@ class _TabContentEntrepreneurshipsState
                     Align(
                       alignment: Alignment.topLeft,
                       child: HorizontalCardsSection(
-                        title: "Mejor valoración (${_bestRatedDisplay.length})",
+                        title: "Mejor valoración",
                         cards: _bestRatedDisplay
                             .map((e) => BusinessCardWidget(entrepreneurship: e))
                             .toList(),
@@ -476,6 +496,11 @@ class _TabContentEntrepreneurshipsState
                         isLoadingMore: _isLoadingMoreAll &&
                             (_visibleBestRatedCount > _bestRatedDisplay.length),
                         hasMore: canLoadMoreRated,
+                        allEntrepreneurships:
+                            _allBestRatedSorted, // Nueva propiedad
+                        onLoadMoreGrid: canLoadMoreRated
+                            ? _loadMoreForBestRated
+                            : null, // Nueva propiedad
                       ),
                     ),
                   ],
