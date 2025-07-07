@@ -6,11 +6,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_validated.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_not_validated.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Step6RegisterPage extends StatefulWidget {
   final Function(Uint8List) onImageCaptured;
-  const Step6RegisterPage({super.key, required this.onImageCaptured});
+  final ValidationData validationData;
+
+  const Step6RegisterPage({
+    super.key,
+    required this.onImageCaptured,
+    required this.validationData,
+  });
 
   @override
   State<Step6RegisterPage> createState() => _Step6RegisterPageState();
@@ -19,6 +31,9 @@ class Step6RegisterPage extends StatefulWidget {
 class _Step6RegisterPageState extends State<Step6RegisterPage> {
   Uint8List? _capturedImageBytes;
   final Logger logger = Logger();
+  final AuthRemoteDataSource authRemoteDataSource =
+      AuthRemoteDataSourceImpl(client: http.Client());
+  bool _isValidating = false;
 
   @override
   void initState() {
@@ -64,13 +79,93 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
     }
   }
 
-  void validateAndContinue() {
-    if (_capturedImageBytes != null) {
-      logger.i('Foto de perfil lista para enviar');
-      widget.onImageCaptured(_capturedImageBytes!);
-      RegisterPage.goToNextStep(context, image: _capturedImageBytes, step: 6);
-    } else {
+  Future<String> _getUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('email_register') ?? '';
+  }
+
+  Future<void> validateAndContinue() async {
+    if (_capturedImageBytes == null) {
       logger.e('Foto de perfil es null');
+      return;
+    }
+
+    setState(() {
+      _isValidating = true;
+    });
+
+    try {
+      logger.i('Iniciando validación de imágenes...');
+
+      // Obtener email del usuario
+      final userEmail = await _getUserEmail();
+
+      if (userEmail.isEmpty) {
+        logger.e('Email del usuario no encontrado');
+        setState(() {
+          _isValidating = false;
+        });
+        return;
+      }
+
+      // Actualizar ValidationData con la imagen del perfil
+      final updatedValidationData = ValidationData(
+        anversoImage: widget.validationData.anversoImage,
+        reversoImage: widget.validationData.reversoImage,
+        perfilImage: _capturedImageBytes,
+      );
+
+      // Llamar al callback con la imagen capturada
+      widget.onImageCaptured(_capturedImageBytes!);
+
+      // Validar imágenes
+      await authRemoteDataSource.validateImages(
+        userIdentifier: userEmail,
+        documentFrontImage: updatedValidationData.anversoImage!,
+        documentBackImage: updatedValidationData.reversoImage!,
+        profileImage: updatedValidationData.perfilImage!,
+      );
+
+      logger.i('Validación de imágenes exitosa');
+
+      // Navegar a página de validación exitosa
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Step65ImagesValidatedPage(
+              validationData: updatedValidationData,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      logger.e('Error en la validación de imágenes: $e');
+
+      // Navegar a página de validación fallida
+      if (mounted) {
+        final updatedValidationData = ValidationData(
+          anversoImage: widget.validationData.anversoImage,
+          reversoImage: widget.validationData.reversoImage,
+          perfilImage: _capturedImageBytes,
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Step65ImagesNotValidatedPage(
+              validationData: updatedValidationData,
+              errorMessage: e.toString(),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isValidating = false;
+        });
+      }
     }
   }
 
@@ -150,7 +245,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
             left: 30,
             right: 30,
             child: ElevatedButton(
-              onPressed: _pickImage,
+              onPressed: _isValidating ? null : _pickImage,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF222222),
                 padding: const EdgeInsets.symmetric(vertical: 24),
@@ -174,12 +269,22 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5)),
               ),
-              onPressed:
-                  _capturedImageBytes != null ? validateAndContinue : null,
-              child: const Text(
-                'Continuar',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              onPressed: (_capturedImageBytes != null && !_isValidating)
+                  ? validateAndContinue
+                  : null,
+              child: _isValidating
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      'Continuar',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
             ),
           ),
         ],

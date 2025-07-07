@@ -110,18 +110,9 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
         if (mounted) {
           _showSnackBar("Usuario registrado con éxito");
 
-          final userEmail = requestBody['email'];
+          // REMOVIDO: La validación de imágenes ya se hizo en Step6
+          // Ya no se llama a validateImages aquí
 
-          try {
-            await authRemoteDataSource.validateImages(
-              userIdentifier: userEmail,
-              documentFrontImage: widget.validationData.anversoImage!,
-              documentBackImage: widget.validationData.reversoImage!,
-              profileImage: widget.validationData.perfilImage!,
-            );
-          } catch (e) {
-            logger.e('Error en la validación de imágenes: $e');
-          }
           deleteStoredPhotos();
           _deleteLocalData();
           RegisterPage.goToNextStep(context);
@@ -143,13 +134,7 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    logger.i('Estado de las imágenes en Step7:');
-    logger.i(
-        'Anverso Image: ${widget.validationData.anversoImage != null ? 'Disponible' : 'Nula'}');
-    logger.i(
-        'Reverso Image: ${widget.validationData.reversoImage != null ? 'Disponible' : 'Nula'}');
-    logger.i(
-        'Perfil Image: ${widget.validationData.perfilImage != null ? 'Disponible' : 'Nula'}');
+    // REMOVIDO: Los logs del estado de las imágenes ya no son necesarios aquí
 
     return Scaffold(
       backgroundColor: Colors.white,

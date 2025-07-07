@@ -6,6 +6,8 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4.5_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step5_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_validated.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_not_validated.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step7_terms_conditions.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step8_register_page.dart';
 import 'package:logger/logger.dart';
@@ -16,12 +18,21 @@ import 'step2_influencer_register_page.dart';
 import 'step3_register_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final int? initialStep;
+
+  const RegisterPage({super.key, this.initialStep});
 
   static void goToNextStep(BuildContext context,
       {Uint8List? image, double? step}) {
     final state = context.findAncestorStateOfType<_RegisterPageState>();
     state?._nextStep();
+  }
+
+  static void goToStep(BuildContext context, int step) {
+    final state = context.findAncestorStateOfType<_RegisterPageState>();
+    if (state != null) {
+      state._goToSpecificStep(step);
+    }
   }
 
   static void updateRequestBody(
@@ -55,6 +66,13 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       ),
     ];
+
+    // Si se especifica un step inicial, navegar a él después de la inicialización
+    if (widget.initialStep != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _goToSpecificStep(widget.initialStep!);
+      });
+    }
   }
 
   void _initializePages() {
@@ -92,10 +110,15 @@ class _RegisterPageState extends State<RegisterPage> {
         logger.i('Reverso Image Captured');
       }),
       Step5RegisterPage(),
-      Step6RegisterPage(onImageCaptured: (image) {
-        setState(() => _validationData.perfilImage = image);
-        logger.i('Perfil Image Captured');
-      }),
+      Step6RegisterPage(
+        onImageCaptured: (image) {
+          setState(() => _validationData.perfilImage = image);
+          logger.i('Perfil Image Captured');
+        },
+        validationData: _validationData,
+      ),
+      // NOTA: Step6.5 pages se manejan por navegación directa desde Step6
+      // No se incluyen en el PageView ya que usan Navigator.pushReplacement
       Step7TermsConditionsPage(
         requestBody: _validationData.requestBody,
         validationData: _validationData,
@@ -118,10 +141,15 @@ class _RegisterPageState extends State<RegisterPage> {
         logger.i('Reverso Image Captured');
       }),
       Step5RegisterPage(),
-      Step6RegisterPage(onImageCaptured: (image) {
-        setState(() => _validationData.perfilImage = image);
-        logger.i('Perfil Image Captured');
-      }),
+      Step6RegisterPage(
+        onImageCaptured: (image) {
+          setState(() => _validationData.perfilImage = image);
+          logger.i('Perfil Image Captured');
+        },
+        validationData: _validationData,
+      ),
+      // NOTA: Step6.5 pages se manejan por navegación directa desde Step6
+      // No se incluyen en el PageView ya que usan Navigator.pushReplacement
       Step7TermsConditionsPage(
         requestBody: _validationData.requestBody,
         validationData: _validationData,
@@ -135,6 +163,13 @@ class _RegisterPageState extends State<RegisterPage> {
       _validationData.requestBody.addAll(data);
       logger.i('Updated Request Body: ${_validationData.requestBody}');
     });
+  }
+
+  void _goToSpecificStep(int step) {
+    setState(() {
+      _currentStep = step;
+    });
+    _pageController.jumpToPage(_currentStep);
   }
 
   void _nextStep() {
