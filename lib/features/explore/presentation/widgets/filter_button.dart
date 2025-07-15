@@ -16,28 +16,32 @@ class FilterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 8.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 8.0, top: 4.0),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           // Botón principal
-          ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isActive ? Colors.black : Colors.white,
-              foregroundColor: isActive ? Colors.white : Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: const BorderSide(color: Colors.black),
+          SizedBox(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isActive ? Colors.black : Colors.white,
+                foregroundColor: isActive ? Colors.white : Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Colors.black),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-            child: SvgPicture.asset(
-              'assets/icons/filtericon.svg',
-              width: 14,
-              height: 14,
-              colorFilter: ColorFilter.mode(
-                isActive ? Colors.white : Colors.black,
-                BlendMode.srcIn,
+              child: SvgPicture.asset(
+                'assets/icons/filtericon.svg',
+                width: 14,
+                height: 14,
+                colorFilter: ColorFilter.mode(
+                  isActive ? Colors.white : Colors.black,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
           ),
@@ -45,8 +49,8 @@ class FilterButton extends StatelessWidget {
           // Contador de filtros (solo se muestra si filterCount > 0)
           if (filterCount != null && filterCount! > 0)
             Positioned(
-              top: -2,
-              right: -2,
+              top: -4,
+              right: -4,
               child: Container(
                 width: 20,
                 height: 20,

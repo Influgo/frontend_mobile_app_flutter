@@ -112,7 +112,7 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
     final int activeFiltersCount = _getActiveFiltersCount();
 
     return Container(
-      padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),

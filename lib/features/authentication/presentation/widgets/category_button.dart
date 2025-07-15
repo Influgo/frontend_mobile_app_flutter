@@ -17,7 +17,7 @@ class CategoryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 4.0, right: isLast ? 16.0 : 4.0),
+      padding: EdgeInsets.only(left: 4.0, right: isLast ? 16.0 : 4.0, top: 4.0),
       child: SizedBox(
       height: 36,
         child: ElevatedButton(
