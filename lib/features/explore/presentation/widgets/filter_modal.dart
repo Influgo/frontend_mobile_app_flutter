@@ -106,7 +106,7 @@ class _FilterModalState extends State<FilterModal> {
           // Content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -118,10 +118,10 @@ class _FilterModalState extends State<FilterModal> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   _buildCategoriesSection(),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // Modality Section
                   const Text(
@@ -131,10 +131,10 @@ class _FilterModalState extends State<FilterModal> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   _buildModalitySection(),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // Location Section - Solo se muestra si no es Virtual
                   if (_selectedModality != "Virtual") ...[
@@ -153,11 +153,11 @@ class _FilterModalState extends State<FilterModal> {
                         color: Colors.grey[600],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     _buildLocationSection(),
                   ],
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -207,14 +207,14 @@ class _FilterModalState extends State<FilterModal> {
 
   Widget _buildCategoriesSection() {
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 6,
+      runSpacing: 6,
       children: _categories.map((category) {
         final isSelected = _selectedCategories.contains(category);
         return GestureDetector(
           onTap: () => _selectCategory(category),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: isSelected ? Colors.black : Colors.grey[200],
               borderRadius: BorderRadius.circular(20),
@@ -238,14 +238,14 @@ class _FilterModalState extends State<FilterModal> {
 
   Widget _buildModalitySection() {
     return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+      spacing: 6,
+      runSpacing: 6,
       children: _modalities.map((modality) {
         final isSelected = _selectedModality == modality;
         return GestureDetector(
           onTap: () => _selectModality(modality),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: isSelected ? Colors.black : Colors.grey[200],
               borderRadius: BorderRadius.circular(20),
