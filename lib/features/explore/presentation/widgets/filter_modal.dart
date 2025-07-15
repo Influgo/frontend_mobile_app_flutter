@@ -33,6 +33,7 @@ class _FilterModalState extends State<FilterModal> {
   final List<String> _modalities = ["Todos", "Presencial", "Virtual"];
 
   final List<String> _peruCities = [
+    "Todos",
     "Amazonas",
     "Ancash",
     "Apurimac",
@@ -66,7 +67,7 @@ class _FilterModalState extends State<FilterModal> {
     _categories = widget.categories ?? FilterConstants.categories;
     _selectedCategories = List.from(widget.selectedCategories);
     _selectedModality = widget.selectedModality;
-    _selectedLocation = widget.selectedLocation;
+    _selectedLocation = widget.selectedLocation == "Lima" ? "Todos" : widget.selectedLocation;
   }
 
   @override
@@ -314,7 +315,7 @@ class _FilterModalState extends State<FilterModal> {
     setState(() {
       _selectedCategories.clear();
       _selectedModality = "Todos";
-      _selectedLocation = "Lima";
+      _selectedLocation = "Todos";
     });
   }
 
@@ -329,7 +330,7 @@ class _FilterModalState extends State<FilterModal> {
     int count = 0;
     if (_selectedCategories.isNotEmpty) count += 1;
     if (_selectedModality != "Todos") count += 1;
-    if (_selectedModality != "Virtual" && _selectedLocation != "Lima")
+    if (_selectedModality != "Virtual" && _selectedLocation != "Todos")
       count += 1;
     return count;
   }

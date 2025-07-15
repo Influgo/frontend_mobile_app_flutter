@@ -32,13 +32,13 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
   // Estados para los filtros avanzados
   List<String> _selectedCategories = [];
   String _selectedModality = "Todos";
-  String _selectedLocation = "Lima";
+  String _selectedLocation = "Todos";
 
   // Función para verificar si hay filtros avanzados activos
   bool _hasAdvancedFiltersActive() {
     return _selectedCategories.isNotEmpty ||
         _selectedModality != "Todos" ||
-        _selectedLocation != "Lima";
+        _selectedLocation != "Todos";
   }
 
   // Función para contar el número de filtros activos
@@ -54,7 +54,7 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
     }
 
     // Contar ubicación si no es "Lima" (valor por defecto)
-    if (_selectedLocation != "Lima") {
+    if (_selectedLocation != "Todos") {
       count += 1;
     }
 
@@ -92,12 +92,12 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
     setState(() {
       _selectedCategories = [];
       _selectedModality = "Todos";
-      _selectedLocation = "Lima";
+      _selectedLocation = "Todos";
     });
 
     // Notificar al padre que se limpiaron los filtros
     if (widget.onAdvancedFiltersApplied != null) {
-      widget.onAdvancedFiltersApplied!([], "Todos", "Lima");
+      widget.onAdvancedFiltersApplied!([], "Todos", "Todos");
     }
 
     // También limpiar el filtro básico

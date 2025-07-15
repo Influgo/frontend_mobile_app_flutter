@@ -21,7 +21,7 @@ class _TabContentEntrepreneurshipsState
   String _selectedCategory = "Todos";
   List<String> _advancedSelectedCategories = [];
   String _selectedModality = "Todos";
-  String _selectedLocation = "Lima";
+  String _selectedLocation = "Todos";
 
   final EntrepreneurshipService _service = EntrepreneurshipService();
 
@@ -166,8 +166,8 @@ class _TabContentEntrepreneurshipsState
           .toList();
     }
 
-    // Filtrar por ubicación (solo si no es Lima)
-    if (_selectedLocation != "Lima") {
+    // Filtrar por ubicación (solo si no es Todos)
+    if (_selectedLocation != "Todos") {
       filtered = filtered.where((e) {
         return e.addresses.any((address) =>
             address.toLowerCase().contains(_selectedLocation.toLowerCase()));
@@ -183,7 +183,7 @@ class _TabContentEntrepreneurshipsState
   bool _hasAdvancedFiltersActive() {
     return _advancedSelectedCategories.isNotEmpty ||
         _selectedModality != "Todos" ||
-        _selectedLocation != "Lima";
+        _selectedLocation != "Todos";
   }
 
   void _processAndPrepareDisplayData() {
@@ -252,7 +252,7 @@ class _TabContentEntrepreneurshipsState
       if (newCategory != "Todos") {
         _advancedSelectedCategories = [];
         _selectedModality = "Todos";
-        _selectedLocation = "Lima";
+        _selectedLocation = "Todos";
       }
       _resetVisibleCounts();
       _processAndPrepareDisplayData();
@@ -264,7 +264,7 @@ class _TabContentEntrepreneurshipsState
       _selectedCategory = "Todos";
       _advancedSelectedCategories = [];
       _selectedModality = "Todos";
-      _selectedLocation = "Lima";
+      _selectedLocation = "Todos";
       _resetVisibleCounts();
       _processAndPrepareDisplayData();
     });
