@@ -1,0 +1,2 @@
+C:/influyo/movil/frontend_mobile_app_flutter/android/app/.cxx/Debug/q122830m/x86/CMakeFiles/edit_cache.dir
+C:/influyo/movil/frontend_mobile_app_flutter/android/app/.cxx/Debug/q122830m/x86/CMakeFiles/rebuild_cache.dir

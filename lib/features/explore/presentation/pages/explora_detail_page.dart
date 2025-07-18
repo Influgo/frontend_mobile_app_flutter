@@ -272,7 +272,7 @@ class ExploraDetailPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Expanded(
+                  Flexible(
                     child: Text(
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -345,12 +345,15 @@ class ExploraDetailPage extends StatelessWidget {
             itemCount: entrepreneurship.socialDtos.length,
             itemBuilder: (context, index) {
               final social = entrepreneurship.socialDtos[index];
-              IconData iconData;
+              Widget iconWidget;
               String url = social.socialUrl.trim();
-              // Lógica simple para iconos (puede mejorarse)
+              // Lógica para iconos usando assets personalizados
               if (social.name.toLowerCase().contains("instagram")) {
-                iconData = Icons
-                    .camera_alt_outlined; // Deberías tener un mapeo mejor o usar FontAwesomeIcons
+                iconWidget = Image.asset(
+                  'assets/icons/instagramicon.png',
+                  width: 24,
+                  height: 24,
+                );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (url.startsWith("@")) {
@@ -358,8 +361,21 @@ class ExploraDetailPage extends StatelessWidget {
                   }
                   url = "https://www.instagram.com/$url";
                 }
+              } else if (social.name.toLowerCase().contains("facebook")) {
+                iconWidget = Image.asset(
+                  'assets/icons/facebookicon.png',
+                  width: 24,
+                  height: 24,
+                );
+                if (!(social.socialUrl.contains("http") ||
+                    social.socialUrl.contains("www"))) {
+                  if (url.startsWith("@")) {
+                    url = url.substring(1);
+                  }
+                  url = "https://www.facebook.com/$url";
+                }
               } else if (social.name.toLowerCase().contains("twitch")) {
-                iconData = Icons.facebook;
+                iconWidget = Icon(Icons.videogame_asset_outlined, color: Colors.black);
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (url.startsWith("@")) {
@@ -367,14 +383,8 @@ class ExploraDetailPage extends StatelessWidget {
                   }
                   url = "https://www.twitch.tv/$url";
                 }
-
-                // } else if (social.name.toLowerCase().contains("facebook")) {
-                //   iconData = Icons.facebook;
-                // } else if (social.name.toLowerCase().contains("twitter")) {
-                //   iconData = Icons.flutter_dash; // Placeholder
               } else if (social.name.toLowerCase().contains("youtube")) {
-                iconData = Icons.play_circle_outline;
-
+                iconWidget = Icon(Icons.play_circle_outline, color: Colors.black);
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (!url.startsWith("@")) {
@@ -383,7 +393,11 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.youtube.com/$url";
                 }
               } else if (social.name.toLowerCase().contains("tiktok")) {
-                iconData = Icons.music_note_outlined;
+                iconWidget = Image.asset(
+                  'assets/icons/tiktokicon.png',
+                  width: 24,
+                  height: 24,
+                );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (!url.startsWith("@")) {
@@ -392,7 +406,7 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.tiktok.com/$url";
                 }
               } else {
-                iconData = Icons.link;
+                iconWidget = Icon(Icons.link, color: Colors.black);
               }
 
               return Padding(
@@ -415,7 +429,7 @@ class ExploraDetailPage extends StatelessWidget {
                     },
                     child: Row(
                       children: [
-                        Icon(iconData, color: Colors.black),
+                        iconWidget,
                         SizedBox(width: 12),
                         Expanded(
                             child: Text(
@@ -703,7 +717,7 @@ class ExploraDetailPage extends StatelessWidget {
   void _showShareModal(BuildContext context) {
     ShareEntrepreneurshipModal.show(
       context,
-      entrepreneurshipId: entrepreneurship.id?.toString() ?? 'unknown',
+      entrepreneurshipId: entrepreneurship.id.toString(),
       entrepreneurshipName: entrepreneurship.entrepreneurshipName,
       summary: entrepreneurship.summary,
       imageUrl: entrepreneurship.entrepreneurLogo?.url,
