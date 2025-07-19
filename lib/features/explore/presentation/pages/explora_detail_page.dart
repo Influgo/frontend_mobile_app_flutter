@@ -334,7 +334,14 @@ class ExploraDetailPage extends StatelessWidget {
         SizedBox(height: 24),
 
         // Redes
-        _buildSectionTitle(context, "Redes"),
+        //_buildSectionTitle(context, "Redes"),
+        Text(
+          "Redes",
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(fontWeight: FontWeight.w500),
+        ),
         if (entrepreneurship.socialDtos.isEmpty)
           Text("No hay redes sociales disponibles.",
               style: TextStyle(color: Colors.grey))
@@ -442,7 +449,7 @@ class ExploraDetailPage extends StatelessWidget {
                   ));
             },
           ),
-        SizedBox(height: 24),
+        SizedBox(height: 16), // Reducido de 24 a 16
 
         // Ubicación
         _buildSectionTitle(context, "Ubicación"),
@@ -481,6 +488,7 @@ class ExploraDetailPage extends StatelessWidget {
               .toList(),
         SizedBox(height: 24),
 
+        /*
         // Enfoque
         _buildSectionTitle(context, "Enfoque"),
         if (entrepreneurship.entrepreneurFocus.isEmpty)
@@ -495,6 +503,7 @@ class ExploraDetailPage extends StatelessWidget {
                 .toList(),
           ),
         SizedBox(height: 24),
+        */
 
         // Galería
         _buildSectionTitle(context, "Galería"),

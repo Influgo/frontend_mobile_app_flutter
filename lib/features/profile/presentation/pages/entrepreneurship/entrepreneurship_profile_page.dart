@@ -1885,6 +1885,7 @@ class _EntrepreneurshipProfilePageState
                               ),
                               buildAddressList(),
                               const SizedBox(height: 30),
+                              /*
                               const Text("Enfoque de tu emprendimiento",
                                   style: TextStyle(
                                       fontSize: 16,
@@ -1906,6 +1907,7 @@ class _EntrepreneurshipProfilePageState
                                       style: TextStyle(color: Colors.black)),
                                 ),
                               ),
+                              */
                               const SizedBox(height: 10),
                               focusTags != []
                                   ? buildFocusTags()
