@@ -67,7 +67,7 @@ class _FilterModalState extends State<FilterModal> {
     _categories = widget.categories ?? FilterConstants.categories;
     _selectedCategories = List.from(widget.selectedCategories);
     _selectedModality = widget.selectedModality;
-    _selectedLocation = widget.selectedLocation == "Lima" ? "Todos" : widget.selectedLocation;
+    _selectedLocation = "Todos";
   }
 
   @override
