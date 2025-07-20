@@ -334,14 +334,7 @@ class ExploraDetailPage extends StatelessWidget {
         SizedBox(height: 24),
 
         // Redes
-        //_buildSectionTitle(context, "Redes"),
-        Text(
-          "Redes",
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(fontWeight: FontWeight.w500),
-        ),
+        _buildSectionTitle(context, "Redes"),
         if (entrepreneurship.socialDtos.isEmpty)
           Text("No hay redes sociales disponibles.",
               style: TextStyle(color: Colors.grey))
@@ -382,7 +375,8 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.facebook.com/$url";
                 }
               } else if (social.name.toLowerCase().contains("twitch")) {
-                iconWidget = Icon(Icons.videogame_asset_outlined, color: Colors.black);
+                iconWidget =
+                    Icon(Icons.videogame_asset_outlined, color: Colors.black);
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (url.startsWith("@")) {
@@ -391,7 +385,8 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.twitch.tv/$url";
                 }
               } else if (social.name.toLowerCase().contains("youtube")) {
-                iconWidget = Icon(Icons.play_circle_outline, color: Colors.black);
+                iconWidget =
+                    Icon(Icons.play_circle_outline, color: Colors.black);
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (!url.startsWith("@")) {
@@ -417,11 +412,7 @@ class ExploraDetailPage extends StatelessWidget {
               }
 
               return Padding(
-                  // padding: const EdgeInsets.symmetric(vertical: 4),
-                  padding: EdgeInsets.only(
-                    top: index == 0 ? 0 : 4,
-                    // bottom: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       padding:
