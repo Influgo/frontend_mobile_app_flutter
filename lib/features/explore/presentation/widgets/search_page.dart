@@ -3,6 +3,9 @@ import 'package:frontend_mobile_app_flutter/features/authentication/presentation
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/search_content_influencers.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/search_content_entrepreneurships.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/search_suggestions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -18,6 +21,8 @@ class _SearchPageState extends State<SearchPage>
   String _searchQuery = '';
   String _submittedQuery = '';
   bool _showTabs = false;
+  String? _userType;
+  bool _isInfluencerFirst = true;
 
   @override
   void initState() {
@@ -38,6 +43,88 @@ class _SearchPageState extends State<SearchPage>
         }
       });
     });
+
+    _getUserType();
+  }
+
+  Future<void> _getUserType() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Primero intentar obtener el rol de usuario almacenado localmente
+      final storedUserRole = prefs.getString('userRole');
+      if (storedUserRole != null && storedUserRole.isNotEmpty) {
+        setState(() {
+          _userType = storedUserRole;
+          // Si el usuario es ENTREPRENEUR, mostrar influencers primero
+          // Si el usuario es INFLUENCER, mostrar emprendimientos primero
+          _isInfluencerFirst = (_userType?.toUpperCase() == 'ENTREPRENEUR');
+        });
+        // Reset TabController to index 0 when user type is determined
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_tabController.index != 0) {
+            _tabController.animateTo(0);
+          }
+        });
+        return;
+      }
+
+      // Si no está almacenado localmente, intentar obtenerlo de la API
+      final userIdentifier = prefs.getString('userIdentifier');
+      final userId = prefs.getString('userId');
+      final token = prefs.getString('token');
+
+      if (token != null && (userIdentifier != null || userId != null)) {
+        final identifier = userIdentifier?.isNotEmpty == true ? userIdentifier! : userId!;
+        
+        final response = await http.get(
+          Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$identifier'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          
+          // Extraer el rol del usuario de roles[0].role.name
+          String userRole = '';
+          if (data['roles'] != null && data['roles'].isNotEmpty) {
+            final roles = data['roles'] as List;
+            if (roles.isNotEmpty && roles[0]['role'] != null) {
+              userRole = roles[0]['role']['name'] ?? '';
+            }
+          }
+          
+          setState(() {
+            _userType = userRole;
+            
+            // Si se obtiene el rol de usuario de la API, almacenarlo localmente
+            if (_userType != null && _userType!.isNotEmpty) {
+              prefs.setString('userRole', _userType!);
+              _isInfluencerFirst = (_userType?.toUpperCase() == 'ENTREPRENEUR');
+            } else {
+              // Por defecto, mostrar influencers primero (asumiendo usuario emprendedor)
+              _isInfluencerFirst = true;
+            }
+          });
+          
+          // Reset TabController to index 0 when user type is determined from API
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_tabController.index != 0) {
+              _tabController.animateTo(0);
+            }
+          });
+        }
+      }
+    } catch (e) {
+      // En caso de error, mantener el orden por defecto
+      print('Error getting user type: $e');
+      setState(() {
+        _isInfluencerFirst = true; // Por defecto
+      });
+    }
   }
 
   @override
@@ -55,6 +142,69 @@ class _SearchPageState extends State<SearchPage>
       });
       // Ocultar el teclado
       FocusScope.of(context).unfocus();
+      
+      // Forzar que el TabController se reinicie en el tab 0
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_tabController.index != 0) {
+          _tabController.animateTo(0);
+        }
+      });
+    }
+  }
+
+  List<Widget> _getTabsInOrder() {
+    if (_isInfluencerFirst) {
+      return [
+        CustomTabItem(
+          title: 'Influencers',
+          index: 0,
+          tabController: _tabController,
+        ),
+        CustomTabItem(
+          title: 'Emprendimientos',
+          index: 1,
+          tabController: _tabController,
+        ),
+      ];
+    } else {
+      return [
+        CustomTabItem(
+          title: 'Emprendimientos',
+          index: 0,
+          tabController: _tabController,
+        ),
+        CustomTabItem(
+          title: 'Influencers',
+          index: 1,
+          tabController: _tabController,
+        ),
+      ];
+    }
+  }
+
+  List<Widget> _getTabContentInOrder() {
+    if (_isInfluencerFirst) {
+      return [
+        SearchContentInfluencers(
+          key: ValueKey('influencers_${_submittedQuery}'),
+          searchQuery: _submittedQuery,
+        ),
+        SearchContentEntrepreneurships(
+          key: ValueKey('entrepreneurships_${_submittedQuery}'),
+          searchQuery: _submittedQuery,
+        ),
+      ];
+    } else {
+      return [
+        SearchContentEntrepreneurships(
+          key: ValueKey('entrepreneurships_${_submittedQuery}'),
+          searchQuery: _submittedQuery,
+        ),
+        SearchContentInfluencers(
+          key: ValueKey('influencers_${_submittedQuery}'),
+          searchQuery: _submittedQuery,
+        ),
+      ];
     }
   }
 
@@ -119,18 +269,7 @@ class _SearchPageState extends State<SearchPage>
                   unselectedLabelColor: Colors.grey,
                   indicatorSize: TabBarIndicatorSize.label,
                   indicatorColor: Colors.transparent,
-                  tabs: [
-                    CustomTabItem(
-                      title: 'Influencers',
-                      index: 1,
-                      tabController: _tabController,
-                    ),
-                    CustomTabItem(
-                      title: 'Emprendimientos',
-                      index: 0,
-                      tabController: _tabController,
-                    ),
-                  ],
+                  tabs: _getTabsInOrder(),
                 ),
                 // Animated indicator
                 Stack(
@@ -171,12 +310,9 @@ class _SearchPageState extends State<SearchPage>
           Expanded(
             child: _showTabs
                 ? TabBarView(
+                    key: ValueKey('${_isInfluencerFirst}_${_submittedQuery}'),
                     controller: _tabController,
-                    children: [
-                      SearchContentEntrepreneurships(
-                          searchQuery: _submittedQuery),
-                      SearchContentInfluencers(searchQuery: _submittedQuery),
-                    ],
+                    children: _getTabContentInOrder(),
                   )
                 : SearchSuggestions(
                     searchQuery: _searchQuery,

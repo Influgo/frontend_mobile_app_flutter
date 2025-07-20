@@ -14,7 +14,7 @@ class SearchContentInfluencers extends StatefulWidget {
       _SearchContentInfluencersState();
 }
 
-class _SearchContentInfluencersState extends State<SearchContentInfluencers> {
+class _SearchContentInfluencersState extends State<SearchContentInfluencers> with AutomaticKeepAliveClientMixin {
   final RecentSearchesService _recentSearchesService = RecentSearchesService();
   List<RecentSearch> _recentSearches = [];
 
@@ -41,7 +41,12 @@ class _SearchContentInfluencersState extends State<SearchContentInfluencers> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Necesario para AutomaticKeepAliveClientMixin
+    
     // Mostrar búsquedas recientes o estado vacío cuando no hay query
     if (widget.searchQuery.isEmpty) {
       return _recentSearches.isEmpty

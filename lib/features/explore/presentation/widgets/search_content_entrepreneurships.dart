@@ -18,7 +18,7 @@ class SearchContentEntrepreneurships extends StatefulWidget {
 }
 
 class _SearchContentEntrepreneurshipsState
-    extends State<SearchContentEntrepreneurships> {
+    extends State<SearchContentEntrepreneurships> with AutomaticKeepAliveClientMixin {
   final EntrepreneurshipService _service = EntrepreneurshipService();
   final RecentSearchesService _recentSearchesService = RecentSearchesService();
   List<Entrepreneurship> _searchResults = [];
@@ -31,6 +31,14 @@ class _SearchContentEntrepreneurshipsState
   void initState() {
     super.initState();
     _loadRecentSearches();
+    
+    // Si ya viene con una query al inicializar, ejecutar búsqueda inmediatamente
+    if (widget.searchQuery.isNotEmpty) {
+      _lastSearchQuery = widget.searchQuery;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _performSearch();
+      });
+    }
   }
 
   // Cargar búsquedas recientes
@@ -92,7 +100,12 @@ class _SearchContentEntrepreneurshipsState
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Necesario para AutomaticKeepAliveClientMixin
+    
     // Mostrar estado vacío o búsquedas recientes cuando no hay query
     if (widget.searchQuery.isEmpty) {
       return _recentSearches.isEmpty
