@@ -212,25 +212,20 @@ class _FilterModalState extends State<FilterModal> {
       runSpacing: 6,
       children: _categories.map((category) {
         final isSelected = _selectedCategories.contains(category);
-        return GestureDetector(
-          onTap: () => _selectCategory(category),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.black : Colors.grey[200],
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected ? Colors.black : Colors.grey[300]!,
+        return SizedBox(
+          height: 36,
+          child: ElevatedButton(
+            onPressed: () => _selectCategory(category),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isSelected ? Colors.black : Colors.white,
+              foregroundColor: isSelected ? Colors.white : Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Colors.black),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
-            child: Text(
-              category,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
+            child: Text(category),
           ),
         );
       }).toList(),
@@ -243,25 +238,20 @@ class _FilterModalState extends State<FilterModal> {
       runSpacing: 6,
       children: _modalities.map((modality) {
         final isSelected = _selectedModality == modality;
-        return GestureDetector(
-          onTap: () => _selectModality(modality),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.black : Colors.grey[200],
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected ? Colors.black : Colors.grey[300]!,
+        return SizedBox(
+          height: 36,
+          child: ElevatedButton(
+            onPressed: () => _selectModality(modality),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isSelected ? Colors.black : Colors.white,
+              foregroundColor: isSelected ? Colors.white : Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Colors.black),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
             ),
-            child: Text(
-              modality,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
+            child: Text(modality),
           ),
         );
       }).toList(),
