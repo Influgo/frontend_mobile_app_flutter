@@ -389,6 +389,9 @@ class _TabContentEntrepreneurshipsState
           onCategorySelected: _onCategorySelected,
           categories: _categories,
           onAdvancedFiltersApplied: _onAdvancedFiltersApplied,
+          selectedCategories: _advancedSelectedCategories,
+          selectedModality: _selectedModality,
+          selectedLocation: _selectedLocation,
         ),
         Expanded(
           child: RefreshIndicator(
