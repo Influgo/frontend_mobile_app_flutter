@@ -375,8 +375,11 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.facebook.com/$url";
                 }
               } else if (social.name.toLowerCase().contains("twitch")) {
-                iconWidget =
-                    Icon(Icons.videogame_asset_outlined, color: Colors.black);
+                iconWidget = Image.asset(
+                  'assets/icons/twitchicon.png',
+                  width: 24,
+                  height: 24,
+                );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (url.startsWith("@")) {
@@ -385,8 +388,11 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.twitch.tv/$url";
                 }
               } else if (social.name.toLowerCase().contains("youtube")) {
-                iconWidget =
-                    Icon(Icons.play_circle_outline, color: Colors.black);
+                iconWidget = Image.asset(
+                  'assets/icons/youtubeicon.png',
+                  width: 24,
+                  height: 24,
+                );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
                   if (!url.startsWith("@")) {
