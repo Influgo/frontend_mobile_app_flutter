@@ -9,6 +9,9 @@ class ScrollableFilters extends StatefulWidget {
   final Function(String) onCategorySelected;
   final List<String>? categories;
   final Function(List<String>, String, String)? onAdvancedFiltersApplied;
+  final List<String> selectedCategories;
+  final String selectedModality;
+  final String selectedLocation;
 
   const ScrollableFilters({
     super.key,
@@ -16,6 +19,9 @@ class ScrollableFilters extends StatefulWidget {
     required this.onCategorySelected,
     this.categories,
     this.onAdvancedFiltersApplied,
+    this.selectedCategories = const [],
+    this.selectedModality = "Todos",
+    this.selectedLocation = "Todos",
   });
 
   @override
@@ -29,10 +35,33 @@ class _ScrollableFiltersState extends State<ScrollableFilters> {
     ...FilterConstants.categories
   ];
 
-  // Estados para los filtros avanzados
-  List<String> _selectedCategories = [];
-  String _selectedModality = "Todos";
-  String _selectedLocation = "Todos";
+  // Estados para los filtros avanzados - sincronizados con el padre
+  late List<String> _selectedCategories;
+  late String _selectedModality;
+  late String _selectedLocation;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategories = List.from(widget.selectedCategories);
+    _selectedModality = widget.selectedModality;
+    _selectedLocation = widget.selectedLocation;
+  }
+
+  @override
+  void didUpdateWidget(ScrollableFilters oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Sincronizar cuando cambien los valores del padre
+    if (oldWidget.selectedCategories != widget.selectedCategories ||
+        oldWidget.selectedModality != widget.selectedModality ||
+        oldWidget.selectedLocation != widget.selectedLocation) {
+      setState(() {
+        _selectedCategories = List.from(widget.selectedCategories);
+        _selectedModality = widget.selectedModality;
+        _selectedLocation = widget.selectedLocation;
+      });
+    }
+  }
 
   // Función para verificar si hay filtros avanzados activos
   bool _hasAdvancedFiltersActive() {

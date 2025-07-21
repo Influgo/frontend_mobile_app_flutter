@@ -61,6 +61,7 @@ class LoginPageState extends State<LoginPage> {
         String token = responseData['token'] ?? '';
         String userIdentifier = responseData['userIdentifier'] ?? '';
         String userId = responseData['userId']?.toString() ?? '';
+        
         if (token.isNotEmpty) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
@@ -69,6 +70,10 @@ class LoginPageState extends State<LoginPage> {
           logger.i('userIdentifier almacenado exitosamente');
           await prefs.setString('userId', userId);
           logger.i('userId almacenado exitosamente');
+          
+          // Obtener el rol del usuario desde el endpoint de account
+          await _fetchAndStoreUserRole(token, userIdentifier, userId, prefs, logger);
+          
           logger.i('Token: $token');
           logger.i('userIdentifier: $userIdentifier');
           logger.i('userId: $userId');
@@ -87,6 +92,43 @@ class LoginPageState extends State<LoginPage> {
     } catch (e) {
       logger.e('Error en la conexión: $e');
       _showSnackBar("Error en la conexión, por favor intente nuevamente");
+    }
+  }
+
+  Future<void> _fetchAndStoreUserRole(String token, String userIdentifier, String userId, SharedPreferences prefs, Logger logger) async {
+    try {
+      // Usar userIdentifier primero, si no está disponible usar userId
+      final identifier = userIdentifier.isNotEmpty ? userIdentifier : userId;
+      
+      final accountResponse = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$identifier'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (accountResponse.statusCode == 200) {
+        final Map<String, dynamic> accountData = json.decode(accountResponse.body);
+        
+        // Extraer el rol del usuario de roles[0].role.name
+        String userRole = '';
+        if (accountData['roles'] != null && accountData['roles'].isNotEmpty) {
+          final roles = accountData['roles'] as List;
+          if (roles.isNotEmpty && roles[0]['role'] != null) {
+            userRole = roles[0]['role']['name'] ?? '';
+          }
+        }
+        
+        if (userRole.isNotEmpty) {
+          await prefs.setString('userRole', userRole);
+          logger.i('userRole almacenado exitosamente: $userRole');
+        }
+      } else {
+        logger.w('Error al obtener información del usuario: ${accountResponse.statusCode}');
+      }
+    } catch (e) {
+      logger.e('Error al obtener el rol del usuario: $e');
     }
   }
 
