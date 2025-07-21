@@ -8,6 +8,8 @@ import 'dart:convert';
 import 'package:frontend_mobile_app_flutter/features/shared/presentation/pages/home_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/influencer/influencer_profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/influencer/my_applications_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/help_center/help_center_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/report_problem/report_problem_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/security/security_page.dart';
@@ -26,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? profileImageUrl;
   String userId = '';
   bool isLoading = true;
+  String? userRole;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final prefs = await SharedPreferences.getInstance();
       final storedUserId = prefs.getString('userId');
       final token = prefs.getString('token');
+      final storedUserRole = prefs.getString('userRole');
 
       if (storedUserId == null || token == null) {
         setState(() {
@@ -47,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       userId = storedUserId;
+      userRole = storedUserRole; // Cargar rol almacenado
 
       await _fetchUserData(token);
     } catch (e) {
@@ -76,6 +81,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (data['profileImage'] != null &&
               data['profileImage']['url'] != null) {
             profileImageUrl = data['profileImage']['url'];
+          }
+
+          // Extraer el rol del usuario si no estaba almacenado localmente
+          if (userRole == null && data['roles'] != null && data['roles'].isNotEmpty) {
+            final roles = data['roles'] as List;
+            if (roles.isNotEmpty && roles[0]['role'] != null) {
+              userRole = roles[0]['role']['name'];
+              // Almacenar el rol para futuros usos
+              SharedPreferences.getInstance().then((prefs) {
+                prefs.setString('userRole', userRole!);
+              });
+            }
           }
 
           isLoading = false;
@@ -238,13 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Expanded(
             child: ListView(
               children: [
-                buildSection(context, 'Configuración', [
-                  'Perfil del emprendimiento',
-                  'Métodos de pago',
-                  'Historial de pagos',
-                  'Seguridad',
-                  'Faltas'
-                ]),
+                buildSection(context, 'Configuración', _getConfigurationItems()),
                 buildSection(context, 'Asistencia',
                     ['Centro de ayuda', 'Reportar un problema']),
                 buildSection(context, 'Legal', ['Término y condiciones']),
@@ -309,9 +320,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  List<String> _getConfigurationItems() {
+    if (userRole?.toUpperCase() == 'INFLUENCER') {
+      return [
+        'Perfil del Influencer',
+        'Mis postulaciones',
+        'Métodos de pago',
+        'Historial de pagos',
+        'Seguridad',
+        'Faltas'
+      ];
+    } else {
+      // Por defecto mostrar opciones de emprendedor
+      return [
+        'Perfil del emprendimiento',
+        'Métodos de pago',
+        'Historial de pagos',
+        'Seguridad',
+        'Faltas'
+      ];
+    }
+  }
+
   void navigateToPage(BuildContext context, String option) {
     final Map<String, Widget> routes = {
       'Perfil del emprendimiento': const EntrepreneurshipProfilePage(),
+      'Perfil del Influencer': const InfluencerProfilePage(),
+      'Mis postulaciones': const MyApplicationsPage(),
       'Métodos de pago': const EntrepreneurshipProfilePage(),
       'Historial de pagos': const EntrepreneurshipProfilePage(),
       'Seguridad': const SecurityPage(),
