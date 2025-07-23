@@ -36,7 +36,7 @@ class _EntrepreneurshipProfilePageState
   final TextEditingController instagramController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
-  final TextEditingController twitchController = TextEditingController();
+  //final TextEditingController twitchController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController focusController = TextEditingController();
   final TextEditingController rucController = TextEditingController();
@@ -45,14 +45,14 @@ class _EntrepreneurshipProfilePageState
   final FocusNode instagramFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
   final FocusNode youtubeFocusNode = FocusNode();
-  final FocusNode twitchFocusNode = FocusNode();
+  //final FocusNode twitchFocusNode = FocusNode();
 
   // --- Variables de Estado de la UI ---
   bool isPublic = true;
   bool showInstagramField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
-  bool showTwitchField = false;
+  //bool showTwitchField = false;
   List<String> focusTags = [];
   List<String> addressList = [];
 
@@ -82,7 +82,7 @@ class _EntrepreneurshipProfilePageState
       _initialInstagram,
       _initialTiktok,
       _initialYoutube,
-      _initialTwitch,
+      //_initialTwitch,
       _initialSelectedCategory,
       _initialSelectedModality;
   bool? _initialIsPublic;
@@ -121,7 +121,7 @@ class _EntrepreneurshipProfilePageState
     instagramController.addListener(_checkForChanges);
     tiktokController.addListener(_checkForChanges);
     youtubeController.addListener(_checkForChanges);
-    twitchController.addListener(_checkForChanges);
+    //twitchController.addListener(_checkForChanges);
     // representativeController y addressController se manejan al agregar/borrar
     // focusController se maneja al agregar/borrar
   }
@@ -137,7 +137,7 @@ class _EntrepreneurshipProfilePageState
     instagramController.removeListener(_checkForChanges);
     tiktokController.removeListener(_checkForChanges);
     youtubeController.removeListener(_checkForChanges);
-    twitchController.removeListener(_checkForChanges);
+    //twitchController.removeListener(_checkForChanges);
 
     // Limpiar controladores
     businessNameController.dispose();
@@ -148,7 +148,7 @@ class _EntrepreneurshipProfilePageState
     instagramController.dispose();
     youtubeController.dispose();
     tiktokController.dispose();
-    twitchController.dispose();
+    //twitchController.dispose();
     addressController.dispose();
     focusController.dispose();
     rucController.dispose();
@@ -164,7 +164,7 @@ class _EntrepreneurshipProfilePageState
     _initialInstagram = instagramController.text;
     _initialTiktok = tiktokController.text;
     _initialYoutube = youtubeController.text;
-    _initialTwitch = twitchController.text;
+    //_initialTwitch = twitchController.text;
     _initialSelectedCategory = selectedCategory;
     _initialSelectedModality = selectedModality;
     _initialIsPublic = isPublic;
@@ -223,7 +223,7 @@ class _EntrepreneurshipProfilePageState
         _initialInstagram != instagramController.text ||
         _initialTiktok != tiktokController.text ||
         _initialYoutube != youtubeController.text ||
-        _initialTwitch != twitchController.text ||
+        //_initialTwitch != twitchController.text ||
         !_listEquals(_initialFocusTags, focusTags) ||
         !_listEquals(_initialAddressList, addressList) ||
         extraFilesChanged;
@@ -372,8 +372,8 @@ class _EntrepreneurshipProfilePageState
           tiktokController.clear();
           showYoutubeField = false;
           youtubeController.clear();
-          showTwitchField = false;
-          twitchController.clear();
+          //showTwitchField = false;
+          //twitchController.clear();
 
           if (data['socialDtos'] != null && data['socialDtos'] is List) {
             for (var socialItem in (data['socialDtos'] as List)) {
@@ -398,10 +398,10 @@ class _EntrepreneurshipProfilePageState
                       showYoutubeField = true;
                       youtubeController.text = urlValue;
                       break;
-                    case 'twitch':
+                    /*case 'twitch':
                       showTwitchField = true;
                       twitchController.text = urlValue;
-                      break;
+                      break;*/
                   }
                 }
               } else {
@@ -718,9 +718,9 @@ class _EntrepreneurshipProfilePageState
     if (showYoutubeField && youtubeController.text.isNotEmpty) {
       socialDtos.add({'name': 'Youtube', 'socialUrl': youtubeController.text});
     }
-    if (showTwitchField && twitchController.text.isNotEmpty) {
+    /*if (showTwitchField && twitchController.text.isNotEmpty) {
       socialDtos.add({'name': 'Twitch', 'socialUrl': twitchController.text});
-    }
+    }*/
 
     // Verificar si realmente hay cambios en las redes sociales antes de enviar
     // Esto es importante para no enviar una petición si no es necesario,
@@ -728,8 +728,8 @@ class _EntrepreneurshipProfilePageState
     bool socialMediaChanged = false;
     if (_initialInstagram != instagramController.text ||
         _initialTiktok != tiktokController.text ||
-        _initialYoutube != youtubeController.text ||
-        _initialTwitch != twitchController.text) {
+        _initialYoutube != youtubeController.text) //||
+        /*_initialTwitch != twitchController.text)*/ {
       socialMediaChanged = true;
     }
     // También considera si se activó/desactivó un campo de red social
@@ -739,8 +739,8 @@ class _EntrepreneurshipProfilePageState
     if (socialDtos.isEmpty &&
         (_initialInstagram == null || _initialInstagram!.isEmpty) &&
         (_initialTiktok == null || _initialTiktok!.isEmpty) &&
-        (_initialYoutube == null || _initialYoutube!.isEmpty) &&
-        (_initialTwitch == null || _initialTwitch!.isEmpty)) {
+        (_initialYoutube == null || _initialYoutube!.isEmpty) //&&
+        /*(_initialTwitch == null || _initialTwitch!.isEmpty)*/) {
       print('ℹ️ No hay redes sociales para enviar y no había antes.');
       return true; // No hay cambios que enviar.
     }
@@ -776,7 +776,7 @@ class _EntrepreneurshipProfilePageState
         _initialInstagram = instagramController.text;
         _initialTiktok = tiktokController.text;
         _initialYoutube = youtubeController.text;
-        _initialTwitch = twitchController.text;
+        //_initialTwitch = twitchController.text;
         return true;
       } else {
         showSnackBar(
@@ -1791,6 +1791,7 @@ class _EntrepreneurshipProfilePageState
                               ],
                               const Divider(color: Colors.grey, thickness: 0.3),
                               // Twitch
+                              /*
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -1828,6 +1829,7 @@ class _EntrepreneurshipProfilePageState
                                     focusNode: twitchFocusNode),
                                 const SizedBox(height: 8),
                               ],
+                              */
                               const SizedBox(height: 20),
                               const Text("Modalidad del emprendimiento",
                                   style: TextStyle(

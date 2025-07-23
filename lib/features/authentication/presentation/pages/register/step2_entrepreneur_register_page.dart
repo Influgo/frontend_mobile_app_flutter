@@ -28,18 +28,18 @@ class _Step2EntrepreneurRegisterPageState
   final TextEditingController instagramController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
-  final TextEditingController twitchController = TextEditingController();
+  //final TextEditingController twitchController = TextEditingController();
   bool isProcessing = false;
 
   final FocusNode instagramFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
   final FocusNode youtubeFocusNode = FocusNode();
-  final FocusNode twitchFocusNode = FocusNode();
+  //final FocusNode twitchFocusNode = FocusNode();
 
   bool showInstagramField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
-  bool showTwitchField = false;
+  //bool showTwitchField = false;
 
   String? businessNameEmpty;
   String? businessNicknameEmpty;
@@ -48,7 +48,7 @@ class _Step2EntrepreneurRegisterPageState
   String? instagramEmpty;
   String? tiktokEmpty;
   String? youtubeEmpty;
-  String? twitchEmpty;
+  //String? twitchEmpty;
 
   @override
   void initState() {
@@ -68,12 +68,12 @@ class _Step2EntrepreneurRegisterPageState
       instagramController.text = prefs.getString('instagram_register') ?? '';
       tiktokController.text = prefs.getString('tiktok_register') ?? '';
       youtubeController.text = prefs.getString('youtube_register') ?? '';
-      twitchController.text = prefs.getString('twitch_register') ?? '';
+      //twitchController.text = prefs.getString('twitch_register') ?? '';
       showInstagramField =
           prefs.getBool('show_instagram_field_register') ?? false;
       showTiktokField = prefs.getBool('show_tiktok_field_register') ?? false;
       showYoutubeField = prefs.getBool('show_youtube_field_register') ?? false;
-      showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
+      //showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
     });
   }
 
@@ -87,11 +87,11 @@ class _Step2EntrepreneurRegisterPageState
     await prefs.setString('instagram_register', instagramController.text);
     await prefs.setString('tiktok_register', tiktokController.text);
     await prefs.setString('youtube_register', youtubeController.text);
-    await prefs.setString('twitch_register', twitchController.text);
+    //await prefs.setString('twitch_register', twitchController.text);
     await prefs.setBool('show_instagram_field_register', showInstagramField);
     await prefs.setBool('show_tiktok_field_register', showTiktokField);
     await prefs.setBool('show_youtube_field_register', showYoutubeField);
-    await prefs.setBool('show_twitch_field_register', showTwitchField);
+    //await prefs.setBool('show_twitch_field_register', showTwitchField);
   }
 
   @override
@@ -99,7 +99,7 @@ class _Step2EntrepreneurRegisterPageState
     instagramFocusNode.dispose();
     tiktokFocusNode.dispose();
     youtubeFocusNode.dispose();
-    twitchFocusNode.dispose();
+    //twitchFocusNode.dispose();
     super.dispose();
   }
 
@@ -143,11 +143,13 @@ class _Step2EntrepreneurRegisterPageState
       } else {
         youtubeEmpty = null;
       }
+      /*
       if (showTwitchField && twitchController.text.trim().isEmpty) {
         twitchEmpty = 'Debe ingresar su canal de Twitch';
       } else {
         twitchEmpty = null;
       }
+      */
 
       if ([
         businessNameEmpty,
@@ -157,7 +159,7 @@ class _Step2EntrepreneurRegisterPageState
         instagramEmpty,
         tiktokEmpty,
         youtubeEmpty,
-        twitchEmpty
+        //twitchEmpty
       ].every((error) => error == null)) {
         var logger = Logger();
         List<Map<String, String>> socials = [];
@@ -183,13 +185,14 @@ class _Step2EntrepreneurRegisterPageState
                 "https://www.youtube.com/@${youtubeController.text.trim()}"
           });
         }
+        /*
         if (showTwitchField) {
           socials.add({
             "name": "Twitch",
             "socialUrl": "https://www.twitch.tv/${twitchController.text.trim()}"
           });
         }
-
+        */
         Map<String, dynamic> requestBody = {
           "entrepreneurshipName": businessNameController.text.trim(),
           "entrepreneursNickname": businessNicknameController.text.trim(),
@@ -406,6 +409,7 @@ class _Step2EntrepreneurRegisterPageState
                           const SizedBox(height: 8),
                         ],
                         const FormSeparator(),
+                        /*
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -443,6 +447,7 @@ class _Step2EntrepreneurRegisterPageState
                           if (twitchEmpty != null)
                             ErrorTextWidget(error: twitchEmpty!),
                         ],
+                        */
                       ],
                     ),
                   ),

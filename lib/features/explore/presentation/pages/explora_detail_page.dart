@@ -335,16 +335,18 @@ class ExploraDetailPage extends StatelessWidget {
 
         // Redes
         _buildSectionTitle(context, "Redes"),
-        if (entrepreneurship.socialDtos.isEmpty)
+        if (entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch")).isEmpty)
           Text("No hay redes sociales disponibles.",
               style: TextStyle(color: Colors.grey))
         else
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: entrepreneurship.socialDtos.length,
+            itemCount: entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch")).length,
             itemBuilder: (context, index) {
-              final social = entrepreneurship.socialDtos[index];
+              // Filtrar las redes sociales para excluir Twitch
+              final filteredSocials = entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch")).toList();
+              final social = filteredSocials[index];
               Widget iconWidget;
               String url = social.socialUrl.trim();
               // Lógica para iconos usando assets personalizados
@@ -374,7 +376,7 @@ class ExploraDetailPage extends StatelessWidget {
                   }
                   url = "https://www.facebook.com/$url";
                 }
-              } else if (social.name.toLowerCase().contains("twitch")) {
+              } /* else if (social.name.toLowerCase().contains("twitch")) {
                 iconWidget = Image.asset(
                   'assets/icons/twitchicon.png',
                   width: 24,
@@ -387,7 +389,7 @@ class ExploraDetailPage extends StatelessWidget {
                   }
                   url = "https://www.twitch.tv/$url";
                 }
-              } else if (social.name.toLowerCase().contains("youtube")) {
+              }*/ else if (social.name.toLowerCase().contains("youtube")) {
                 iconWidget = Image.asset(
                   'assets/icons/youtubeicon.png',
                   width: 24,
