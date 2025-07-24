@@ -26,17 +26,20 @@ class _Step2EntrepreneurRegisterPageState
       TextEditingController();
   final TextEditingController rucController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
+  final TextEditingController facebookController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
   //final TextEditingController twitchController = TextEditingController();
   bool isProcessing = false;
 
   final FocusNode instagramFocusNode = FocusNode();
+  final FocusNode facebookFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
   final FocusNode youtubeFocusNode = FocusNode();
   //final FocusNode twitchFocusNode = FocusNode();
 
   bool showInstagramField = false;
+  bool showFacebookField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
   //bool showTwitchField = false;
@@ -46,6 +49,7 @@ class _Step2EntrepreneurRegisterPageState
   String? rucEmpty;
   String? socialMediaEmpty;
   String? instagramEmpty;
+  String? facebookEmpty;
   String? tiktokEmpty;
   String? youtubeEmpty;
   //String? twitchEmpty;
@@ -66,11 +70,14 @@ class _Step2EntrepreneurRegisterPageState
           prefs.getString('business_nickname_register') ?? '';
       rucController.text = prefs.getString('ruc_register') ?? '';
       instagramController.text = prefs.getString('instagram_register') ?? '';
+      facebookController.text = prefs.getString('facebook_register') ?? '';
       tiktokController.text = prefs.getString('tiktok_register') ?? '';
       youtubeController.text = prefs.getString('youtube_register') ?? '';
       //twitchController.text = prefs.getString('twitch_register') ?? '';
       showInstagramField =
           prefs.getBool('show_instagram_field_register') ?? false;
+      showFacebookField =
+          prefs.getBool('show_facebook_field_register') ?? false;
       showTiktokField = prefs.getBool('show_tiktok_field_register') ?? false;
       showYoutubeField = prefs.getBool('show_youtube_field_register') ?? false;
       //showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
@@ -85,10 +92,12 @@ class _Step2EntrepreneurRegisterPageState
         'business_nickname_register', businessNicknameController.text);
     await prefs.setString('ruc_register', rucController.text);
     await prefs.setString('instagram_register', instagramController.text);
+    await prefs.setString('facebook_register', facebookController.text);
     await prefs.setString('tiktok_register', tiktokController.text);
     await prefs.setString('youtube_register', youtubeController.text);
     //await prefs.setString('twitch_register', twitchController.text);
     await prefs.setBool('show_instagram_field_register', showInstagramField);
+    await prefs.setBool('show_facebook_field_register', showFacebookField);
     await prefs.setBool('show_tiktok_field_register', showTiktokField);
     await prefs.setBool('show_youtube_field_register', showYoutubeField);
     //await prefs.setBool('show_twitch_field_register', showTwitchField);
@@ -97,6 +106,7 @@ class _Step2EntrepreneurRegisterPageState
   @override
   void dispose() {
     instagramFocusNode.dispose();
+    facebookFocusNode.dispose();
     tiktokFocusNode.dispose();
     youtubeFocusNode.dispose();
     //twitchFocusNode.dispose();
@@ -130,6 +140,11 @@ class _Step2EntrepreneurRegisterPageState
         } else {
           instagramEmpty = null;
         }
+        if (showFacebookField && facebookController.text.trim().isEmpty) {
+          facebookEmpty = 'Debe ingresar su cuenta de Facebook';
+        } else {
+          facebookEmpty = null;
+        }
 
         if (showTiktokField && tiktokController.text.trim().isEmpty) {
           tiktokEmpty = 'Debe ingresar su usuario de Tiktok';
@@ -157,6 +172,7 @@ class _Step2EntrepreneurRegisterPageState
         rucEmpty,
         socialMediaEmpty,
         instagramEmpty,
+        facebookEmpty,
         tiktokEmpty,
         youtubeEmpty,
         //twitchEmpty
@@ -169,6 +185,13 @@ class _Step2EntrepreneurRegisterPageState
             "name": "Instagram",
             "socialUrl":
                 "https://instagram.com/${instagramController.text.trim()}"
+          });
+        }
+        if (showFacebookField) {
+          socials.add({
+            "name": "Facebook",
+            "socialUrl":
+                "https://www.facebook.com/${facebookController.text.trim()}"
           });
         }
         if (showTiktokField) {
@@ -409,26 +432,26 @@ class _Step2EntrepreneurRegisterPageState
                           const SizedBox(height: 8),
                         ],
                         const FormSeparator(),
-                        /*
+                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
-                              'Twitch',
+                              'Facebook',
                               style:
                                   TextStyle(fontSize: 16, color: Colors.grey),
                             ),
                             Checkbox(
-                              value: showTwitchField,
+                              value: showFacebookField,
                               onChanged: (bool? value) {
                                 setState(() {
-                                  showTwitchField = value ?? false;
+                                  showFacebookField = value ?? false;
                                 });
-                                if (showTwitchField) {
+                                if (showFacebookField) {
                                   Future.delayed(Duration(milliseconds: 100),
                                       () {
                                     FocusScope.of(context)
-                                        .requestFocus(twitchFocusNode);
+                                        .requestFocus(facebookFocusNode);
                                   });
                                 }
                               },
@@ -437,17 +460,16 @@ class _Step2EntrepreneurRegisterPageState
                           ],
                         ),
                         const SizedBox(height: 8),
-                        if (showTwitchField) ...[
+                        if (showFacebookField) ...[
                           CustomUsernameField(
-                            label: 'Canal de Twitch',
-                            controller: twitchController,
+                            label: 'Página de Facebook',
+                            controller: facebookController,
                             maxLength: 100,
-                            focusNode: twitchFocusNode,
+                            focusNode: facebookFocusNode,
                           ),
-                          if (twitchEmpty != null)
-                            ErrorTextWidget(error: twitchEmpty!),
+                          if (facebookEmpty != null)
+                            ErrorTextWidget(error: facebookEmpty!),
                         ],
-                        */
                       ],
                     ),
                   ),

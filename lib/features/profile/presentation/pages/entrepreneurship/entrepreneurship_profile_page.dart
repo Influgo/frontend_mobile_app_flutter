@@ -34,6 +34,7 @@ class _EntrepreneurshipProfilePageState
   final TextEditingController summaryController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
+  final TextEditingController facebookController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
   //final TextEditingController twitchController = TextEditingController();
@@ -43,6 +44,7 @@ class _EntrepreneurshipProfilePageState
 
   // --- Nodos de Foco ---
   final FocusNode instagramFocusNode = FocusNode();
+  final FocusNode facebookFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
   final FocusNode youtubeFocusNode = FocusNode();
   //final FocusNode twitchFocusNode = FocusNode();
@@ -50,6 +52,7 @@ class _EntrepreneurshipProfilePageState
   // --- Variables de Estado de la UI ---
   bool isPublic = true;
   bool showInstagramField = false;
+  bool showFacebookField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
   //bool showTwitchField = false;
@@ -80,6 +83,7 @@ class _EntrepreneurshipProfilePageState
       _initialSummary,
       _initialDescription,
       _initialInstagram,
+      _initialFacebook,
       _initialTiktok,
       _initialYoutube,
       //_initialTwitch,
@@ -119,6 +123,7 @@ class _EntrepreneurshipProfilePageState
     summaryController.addListener(_checkForChanges);
     descriptionController.addListener(_checkForChanges);
     instagramController.addListener(_checkForChanges);
+    facebookController.addListener(_checkForChanges);
     tiktokController.addListener(_checkForChanges);
     youtubeController.addListener(_checkForChanges);
     //twitchController.addListener(_checkForChanges);
@@ -135,6 +140,7 @@ class _EntrepreneurshipProfilePageState
     summaryController.removeListener(_checkForChanges);
     descriptionController.removeListener(_checkForChanges);
     instagramController.removeListener(_checkForChanges);
+    facebookController.removeListener(_checkForChanges);
     tiktokController.removeListener(_checkForChanges);
     youtubeController.removeListener(_checkForChanges);
     //twitchController.removeListener(_checkForChanges);
@@ -146,6 +152,7 @@ class _EntrepreneurshipProfilePageState
     summaryController.dispose();
     descriptionController.dispose();
     instagramController.dispose();
+    facebookController.dispose();
     youtubeController.dispose();
     tiktokController.dispose();
     //twitchController.dispose();
@@ -162,6 +169,7 @@ class _EntrepreneurshipProfilePageState
     _initialSummary = summaryController.text;
     _initialDescription = descriptionController.text;
     _initialInstagram = instagramController.text;
+    _initialFacebook = facebookController.text;
     _initialTiktok = tiktokController.text;
     _initialYoutube = youtubeController.text;
     //_initialTwitch = twitchController.text;
@@ -221,6 +229,7 @@ class _EntrepreneurshipProfilePageState
         _profileImage != null || // Nueva imagen de perfil
         _coverImage != null || // Nueva imagen de portada
         _initialInstagram != instagramController.text ||
+        _initialFacebook != facebookController.text ||
         _initialTiktok != tiktokController.text ||
         _initialYoutube != youtubeController.text ||
         //_initialTwitch != twitchController.text ||
@@ -369,6 +378,8 @@ class _EntrepreneurshipProfilePageState
           showInstagramField = false;
           instagramController.clear();
           showTiktokField = false;
+          showFacebookField = false;
+          facebookController.clear();
           tiktokController.clear();
           showYoutubeField = false;
           youtubeController.clear();
@@ -390,6 +401,10 @@ class _EntrepreneurshipProfilePageState
                       instagramController.text = urlValue;
                       break;
                     // ... otros casos de redes sociales
+                    case 'facebook':
+                      showFacebookField = true;
+                      facebookController.text = urlValue;
+                      break;
                     case 'tiktok':
                       showTiktokField = true;
                       tiktokController.text = urlValue;
@@ -712,6 +727,10 @@ class _EntrepreneurshipProfilePageState
       socialDtos
           .add({'name': 'Instagram', 'socialUrl': instagramController.text});
     }
+    if (showFacebookField && facebookController.text.isNotEmpty) {
+      socialDtos
+          .add({'name': 'Facebook', 'socialUrl': facebookController.text});
+    }
     if (showTiktokField && tiktokController.text.isNotEmpty) {
       socialDtos.add({'name': 'Tiktok', 'socialUrl': tiktokController.text});
     }
@@ -727,6 +746,7 @@ class _EntrepreneurshipProfilePageState
     // o para enviar una lista vacía si el usuario borró todas las redes.
     bool socialMediaChanged = false;
     if (_initialInstagram != instagramController.text ||
+        _initialFacebook != facebookController.text ||
         _initialTiktok != tiktokController.text ||
         _initialYoutube != youtubeController.text) //||
         /*_initialTwitch != twitchController.text)*/ {
@@ -738,6 +758,7 @@ class _EntrepreneurshipProfilePageState
     // Si no hay DTOs para enviar Y los campos iniciales también estaban vacíos, no hay nada que hacer.
     if (socialDtos.isEmpty &&
         (_initialInstagram == null || _initialInstagram!.isEmpty) &&
+        (_initialFacebook == null || _initialFacebook!.isEmpty) &&
         (_initialTiktok == null || _initialTiktok!.isEmpty) &&
         (_initialYoutube == null || _initialYoutube!.isEmpty) //&&
         /*(_initialTwitch == null || _initialTwitch!.isEmpty)*/) {
@@ -774,6 +795,7 @@ class _EntrepreneurshipProfilePageState
         print('✅ Redes sociales actualizadas.');
         // Actualizar los valores iniciales de las redes sociales después de un guardado exitoso
         _initialInstagram = instagramController.text;
+        _initialFacebook = facebookController.text;
         _initialTiktok = tiktokController.text;
         _initialYoutube = youtubeController.text;
         //_initialTwitch = twitchController.text;
@@ -1709,6 +1731,49 @@ class _EntrepreneurshipProfilePageState
                                 buildTextField(
                                     'Cuenta de Instagram', instagramController,
                                     focusNode: instagramFocusNode),
+                                const SizedBox(height: 8),
+                              ],
+                              const Divider(color: Colors.grey, thickness: 0.3),
+                              // Facebook
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text('Facebook',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.grey)),
+                                  Radio<bool>(
+                                    value:
+                                        true, // Siempre true para que el grupo funcione
+                                    groupValue:
+                                        showFacebookField, // El valor del grupo es el booleano
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        showFacebookField =
+                                            !showFacebookField;
+                                        if (!showFacebookField) {
+                                          instagramController
+                                              .clear(); // Limpiar si se oculta
+                                        }
+                                        _checkForChanges();
+                                      });
+                                      if (showFacebookField) {
+                                        Future.delayed(
+                                            const Duration(milliseconds: 100),
+                                            () {
+                                          FocusScope.of(context)
+                                              .requestFocus(facebookFocusNode);
+                                        });
+                                      }
+                                    },
+                                    activeColor: Colors.black,
+                                  ),
+                                ],
+                              ),
+                              if (showFacebookField) ...[
+                                buildTextField(
+                                    'Cuenta de Facebook', facebookController,
+                                    focusNode: facebookFocusNode),
                                 const SizedBox(height: 8),
                               ],
                               const Divider(color: Colors.grey, thickness: 0.3),
