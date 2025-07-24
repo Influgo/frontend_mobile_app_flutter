@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/pill_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../widgets/share_entrepreneurship_modal.dart'; // ← NUEVO IMPORT
+import '../widgets/share_entrepreneurship_modal.dart';
 
 // Modelos placeholder para datos faltantes
 class Review {
@@ -11,17 +11,20 @@ class Review {
   final double rating;
   final String comment;
   final DateTime date;
-  Review(
-      {required this.userName,
-      required this.userAvatarUrl,
-      required this.rating,
-      required this.comment,
-      required this.date});
+
+  Review({
+    required this.userName,
+    required this.userAvatarUrl,
+    required this.rating,
+    required this.comment,
+    required this.date,
+  });
 }
 
 class Collaborator {
   final String name;
   final String avatarUrl;
+
   Collaborator({required this.name, required this.avatarUrl});
 }
 
@@ -37,38 +40,49 @@ class ExploraDetailPage extends StatelessWidget {
     final exampleTotalReviews = 76;
     final exampleReviews = [
       Review(
-          userName: 'Ana María',
-          userAvatarUrl: 'https://i.pravatar.cc/150?img=1',
-          rating: 5,
-          comment: 'Trabajar con Las Canastas fue una experiencia increíble.',
-          date: DateTime.now().subtract(Duration(days: 2))),
+        userName: 'Ana María',
+        userAvatarUrl: 'https://i.pravatar.cc/150?img=1',
+        rating: 5,
+        comment: 'Trabajar con Las Canastas fue una experiencia increíble.',
+        date: DateTime.now().subtract(Duration(days: 2)),
+      ),
       Review(
-          userName: 'Carlos López',
-          userAvatarUrl: 'https://i.pravatar.cc/150?img=2',
-          rating: 4,
-          comment: 'Buen servicio y productos de calidad.',
-          date: DateTime.now().subtract(Duration(days: 5))),
+        userName: 'Carlos López',
+        userAvatarUrl: 'https://i.pravatar.cc/150?img=2',
+        rating: 4,
+        comment: 'Buen servicio y productos de calidad.',
+        date: DateTime.now().subtract(Duration(days: 5)),
+      ),
     ];
+
     final exampleCollaborators = [
       Collaborator(
-          name: 'Alejandra Guzmán',
-          avatarUrl: 'https://i.pravatar.cc/150?img=3'),
+        name: 'Alejandra Guzmán',
+        avatarUrl: 'https://i.pravatar.cc/150?img=3',
+      ),
       Collaborator(
-          name: 'Gustavo Flores', avatarUrl: 'https://i.pravatar.cc/150?img=4'),
+        name: 'Gustavo Flores',
+        avatarUrl: 'https://i.pravatar.cc/150?img=4',
+      ),
       Collaborator(
-          name: 'Elizabeth Camargo',
-          avatarUrl: 'https://i.pravatar.cc/150?img=5'),
+        name: 'Elizabeth Camargo',
+        avatarUrl: 'https://i.pravatar.cc/150?img=5',
+      ),
       Collaborator(
-          name: 'Ana María', avatarUrl: 'https://i.pravatar.cc/150?img=6'),
+        name: 'Ana María',
+        avatarUrl: 'https://i.pravatar.cc/150?img=6',
+      ),
       Collaborator(
-          name: 'Juana Larco', avatarUrl: 'https://i.pravatar.cc/150?img=7'),
+        name: 'Juana Larco',
+        avatarUrl: 'https://i.pravatar.cc/150?img=7',
+      ),
       Collaborator(
-          name: 'Juan Benavides', avatarUrl: 'https://i.pravatar.cc/150?img=8'),
+        name: 'Juan Benavides',
+        avatarUrl: 'https://i.pravatar.cc/150?img=8',
+      ),
     ];
 
-    final Size screenSize =
-        MediaQuery.of(context).size; // Obtener el tamaño de la pantalla
-
+    final Size screenSize = MediaQuery.of(context).size;
     const double designLogoDiameter = 114.0;
     const double designLogoRadius = designLogoDiameter / 2;
     const double designLogoTopPosition = 107.0;
@@ -109,7 +123,6 @@ class ExploraDetailPage extends StatelessWidget {
               ),
             ),
             actions: [
-              // ===== BOTÓN DE MÁS OPCIONES CON MENÚ =====
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -172,18 +185,15 @@ class ExploraDetailPage extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: screenSize.width,
-                    height:
-                        finalFlexibleBackgroundHeight, // Debe coincidir con expandedHeight
+                    height: finalFlexibleBackgroundHeight,
                   ),
                   Positioned(
                     top: 0,
                     left: 0,
                     right: 0,
                     child: SizedBox(
-                      // Esta es la altura real de tu imagen de banner
-                      height: 174, // 174.0px
-                      width: screenSize
-                          .width, // Opcional si Positioned ya tiene left y right
+                      height: 174,
+                      width: screenSize.width,
                       child: Image.network(
                         entrepreneurship.entrepreneurBanner?.url ??
                             'https://via.placeholder.com/393x174.png?text=Banner',
@@ -203,14 +213,13 @@ class ExploraDetailPage extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    top:
-                        designLogoTopPosition, // 107.0px desde el top del SizedBox principal
+                    top: designLogoTopPosition,
                     left: 20,
                     child: Container(
-                      width: designLogoDiameter, // 114.0px
+                      width: designLogoDiameter,
                       height: designLogoDiameter,
                       decoration: ShapeDecoration(
-                        color: Colors.grey[200], // Placeholder
+                        color: Colors.grey[200],
                         image: entrepreneurship.entrepreneurLogo?.url != null
                             ? DecorationImage(
                                 image: NetworkImage(
@@ -221,8 +230,7 @@ class ExploraDetailPage extends StatelessWidget {
                         shape: OvalBorder(
                           side: BorderSide(
                             width: 4,
-                            color: Color(
-                                0xFFF9F9F9), // Borde blanco como en tu diseño
+                            color: Color(0xFFF9F9F9),
                           ),
                         ),
                       ),
@@ -255,12 +263,94 @@ class ExploraDetailPage extends StatelessWidget {
     );
   }
 
+  // ===== MÉTODO MEJORADO PARA OBTENER ICONOS DE REDES SOCIALES =====
+  Widget _getSocialIcon(String socialName) {
+    String lowerName = socialName.toLowerCase();
+    
+    if (lowerName.contains("instagram")) {
+      return Image.asset(
+        'assets/icons/instagramicon.png',
+        width: 24,
+        height: 24,
+        errorBuilder: (context, error, stackTrace) => 
+            Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 24),
+      );
+    } else if (lowerName.contains("facebook")) {
+      return Image.asset(
+        'assets/icons/facebookicon.png',
+        width: 24,
+        height: 24,
+        errorBuilder: (context, error, stackTrace) => 
+            Icon(Icons.facebook, color: Color(0xFF1877F2), size: 24),
+      );
+    } else if (lowerName.contains("youtube")) {
+      return Image.asset(
+        'assets/icons/youtubeicon.png',
+        width: 24,
+        height: 24,
+        errorBuilder: (context, error, stackTrace) => 
+            Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 24),
+      );
+    } else if (lowerName.contains("tiktok")) {
+      return Image.asset(
+        'assets/icons/tiktokicon.png',
+        width: 24,
+        height: 24,
+        errorBuilder: (context, error, stackTrace) => 
+            Icon(Icons.music_note, color: Colors.black, size: 24),
+      );
+    } else {
+      return Icon(Icons.link, color: Colors.grey[600], size: 24);
+    }
+  }
+
+  // ===== MÉTODO MEJORADO PARA CONSTRUIR URLs =====
+  String _buildSocialUrl(String socialName, String socialUrl) {
+    String url = socialUrl.trim();
+    String lowerName = socialName.toLowerCase();
+
+    // Si ya es una URL completa, devolverla tal como está
+    if (url.contains("http") || url.contains("www")) {
+      return url;
+    }
+
+    // Remover @ si existe
+    if (url.startsWith("@")) {
+      url = url.substring(1);
+    }
+
+    // Construir URL según la plataforma
+    if (lowerName.contains("instagram")) {
+      return "https://www.instagram.com/$url";
+    } else if (lowerName.contains("facebook")) {
+      return "https://www.facebook.com/$url";
+    } else if (lowerName.contains("youtube")) {
+      if (!url.startsWith("@")) {
+        return "https://www.youtube.com/@$url";
+      }
+      return "https://www.youtube.com/$url";
+    } else if (lowerName.contains("tiktok")) {
+      if (!url.startsWith("@")) {
+        return "https://www.tiktok.com/@$url";
+      }
+      return "https://www.tiktok.com/$url";
+    }
+
+    return url; // Fallback
+  }
+
   Widget _buildContent(
       BuildContext context,
       double exampleRating,
       int exampleTotalReviews,
       List<Review> exampleReviews,
       List<Collaborator> exampleCollaborators) {
+    
+    // Filtrar redes sociales excluyendo Twitch
+    final filteredSocials = entrepreneurship.socialDtos
+        .where((social) => !social.name.toLowerCase().contains("twitch"))
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -279,13 +369,12 @@ class ExploraDetailPage extends StatelessWidget {
                       entrepreneurship.entrepreneurshipName,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w500,
-                            fontSize: 20, // ← Aumentado de ~14 a 16
+                            fontSize: 20,
                           ),
                     ),
                   ),
                   SizedBox(width: 8),
-                  Icon(Icons.verified,
-                      color: Colors.blue, size: 24), // ← Aumentado de 20 a 22
+                  Icon(Icons.verified, color: Colors.blue, size: 24),
                 ],
               ),
               SizedBox(height: 4),
@@ -294,37 +383,20 @@ class ExploraDetailPage extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Colors.grey[600],
                       fontWeight: FontWeight.bold,
-                      fontSize: 13, // ← Aumentado de ~11 a 13
+                      fontSize: 13,
                     ),
               ),
-              /*SizedBox(height: 8),
-              Text(
-                "@${entrepreneurship.entrepreneursNickname}",
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.grey[600],
-                      fontSize: 13, // ← Aumentado de ~11 a 13
-                    ),
-              ),*/
               SizedBox(height: 8),
               PillWidget(entrepreneurship.category),
-
-              // Chip(
-              //   label: Text(entrepreneurship.category),
-              //   backgroundColor: Colors.orange.shade100,
-              //   labelStyle: TextStyle(
-              //       color: Colors.orange.shade800, fontWeight: FontWeight.bold),
-              // ),
             ],
           ),
         ),
         SizedBox(height: 16),
-
         Text(
           entrepreneurship.summary,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         SizedBox(height: 16),
-
         // Descripción
         _buildSectionTitle(context, "Descripción"),
         Text(
@@ -332,29 +404,28 @@ class ExploraDetailPage extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: 24),
-
         // Redes
         _buildSectionTitle(context, "Redes"),
+        SizedBox(height: 8), // Espaciado consistente después del título
         if (entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch")).isEmpty)
           Text("No hay redes sociales disponibles.",
               style: TextStyle(color: Colors.grey))
         else
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch")).length,
-            itemBuilder: (context, index) {
-              // Filtrar las redes sociales para excluir Twitch
-              final filteredSocials = entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch")).toList();
-              final social = filteredSocials[index];
+          Column(
+            children: entrepreneurship.socialDtos
+                .where((social) => !social.name.toLowerCase().contains("twitch"))
+                .map((social) {
               Widget iconWidget;
               String url = social.socialUrl.trim();
+              
               // Lógica para iconos usando assets personalizados
               if (social.name.toLowerCase().contains("instagram")) {
                 iconWidget = Image.asset(
                   'assets/icons/instagramicon.png',
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
+                  errorBuilder: (context, error, stackTrace) => 
+                      Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
@@ -366,8 +437,10 @@ class ExploraDetailPage extends StatelessWidget {
               } else if (social.name.toLowerCase().contains("facebook")) {
                 iconWidget = Image.asset(
                   'assets/icons/facebookicon.png',
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
+                  errorBuilder: (context, error, stackTrace) => 
+                      Icon(Icons.facebook, color: Color(0xFF1877F2), size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
@@ -376,24 +449,13 @@ class ExploraDetailPage extends StatelessWidget {
                   }
                   url = "https://www.facebook.com/$url";
                 }
-              } /* else if (social.name.toLowerCase().contains("twitch")) {
-                iconWidget = Image.asset(
-                  'assets/icons/twitchicon.png',
-                  width: 24,
-                  height: 24,
-                );
-                if (!(social.socialUrl.contains("http") ||
-                    social.socialUrl.contains("www"))) {
-                  if (url.startsWith("@")) {
-                    url = url.substring(1);
-                  }
-                  url = "https://www.twitch.tv/$url";
-                }
-              }*/ else if (social.name.toLowerCase().contains("youtube")) {
+              } else if (social.name.toLowerCase().contains("youtube")) {
                 iconWidget = Image.asset(
                   'assets/icons/youtubeicon.png',
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
+                  errorBuilder: (context, error, stackTrace) => 
+                      Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
@@ -405,8 +467,10 @@ class ExploraDetailPage extends StatelessWidget {
               } else if (social.name.toLowerCase().contains("tiktok")) {
                 iconWidget = Image.asset(
                   'assets/icons/tiktokicon.png',
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
+                  errorBuilder: (context, error, stackTrace) => 
+                      Icon(Icons.music_note, color: Colors.black, size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
                     social.socialUrl.contains("www"))) {
@@ -416,55 +480,49 @@ class ExploraDetailPage extends StatelessWidget {
                   url = "https://www.tiktok.com/$url";
                 }
               } else {
-                iconWidget = Icon(Icons.link, color: Colors.black);
+                iconWidget = Icon(Icons.link, color: Colors.grey[600], size: 20);
               }
 
-              return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+              return Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(bottom: 8),
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    side: BorderSide(color: Colors.grey.shade400, width: 1),
+                    backgroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    launchUrl(Uri.parse(url));
+                  },
+                  child: Row(
+                    children: [
+                      iconWidget,
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          social.name.toLowerCase(),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
                       ),
-                      side: BorderSide(color: Colors.grey),
-                    ),
-                    onPressed: () {
-                      launchUrl(Uri.parse(url));
-                    },
-                    child: Row(
-                      children: [
-                        iconWidget,
-                        SizedBox(width: 12),
-                        Expanded(
-                            child: Text(
-                          social.name,
-                          style: TextStyle(color: Colors.black),
-                        )),
-                        Icon(Icons.open_in_new, size: 20, color: Colors.black),
-                      ],
-                    ),
-                  ));
-            },
+                      Icon(Icons.open_in_new, size: 18, color: Colors.grey[600]),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
           ),
-        SizedBox(height: 16), // Reducido de 24 a 16
-
+        SizedBox(height: 24),
         // Ubicación
         _buildSectionTitle(context, "Ubicación"),
         PillWidget(entrepreneurship.addressType),
-        // Chip(
-        //   label: Text(entrepreneurship.addressType), // Ej: "Presencial"
-        //   backgroundColor:
-        //       entrepreneurship.addressType.toLowerCase() == "presencial"
-        //           ? Colors.blue.shade100
-        //           : Colors.green.shade100,
-        //   labelStyle: TextStyle(
-        //       color: entrepreneurship.addressType.toLowerCase() == "presencial"
-        //           ? Colors.blue.shade800
-        //           : Colors.green.shade800,
-        //       fontWeight: FontWeight.bold),
-        // ),
         SizedBox(height: 8),
         if (entrepreneurship.addresses.isEmpty)
           Text("No hay direcciones disponibles.",
@@ -479,31 +537,14 @@ class ExploraDetailPage extends StatelessWidget {
                             size: 18, color: Colors.grey[700]),
                         SizedBox(width: 8),
                         Expanded(
-                            child: Text(address,
-                                style: Theme.of(context).textTheme.bodyLarge)),
+                          child: Text(address,
+                              style: Theme.of(context).textTheme.bodyLarge),
+                        ),
                       ],
                     ),
                   ))
               .toList(),
         SizedBox(height: 24),
-
-        /*
-        // Enfoque
-        _buildSectionTitle(context, "Enfoque"),
-        if (entrepreneurship.entrepreneurFocus.isEmpty)
-          Text("No hay enfoques definidos.",
-              style: TextStyle(color: Colors.grey))
-        else
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 4.0,
-            children: entrepreneurship.entrepreneurFocus
-                .map((focus) => Chip(label: Text(focus)))
-                .toList(),
-          ),
-        SizedBox(height: 24),
-        */
-
         // Galería
         _buildSectionTitle(context, "Galería"),
         if (entrepreneurship.s3Files.isEmpty)
@@ -511,7 +552,7 @@ class ExploraDetailPage extends StatelessWidget {
               style: TextStyle(color: Colors.grey))
         else
           Container(
-            height: 120, // Altura de la galería horizontal
+            height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: entrepreneurship.s3Files.length,
@@ -521,28 +562,29 @@ class ExploraDetailPage extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8.0),
-                    child: Image.network(file.url,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.grey[300],
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey[300],
-                            child: Icon(Icons.broken_image,
-                                color: Colors.grey[600]))),
+                    child: Image.network(
+                      file.url,
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey[300],
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[300],
+                        child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                      ),
+                    ),
                   ),
                 );
               },
             ),
           ),
         SizedBox(height: 24),
-
-        // Colaboraciones (NECESITA DATOS DEL MODELO)
+        // Colaboraciones
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -550,19 +592,17 @@ class ExploraDetailPage extends StatelessWidget {
             TextButton(onPressed: () {}, child: Text("Ver más")),
           ],
         ),
-        if (exampleCollaborators
-            .isEmpty) // Usa entrepreneurship.collaborators cuando lo tengas
+        if (exampleCollaborators.isEmpty)
           Text("No hay colaboraciones para mostrar.",
               style: TextStyle(color: Colors.grey))
         else
           SizedBox(
-            height: 100, // Altura para la lista de colaboradores
+            height: 100,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: exampleCollaborators.length > 4
                   ? 4
-                  : exampleCollaborators
-                      .length, // Mostrar solo algunos inicialmente
+                  : exampleCollaborators.length,
               itemBuilder: (context, index) {
                 final collaborator = exampleCollaborators[index];
                 return Container(
@@ -589,16 +629,13 @@ class ExploraDetailPage extends StatelessWidget {
             ),
           ),
         SizedBox(height: 24),
-
-        // Valoraciones (NECESITA DATOS DEL MODELO)
-        _buildSectionTitle(context,
-            "Valoraciones"), // En la imagen dice "Descripción", pero "Valoraciones" es más apropiado
+        // Valoraciones
+        _buildSectionTitle(context, "Valoraciones"),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              exampleRating
-                  .toStringAsFixed(1), // Usa entrepreneurship.averageRating
+              exampleRating.toStringAsFixed(1),
               style: Theme.of(context)
                   .textTheme
                   .displaySmall
@@ -608,10 +645,9 @@ class ExploraDetailPage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStarRating(
-                    exampleRating), // Usa entrepreneurship.averageRating
+                _buildStarRating(exampleRating),
                 Text(
-                  "$exampleTotalReviews comentarios", // Usa entrepreneurship.totalReviews
+                  "$exampleTotalReviews comentarios",
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
@@ -629,11 +665,11 @@ class ExploraDetailPage extends StatelessWidget {
             // Lógica para escribir comentario
           },
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(double.infinity, 40), // Ancho completo
+            minimumSize: Size(double.infinity, 40),
           ),
         ),
         SizedBox(height: 16),
-        if (exampleReviews.isEmpty) // Usa entrepreneurship.reviews
+        if (exampleReviews.isEmpty)
           Text("Aún no hay comentarios.", style: TextStyle(color: Colors.grey))
         else
           ListView.builder(
@@ -665,7 +701,7 @@ class ExploraDetailPage extends StatelessWidget {
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold)),
                                 Text(
-                                  "${review.date.day}/${review.date.month}/${review.date.year}", // Formatea la fecha como necesites
+                                  "${review.date.day}/${review.date.month}/${review.date.year}",
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -685,7 +721,7 @@ class ExploraDetailPage extends StatelessWidget {
               );
             },
           ),
-        SizedBox(height: 30), // Espacio al final
+        SizedBox(height: 30),
       ],
     );
   }
@@ -704,11 +740,9 @@ class ExploraDetailPage extends StatelessWidget {
   }
 
   Widget _buildStarRating(double rating, {double itemSize = 20}) {
-    // Implementación simple de estrellas. Puedes usar flutter_rating_bar para más opciones.
     List<Widget> stars = [];
     int fullStars = rating.floor();
     bool halfStar = (rating - fullStars) >= 0.5;
-
     for (int i = 0; i < 5; i++) {
       if (i < fullStars) {
         stars.add(Icon(Icons.star, color: Colors.amber, size: itemSize));
@@ -721,7 +755,6 @@ class ExploraDetailPage extends StatelessWidget {
     return Row(children: stars);
   }
 
-  // ===== MÉTODO PARA MOSTRAR EL MODAL DE COMPARTIR =====
   void _showShareModal(BuildContext context) {
     ShareEntrepreneurshipModal.show(
       context,
