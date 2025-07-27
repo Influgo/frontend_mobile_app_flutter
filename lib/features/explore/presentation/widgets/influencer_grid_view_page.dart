@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/influencer_model.dart';
-import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/business_card_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/influencer_card_widget.dart';
 
-class GridViewPage extends StatefulWidget {
+class InfluencerGridViewPage extends StatefulWidget {
   final String title;
-  final List<Entrepreneurship> entrepreneurships;
+  final List<Influencer> influencers;
   final VoidCallback? onLoadMore;
   final bool isLoadingMore;
   final bool hasMore;
 
-  const GridViewPage({
+  const InfluencerGridViewPage({
     super.key,
     required this.title,
-    required this.entrepreneurships,
+    required this.influencers,
     this.onLoadMore,
     this.isLoadingMore = false,
     this.hasMore = false,
   });
 
   @override
-  _GridViewPageState createState() => _GridViewPageState();
+  _InfluencerGridViewPageState createState() => _InfluencerGridViewPageState();
 }
 
-class _GridViewPageState extends State<GridViewPage> {
+class _InfluencerGridViewPageState extends State<InfluencerGridViewPage> {
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -62,14 +61,14 @@ class _GridViewPageState extends State<GridViewPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: widget.entrepreneurships.isEmpty
+      body: widget.influencers.isEmpty
           ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.search_off, size: 64, color: Colors.grey),
+                  Icon(Icons.person_search, size: 64, color: Colors.grey),
                   SizedBox(height: 16),
-                  Text('No hay resultados para mostrar'),
+                  Text('No hay influencers para mostrar'),
                 ],
               ),
             )
@@ -85,14 +84,14 @@ class _GridViewPageState extends State<GridViewPage> {
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                       childAspectRatio: 150 /
-                          190, // Mantener proporción del BusinessCardWidget
+                          190, // Mantener proporción del InfluencerCardWidget
                     ),
-                    itemCount: widget.entrepreneurships.length +
+                    itemCount: widget.influencers.length +
                         (widget.isLoadingMore ? 1 : 0),
                     itemBuilder: (context, index) {
-                      if (index < widget.entrepreneurships.length) {
-                        return BusinessCardWidget(
-                          entrepreneurship: widget.entrepreneurships[index],
+                      if (index < widget.influencers.length) {
+                        return InfluencerCardWidget(
+                          influencer: widget.influencers[index],
                         );
                       } else if (widget.isLoadingMore) {
                         return const Center(

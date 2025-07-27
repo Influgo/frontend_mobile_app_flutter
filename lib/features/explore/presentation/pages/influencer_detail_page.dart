@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/pill_widget.dart';
-import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/models/influencer_model.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../widgets/share_entrepreneurship_modal.dart';
+import 'dart:ui';
 
-// Modelos placeholder para datos faltantes
+// Modelos placeholder para datos faltantes (similares a ExploraDetailPage)
 class Review {
   final String userName;
   final String userAvatarUrl;
@@ -28,29 +28,38 @@ class Collaborator {
   Collaborator({required this.name, required this.avatarUrl});
 }
 
-class ExploraDetailPage extends StatelessWidget {
-  final Entrepreneurship entrepreneurship;
+class InfluencerDetailPage extends StatelessWidget {
+  final Influencer influencer;
 
-  const ExploraDetailPage({super.key, required this.entrepreneurship});
+  const InfluencerDetailPage({super.key, required this.influencer});
+
+  String _formatFollowersCount(int count) {
+    if (count >= 1000000) {
+      return '${(count / 1000000).toStringAsFixed(1)}M';
+    } else if (count >= 1000) {
+      return '${(count / 1000).toStringAsFixed(1)}K';
+    }
+    return count.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Datos de ejemplo para secciones faltantes
-    final exampleRating = 4.5;
+    final exampleRating = influencer.rating;
     final exampleTotalReviews = 76;
     final exampleReviews = [
       Review(
         userName: 'Ana María',
         userAvatarUrl: 'https://i.pravatar.cc/150?img=1',
         rating: 5,
-        comment: 'Trabajar con Las Canastas fue una experiencia increíble.',
+        comment: 'Excelente trabajo con ${influencer.influencerName}, muy profesional.',
         date: DateTime.now().subtract(Duration(days: 2)),
       ),
       Review(
         userName: 'Carlos López',
         userAvatarUrl: 'https://i.pravatar.cc/150?img=2',
         rating: 4,
-        comment: 'Buen servicio y productos de calidad.',
+        comment: 'Gran contenido y muy buena comunicación.',
         date: DateTime.now().subtract(Duration(days: 5)),
       ),
     ];
@@ -90,6 +99,7 @@ class ExploraDetailPage extends StatelessWidget {
         designLogoTopPosition + designLogoDiameter + 10;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF9F9F9),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
@@ -100,7 +110,7 @@ class ExploraDetailPage extends StatelessWidget {
             expandedHeight: 200.0,
             floating: false,
             pinned: true,
-            backgroundColor: Colors.transparent,
+            backgroundColor: Color(0xFFF9F9F9).withOpacity(0.8),
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
@@ -194,22 +204,53 @@ class ExploraDetailPage extends StatelessWidget {
                     child: SizedBox(
                       height: 174,
                       width: screenSize.width,
-                      child: Image.network(
-                        entrepreneurship.entrepreneurBanner?.url ??
-                            'https://via.placeholder.com/393x174.png?text=Banner',
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.grey[300],
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[300],
-                          child:
-                              Icon(Icons.broken_image, color: Colors.grey[600]),
-                        ),
-                      ),
+                      child: influencer.influencerBanner != null
+                          ? Image.network(
+                              influencer.influencerBanner!.url,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.purple.shade300,
+                                        Colors.pink.shade300,
+                                        Colors.orange.shade300,
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.purple.shade300,
+                                      Colors.pink.shade300,
+                                      Colors.orange.shade300,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.purple.shade300,
+                                    Colors.pink.shade300,
+                                    Colors.orange.shade300,
+                                  ],
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                   Positioned(
@@ -220,10 +261,10 @@ class ExploraDetailPage extends StatelessWidget {
                       height: designLogoDiameter,
                       decoration: ShapeDecoration(
                         color: Colors.grey[200],
-                        image: entrepreneurship.entrepreneurLogo?.url != null
+                        image: influencer.influencerProfileImage?.url != null
                             ? DecorationImage(
                                 image: NetworkImage(
-                                    entrepreneurship.entrepreneurLogo!.url),
+                                    influencer.influencerProfileImage!.url),
                                 fit: BoxFit.cover,
                               )
                             : null,
@@ -234,8 +275,8 @@ class ExploraDetailPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      child: entrepreneurship.entrepreneurLogo?.url == null
-                          ? Icon(Icons.business,
+                      child: influencer.influencerProfileImage?.url == null
+                          ? Icon(Icons.person,
                               size: designLogoRadius * 0.8,
                               color: Colors.grey[600])
                           : null,
@@ -247,8 +288,7 @@ class ExploraDetailPage extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: _buildContent(
                 context,
                 exampleRating,
@@ -270,37 +310,37 @@ class ExploraDetailPage extends StatelessWidget {
     if (lowerName.contains("instagram")) {
       return Image.asset(
         'assets/icons/instagramicon.png',
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 24),
+            Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 20),
       );
     } else if (lowerName.contains("facebook")) {
       return Image.asset(
         'assets/icons/facebookicon.png',
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.facebook, color: Color(0xFF1877F2), size: 24),
+            Icon(Icons.facebook, color: Color(0xFF1877F2), size: 20),
       );
     } else if (lowerName.contains("youtube")) {
       return Image.asset(
         'assets/icons/youtubeicon.png',
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 24),
+            Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 20),
       );
     } else if (lowerName.contains("tiktok")) {
       return Image.asset(
         'assets/icons/tiktokicon.png',
-        width: 24,
-        height: 24,
+        width: 20,
+        height: 20,
         errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.music_note, color: Colors.black, size: 24),
+            Icon(Icons.music_note, color: Colors.black, size: 20),
       );
     } else {
-      return Icon(Icons.link, color: Colors.grey[600], size: 24);
+      return Icon(Icons.link, color: Colors.grey[600], size: 20);
     }
   }
 
@@ -346,10 +386,10 @@ class ExploraDetailPage extends StatelessWidget {
       List<Review> exampleReviews,
       List<Collaborator> exampleCollaborators) {
     
-    // Filtrar redes sociales excluyendo Twitch y Twitter
-    final filteredSocials = entrepreneurship.socialDtos
-        .where((social) => !social.name.toLowerCase().contains("twitch") && 
-                          !social.name.toLowerCase().contains("twitter"))
+    // Filtrar redes sociales excluyendo Twitter y Facebook
+    final filteredSocials = influencer.socialDtos
+        .where((social) => !social.name.toLowerCase().contains("twitter") 
+                          && !social.name.toLowerCase().contains("facebook"))
         .toList();
 
     return Column(
@@ -367,20 +407,22 @@ class ExploraDetailPage extends StatelessWidget {
                     child: Text(
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      entrepreneurship.entrepreneurshipName,
+                      influencer.influencerName,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w500,
                             fontSize: 20,
                           ),
                     ),
                   ),
-                  SizedBox(width: 8),
-                  Icon(Icons.verified, color: Colors.blue, size: 24),
+                  if (influencer.isVerified) ...[
+                    SizedBox(width: 8),
+                    Icon(Icons.verified, color: Colors.blue, size: 24),
+                  ],
                 ],
               ),
               SizedBox(height: 4),
               Text(
-                "@${entrepreneurship.entrepreneursNickname}",
+                influencer.influencerHandle,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Colors.grey[600],
                       fontWeight: FontWeight.bold,
@@ -388,103 +430,77 @@ class ExploraDetailPage extends StatelessWidget {
                     ),
               ),
               SizedBox(height: 8),
-              PillWidget(entrepreneurship.category),
+              PillWidget(influencer.category),
             ],
           ),
         ),
         SizedBox(height: 16),
         Text(
-          entrepreneurship.summary,
+          influencer.summary,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         SizedBox(height: 16),
+        
+        // Estadísticas
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildStatItem(
+              context,
+              "Seguidores",
+              _formatFollowersCount(influencer.followersCount),
+              Icons.people,
+            ),
+            _buildStatItem(
+              context,
+              "Colaboraciones",
+              influencer.collaborationsCount.toString(),
+              Icons.handshake,
+            ),
+            _buildStatItem(
+              context,
+              "Valoración",
+              influencer.rating.toStringAsFixed(1),
+              Icons.star,
+            ),
+          ],
+        ),
+        SizedBox(height: 24),
+        
         // Descripción
         _buildSectionTitle(context, "Descripción"),
         Text(
-          entrepreneurship.description,
+          influencer.description,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: 24),
-        // Redes
+        
+        // Especialidades
+        if (influencer.specialties.isNotEmpty) ...[
+          _buildSectionTitle(context, "Especialidades"),
+          Wrap(
+            spacing: 8.0,
+            runSpacing: 4.0,
+            children: influencer.specialties
+                .map((specialty) => Chip(
+                      label: Text(specialty),
+                      backgroundColor: Colors.grey.shade100,
+                    ))
+                .toList(),
+          ),
+          SizedBox(height: 24),
+        ],
+        
+        // Redes sociales
         _buildSectionTitle(context, "Redes"),
-        SizedBox(height: 8), // Espaciado consistente después del título
-        if (entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch") && 
-                                                       !social.name.toLowerCase().contains("twitter")).isEmpty)
+        SizedBox(height: 8),
+        if (filteredSocials.isEmpty)
           Text("No hay redes sociales disponibles.",
               style: TextStyle(color: Colors.grey))
         else
           Column(
-            children: entrepreneurship.socialDtos
-                .where((social) => !social.name.toLowerCase().contains("twitch") && 
-                                  !social.name.toLowerCase().contains("twitter"))
-                .map((social) {
-              Widget iconWidget;
-              String url = social.socialUrl.trim();
-              
-              // Lógica para iconos usando assets personalizados
-              if (social.name.toLowerCase().contains("instagram")) {
-                iconWidget = Image.asset(
-                  'assets/icons/instagramicon.png',
-                  width: 20,
-                  height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
-                      Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 20),
-                );
-                if (!(social.socialUrl.contains("http") ||
-                    social.socialUrl.contains("www"))) {
-                  if (url.startsWith("@")) {
-                    url = url.substring(1);
-                  }
-                  url = "https://www.instagram.com/$url";
-                }
-              } else if (social.name.toLowerCase().contains("facebook")) {
-                iconWidget = Image.asset(
-                  'assets/icons/facebookicon.png',
-                  width: 20,
-                  height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
-                      Icon(Icons.facebook, color: Color(0xFF1877F2), size: 20),
-                );
-                if (!(social.socialUrl.contains("http") ||
-                    social.socialUrl.contains("www"))) {
-                  if (url.startsWith("@")) {
-                    url = url.substring(1);
-                  }
-                  url = "https://www.facebook.com/$url";
-                }
-              } else if (social.name.toLowerCase().contains("youtube")) {
-                iconWidget = Image.asset(
-                  'assets/icons/youtubeicon.png',
-                  width: 20,
-                  height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
-                      Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 20),
-                );
-                if (!(social.socialUrl.contains("http") ||
-                    social.socialUrl.contains("www"))) {
-                  if (!url.startsWith("@")) {
-                    url = "https://www.youtube.com/@$url";
-                  }
-                  url = "https://www.youtube.com/$url";
-                }
-              } else if (social.name.toLowerCase().contains("tiktok")) {
-                iconWidget = Image.asset(
-                  'assets/icons/tiktokicon.png',
-                  width: 20,
-                  height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
-                      Icon(Icons.music_note, color: Colors.black, size: 20),
-                );
-                if (!(social.socialUrl.contains("http") ||
-                    social.socialUrl.contains("www"))) {
-                  if (!url.startsWith("@")) {
-                    url = "https://www.tiktok.com/@$url";
-                  }
-                  url = "https://www.tiktok.com/$url";
-                }
-              } else {
-                iconWidget = Icon(Icons.link, color: Colors.grey[600], size: 20);
-              }
+            children: filteredSocials.map((social) {
+              String url = _buildSocialUrl(social.name, social.socialUrl);
 
               return Container(
                 width: double.infinity,
@@ -495,7 +511,7 @@ class ExploraDetailPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    side: BorderSide(color: Colors.grey.shade400, width: 1),
+                    side: BorderSide(color: Colors.grey.shade300, width: 1),
                     backgroundColor: Colors.white,
                   ),
                   onPressed: () {
@@ -503,7 +519,7 @@ class ExploraDetailPage extends StatelessWidget {
                   },
                   child: Row(
                     children: [
-                      iconWidget,
+                      _getSocialIcon(social.name),
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -523,44 +539,21 @@ class ExploraDetailPage extends StatelessWidget {
             }).toList(),
           ),
         SizedBox(height: 24),
-        // Ubicación
-        _buildSectionTitle(context, "Ubicación"),
-        PillWidget(entrepreneurship.addressType),
-        SizedBox(height: 8),
-        if (entrepreneurship.addresses.isEmpty)
-          Text("No hay direcciones disponibles.",
-              style: TextStyle(color: Colors.grey))
-        else
-          ...entrepreneurship.addresses
-              .map((address) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: Row(
-                      children: [
-                        Icon(Icons.location_on_outlined,
-                            size: 18, color: Colors.grey[700]),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(address,
-                              style: Theme.of(context).textTheme.bodyLarge),
-                        ),
-                      ],
-                    ),
-                  ))
-              .toList(),
-        SizedBox(height: 24),
-        // Galería
-        _buildSectionTitle(context, "Galería"),
-        if (entrepreneurship.s3Files.isEmpty)
-          Text("No hay imágenes en la galería.",
+        
+        
+        // Portafolio
+        _buildSectionTitle(context, "Portafolio"),
+        if (influencer.portfolioFiles.isEmpty)
+          Text("No hay imágenes en el portafolio.",
               style: TextStyle(color: Colors.grey))
         else
           Container(
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: entrepreneurship.s3Files.length,
+              itemCount: influencer.portfolioFiles.length,
               itemBuilder: (context, index) {
-                final file = entrepreneurship.s3Files[index];
+                final file = influencer.portfolioFiles[index];
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ClipRRect(
@@ -587,6 +580,7 @@ class ExploraDetailPage extends StatelessWidget {
             ),
           ),
         SizedBox(height: 24),
+        
         // Colaboraciones
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -632,6 +626,7 @@ class ExploraDetailPage extends StatelessWidget {
             ),
           ),
         SizedBox(height: 24),
+        
         // Valoraciones
         _buildSectionTitle(context, "Valoraciones"),
         Row(
@@ -729,6 +724,27 @@ class ExploraDetailPage extends StatelessWidget {
     );
   }
 
+  Widget _buildStatItem(BuildContext context, String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.grey[600], size: 24),
+        SizedBox(height: 4),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey[600],
+              ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -759,12 +775,10 @@ class ExploraDetailPage extends StatelessWidget {
   }
 
   void _showShareModal(BuildContext context) {
-    ShareEntrepreneurshipModal.show(
-      context,
-      entrepreneurshipId: entrepreneurship.id.toString(),
-      entrepreneurshipName: entrepreneurship.entrepreneurshipName,
-      summary: entrepreneurship.summary,
-      imageUrl: entrepreneurship.entrepreneurLogo?.url,
+    // TODO: Implementar modal de compartir para influencers
+    // Similar a ShareEntrepreneurshipModal pero para influencers
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Compartir perfil de ${influencer.influencerName}')),
     );
   }
 }

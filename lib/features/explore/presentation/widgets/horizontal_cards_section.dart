@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/data/models/influencer_model.dart';
+import 'package:frontend_mobile_app_flutter/features/explore/presentation/widgets/influencer_grid_view_page.dart';
 import 'grid_view_page.dart'; // Importar la nueva página
 
 class HorizontalCardsSection extends StatefulWidget {
@@ -12,6 +14,9 @@ class HorizontalCardsSection extends StatefulWidget {
   // Nuevas propiedades para el "Ver más"
   final List<Entrepreneurship>?
       allEntrepreneurships; // Lista completa para la vista cuadricular
+
+  final List<Influencer>?
+      allInfluencers;
   final VoidCallback?
       onLoadMoreGrid; // Callback para cargar más en la vista cuadricular
 
@@ -23,6 +28,7 @@ class HorizontalCardsSection extends StatefulWidget {
     this.isLoadingMore = false,
     this.hasMore = false,
     this.allEntrepreneurships,
+    this.allInfluencers,
     this.onLoadMoreGrid,
   });
 
@@ -73,6 +79,23 @@ class _HorizontalCardsSectionState extends State<HorizontalCardsSection> {
     }
   }
 
+  void _navigateToGridViewInfluencer() {
+    if (widget.allInfluencers != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => InfluencerGridViewPage(
+            title: widget.title,
+            influencers: widget.allInfluencers!,
+            onLoadMore: widget.onLoadMoreGrid,
+            isLoadingMore: widget.isLoadingMore,
+            hasMore: widget.hasMore,
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     bool shouldShowIndicatorSlot =
@@ -109,6 +132,20 @@ class _HorizontalCardsSectionState extends State<HorizontalCardsSection> {
                     ),
                   ),
                 ),
+
+              if (widget.allInfluencers != null &&
+                  widget.allInfluencers!.isNotEmpty)
+                GestureDetector(
+                  onTap: _navigateToGridViewInfluencer,
+                  child: const Text(
+                    'Ver más',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -116,7 +153,7 @@ class _HorizontalCardsSectionState extends State<HorizontalCardsSection> {
 
         // Lista horizontal de tarjetas
         SizedBox(
-          height: 190,
+          height: 220, // Aumentado de 190 a 220 para acomodar las tarjetas más grandes
           child: ListView.separated(
             controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -126,7 +163,7 @@ class _HorizontalCardsSectionState extends State<HorizontalCardsSection> {
             itemBuilder: (context, index) {
               if (index < widget.cards.length) {
                 return SizedBox(
-                  width: 150,
+                  width: 170, // Aumentado de 150 a 170 para coincidir con el ancho de las tarjetas de influencer
                   child: widget.cards[index],
                 );
               } else if (shouldShowIndicatorSlot) {

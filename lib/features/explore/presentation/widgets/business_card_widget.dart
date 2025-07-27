@@ -134,19 +134,46 @@ class BusinessCardWidget extends StatelessWidget {
       
                     // Categoría
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                      padding: const EdgeInsets.all(1), // Padding para el borde degradado
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: Colors.grey.shade300),
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFC20B0C),
+                            Color(0xFF7E0F9D),
+                            Color(0xFF2616C7)
+                          ],
+                        ),
                       ),
-                      child: Text(
-                        entrepreneurship.category != 'N/A'
-                            ? entrepreneurship.category
-                            : 'No Categoría',
-                        style: const TextStyle(fontSize: 10),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: ShaderMask(
+                          shaderCallback: (bounds) => LinearGradient(
+                            colors: [
+                              Color(0xFFC20B0C),
+                              Color(0xFF7E0F9D),
+                              Color(0xFF2616C7)
+                            ],
+                          ).createShader(
+                            Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                          ),
+                          child: Text(
+                            entrepreneurship.category != 'N/A'
+                                ? entrepreneurship.category
+                                : 'No Categoría',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.white, // Color base requerido por ShaderMask
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ),
                     ),
       
