@@ -28,6 +28,30 @@ class Collaborator {
   Collaborator({required this.name, required this.avatarUrl});
 }
 
+class Socials {
+  final String userName;
+  final String socialName;
+  final int followers;
+  final String ranking; // Puede ser número con K/M o texto como "2.5k"
+  final String? engagementMetric; // "Me gustas", "Visualizaciones", "Transmisión"
+  final String? engagementValue; // "15M", "2.5k", etc.
+  final String? profileUrl; // URL completa del perfil
+  final String? iconAsset; // Ruta del ícono de la red social
+  final List<Color>? brandColors; // Colores de la marca para gradientes
+
+  Socials({
+    required this.userName,
+    required this.socialName,
+    required this.followers,
+    required this.ranking,
+    this.engagementMetric,
+    this.engagementValue,
+    this.profileUrl,
+    this.iconAsset,
+    this.brandColors,
+  });
+}
+
 class InfluencerDetailPage extends StatelessWidget {
   final Influencer influencer;
 
@@ -41,6 +65,7 @@ class InfluencerDetailPage extends StatelessWidget {
     }
     return count.toString();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +113,42 @@ class InfluencerDetailPage extends StatelessWidget {
       Collaborator(
         name: 'Juan Benavides',
         avatarUrl: 'https://i.pravatar.cc/150?img=8',
+      ),
+    ];
+
+    // Datos de ejemplo para redes sociales mejorados
+    final exampleSocials = [
+      Socials(
+        userName: '@ana27_maria',
+        socialName: 'Instagram',
+        followers: 2500,
+        ranking: '2.5k',
+        engagementMetric: 'Seguidores',
+        engagementValue: '2.5k',
+      ),
+      Socials(
+        userName: '@ana27_maria',
+        socialName: 'TikTok',
+        followers: 10050,
+        ranking: '1M',
+        engagementMetric: 'Me gustas',
+        engagementValue: '1M',
+      ),
+      Socials(
+        userName: '@ana27_maria',
+        socialName: 'YouTube',
+        followers: 2500,
+        ranking: '2.5k',
+        engagementMetric: 'Visualizaciones',
+        engagementValue: '2.5k',
+      ),
+      Socials(
+        userName: '@ana27_maria',
+        socialName: 'Twitch',
+        followers: 2500,
+        ranking: '2.5k',
+        engagementMetric: 'Transmisión',
+        engagementValue: '2.5k',
       ),
     ];
 
@@ -295,6 +356,7 @@ class InfluencerDetailPage extends StatelessWidget {
                 exampleTotalReviews,
                 exampleReviews,
                 exampleCollaborators,
+                exampleSocials,
               ),
             ),
           ),
@@ -378,6 +440,14 @@ class InfluencerDetailPage extends StatelessWidget {
           color: Colors.white,
         ),
       );
+      final instagramExample = Socials(
+        userName: '@ana27_maria',
+        socialName: 'Instagram',
+        followers: 2500,
+        ranking: '2.5k',
+        engagementMetric: 'Seguidores',
+        engagementValue: '2.5k',
+      );
     } else if (lowerName.contains("tiktok")) {
       gradientColors = [
         Color(0xFF00F2EA), // Turquesa
@@ -396,6 +466,14 @@ class InfluencerDetailPage extends StatelessWidget {
           height: 20,
           color: Colors.white,
         ),
+      );
+      final tiktokExample = Socials(
+        userName: '@tiktok_user',
+        socialName: 'TikTok',
+        followers: 1500,
+        ranking: '1.5k',
+        engagementMetric: 'Seguidores',
+        engagementValue: '1.5k',
       );
     } else if (lowerName.contains("youtube")) {
       gradientColors = [
@@ -416,6 +494,14 @@ class InfluencerDetailPage extends StatelessWidget {
           color: Colors.white,
         ),
       );
+      final youtubeExample = Socials(
+        userName: '@youtube_user',
+        socialName: 'YouTube',
+        followers: 5000,
+        ranking: '5k',
+        engagementMetric: 'Visualizaciones',
+        engagementValue: '5k',
+      );
     } else if (lowerName.contains("twitch")) {
       gradientColors = [
         Color(0xFF9146FF), // Morado Twitch
@@ -434,6 +520,14 @@ class InfluencerDetailPage extends StatelessWidget {
           height: 20,
           color: Colors.white,
         ),
+      );
+      final twitchExample = Socials(
+        userName: '@twitch_user',
+        socialName: 'Twitch',
+        followers: 3000,
+        ranking: '3k',
+        engagementMetric: 'Transmisión',
+        engagementValue: '3k',
       );
     } else if (lowerName.contains("facebook")) {
       gradientColors = [
@@ -521,12 +615,80 @@ class InfluencerDetailPage extends StatelessWidget {
     return url; // Fallback
   }
 
+  Widget _buildStatColumn(String value, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13, color: Colors.black87),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(fontWeight: FontWeight.w100, color: Colors.grey[700], fontSize: 12),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocials(BuildContext context, List<Socials> socials) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: socials.map((social) {
+        return Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStatColumn(
+                    social.userName,
+                    social.socialName
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Flexible(
+                    child: _buildStatColumn(
+                      social.ranking,
+                      "Seguidores",
+                    ),
+                  ),
+                  Flexible(
+                    child: _buildStatColumn(
+                      social.engagementValue ?? '',
+                      social.engagementMetric ?? '',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildContent(
       BuildContext context,
       double exampleRating,
       int exampleTotalReviews,
       List<Review> exampleReviews,
-      List<Collaborator> exampleCollaborators) {
+      List<Collaborator> exampleCollaborators,
+      List<Socials> exampleSocials) {
     
     // Filtrar redes sociales excluyendo Twitter y Facebook
     final filteredSocials = influencer.socialDtos
@@ -617,16 +779,10 @@ class InfluencerDetailPage extends StatelessWidget {
                       _getSocialIcon(social.name),
                       SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          social.name.toLowerCase(),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
+                        child: _buildSocials(context, exampleSocials.where((mockSocial) => 
+                          mockSocial.socialName.toLowerCase() == social.name.toLowerCase()).toList()),
                       ),
-                      Icon(Icons.open_in_new, size: 18, color: Colors.grey[600]),
+                      //Icon(Icons.open_in_new, size: 18, color: Colors.grey[600]),
                     ],
                   ),
                 ),
@@ -634,7 +790,6 @@ class InfluencerDetailPage extends StatelessWidget {
             }).toList(),
           ),
         SizedBox(height: 24),
-        
         
         // Descripción
         _buildSectionTitle(context, "Descripción"),
@@ -869,27 +1024,6 @@ class InfluencerDetailPage extends StatelessWidget {
       ],
     );
     
-  }
-
-  Widget _buildStatItem(BuildContext context, String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.grey[600], size: 24),
-        SizedBox(height: 4),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
-        ),
-      ],
-    );
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
