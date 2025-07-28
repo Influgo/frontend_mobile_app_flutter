@@ -44,6 +44,7 @@ class Influencer {
   final String summary;
   final String description;
   final bool showRealName;
+  final List<String> addresses;
   final List<String> specialties;
   final List<SocialDto> socialDtos;
   final MediaFile? influencerProfileImage;
@@ -64,6 +65,7 @@ class Influencer {
     required this.summary,
     required this.description,
     required this.showRealName,
+    required this.addresses,
     required this.specialties,
     required this.socialDtos,
     this.influencerProfileImage,
@@ -77,38 +79,73 @@ class Influencer {
   });
 
   factory Influencer.fromJson(Map<String, dynamic> json) {
+    // Debug: imprimir los datos que llegan
+    print('DEBUG - JSON recibido: $json');
+    
     return Influencer(
-      id: json['id'],
-      influencerName: json['influencerInformationInfluencerName'] ?? 'N/A',
-      influencerNickname: json['influencerInformationInfluencerNickname'] ?? 'N/A',
-      influencerHandle: json['influencerInformationInfluencerHandle'] ?? '@unknown',
-      category: json['influencerInformationCategory'] ?? 'N/A',
-      summary: json['influencerInformationSummary'] ?? 'N/A',
-      description: json['influencerInformationDescription'] ?? 'N/A',
+      id: json['id'] ?? 0,
+      //influencerName: json['influencerName'] ?? 
+                     //json['influencerInformationInfluencerName'] ?? 
+                     //json['name'] ?? 'N/A',
+      influencerName: json['entrepreneurshipInformationEntrepreneurshipName'] ?? 'N/A',
+      influencerNickname: json['influencerNickname'] ?? 
+                         json['influencerInformationInfluencerNickname'] ?? 
+                         json['nickname'] ?? 'N/A',
+      influencerHandle: json['influencerHandle'] ?? 
+                       json['influencerInformationInfluencerHandle'] ?? 
+                       json['handle'] ?? '@unknown',
+      category: json['category'] ?? 
+               json['influencerInformationCategory'] ?? 
+               json['influencerCategory'] ?? 'N/A',
+      summary: json['summary'] ?? 
+              json['influencerInformationSummary'] ?? 
+              json['influencerSummary'] ?? 'N/A',
+      description: json['description'] ?? 
+                  json['influencerInformationDescription'] ?? 
+                  json['influencerDescription'] ?? 'N/A',
       showRealName: json['showRealName'] ?? false,
-      specialties: json['influencerSpecialties'] != null
+      addresses: json['addresses'] != null
+          ? List<String>.from(json['addresses'])
+          : json['influencerAddresses'] != null
+          ? List<String>.from(json['influencerAddresses'])
+          : [],
+      specialties: json['specialties'] != null
+          ? List<String>.from(json['specialties'])
+          : json['influencerSpecialties'] != null
           ? List<String>.from(json['influencerSpecialties'])
           : [],
       socialDtos: json['socialDtos'] != null
           ? (json['socialDtos'] as List)
               .map((item) => SocialDto.fromJson(item))
               .toList()
+          : json['socials'] != null
+          ? (json['socials'] as List)
+              .map((item) => SocialDto.fromJson(item))
+              .toList()
           : [],
       influencerProfileImage: json['influencerProfileImage'] != null
           ? MediaFile.fromJson(json['influencerProfileImage'])
+          : json['profileImage'] != null
+          ? MediaFile.fromJson(json['profileImage'])
           : null,
       influencerBanner: json['influencerBanner'] != null
           ? MediaFile.fromJson(json['influencerBanner'])
+          : json['banner'] != null
+          ? MediaFile.fromJson(json['banner'])
           : null,
       portfolioFiles: json['portfolioFiles'] != null
           ? (json['portfolioFiles'] as List)
               .map((item) => MediaFile.fromJson(item))
               .toList()
+          : json['portfolio'] != null
+          ? (json['portfolio'] as List)
+              .map((item) => MediaFile.fromJson(item))
+              .toList()
           : [],
-      followersCount: json['followersCount'] ?? 0,
-      collaborationsCount: json['collaborationsCount'] ?? 0,
+      followersCount: json['followersCount'] ?? json['followers'] ?? 0,
+      collaborationsCount: json['collaborationsCount'] ?? json['collaborations'] ?? 0,
       rating: (json['rating'] ?? 0.0).toDouble(),
-      isVerified: json['isVerified'] ?? false,
+      isVerified: json['isVerified'] ?? json['verified'] ?? false,
       createdAt: json['createdAt'] != null 
           ? DateTime.tryParse(json['createdAt']) 
           : null,
@@ -125,6 +162,7 @@ class Influencer {
       'influencerInformationSummary': summary,
       'influencerInformationDescription': description,
       'showRealName': showRealName,
+      'influencerAddresses': addresses,
       'influencerSpecialties': specialties,
       'socialDtos': socialDtos.map((social) => social.toJson()).toList(),
       'influencerProfileImage': influencerProfileImage?.toJson(),

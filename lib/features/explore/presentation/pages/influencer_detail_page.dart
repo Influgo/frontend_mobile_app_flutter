@@ -303,45 +303,187 @@ class InfluencerDetailPage extends StatelessWidget {
     );
   }
 
+  Widget buildGlassSocialIcon({
+    required List<Color> gradientColors,
+    required String assetPath,
+    double size = 40,
+  }) {
+    final gradient = LinearGradient(
+      colors: gradientColors,
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.white.withOpacity(0.3),
+              ),
+            ),
+          ),
+          Center(
+            child: ShaderMask(
+              shaderCallback: (bounds) => gradient.createShader(bounds),
+              blendMode: BlendMode.srcIn,
+              child: Image.asset(
+                assetPath,
+                width: size * 0.5,
+                height: size * 0.5,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ===== MÉTODO MEJORADO PARA OBTENER ICONOS DE REDES SOCIALES =====
   Widget _getSocialIcon(String socialName) {
     String lowerName = socialName.toLowerCase();
     
+    // Definir colores y iconos según la red social
+    List<Color> gradientColors;
+    Widget iconWidget;
+    
     if (lowerName.contains("instagram")) {
-      return Image.asset(
-        'assets/icons/instagramicon.png',
-        width: 20,
-        height: 20,
-        errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 20),
-      );
-    } else if (lowerName.contains("facebook")) {
-      return Image.asset(
-        'assets/icons/facebookicon.png',
-        width: 20,
-        height: 20,
-        errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.facebook, color: Color(0xFF1877F2), size: 20),
-      );
-    } else if (lowerName.contains("youtube")) {
-      return Image.asset(
-        'assets/icons/youtubeicon.png',
-        width: 20,
-        height: 20,
-        errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 20),
+      gradientColors = [
+        Color(0xFFF58529), // Naranja
+        Color(0xFFDD2A7B), // Rosa
+        Color(0xFF8134AF), // Morado
+        Color(0xFF515BD4), // Azul
+      ];
+      iconWidget = ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds),
+        blendMode: BlendMode.srcIn,
+        child: Image.asset(
+          'assets/icons/instagramicon.png',
+          width: 20,
+          height: 20,
+          color: Colors.white,
+        ),
       );
     } else if (lowerName.contains("tiktok")) {
-      return Image.asset(
-        'assets/icons/tiktokicon.png',
-        width: 20,
-        height: 20,
-        errorBuilder: (context, error, stackTrace) => 
-            Icon(Icons.music_note, color: Colors.black, size: 20),
+      gradientColors = [
+        Color(0xFF00F2EA), // Turquesa
+        Color(0xFFEE1D52), // Rosa
+      ];
+    iconWidget = ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds),
+        blendMode: BlendMode.srcIn,
+        child: Image.asset(
+          'assets/icons/tiktokicon.png',
+          width: 20,
+          height: 20,
+          color: Colors.white,
+        ),
+      );
+    } else if (lowerName.contains("youtube")) {
+      gradientColors = [
+        Color(0xFFFF0000), // Rojo YouTube
+        Color(0xFF282828), // Rojo más claro
+      ];
+      iconWidget = ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds),
+        blendMode: BlendMode.srcIn,
+        child: Image.asset(
+          'assets/icons/youtubeicon.png',
+          width: 20,
+          height: 20,
+          color: Colors.white,
+        ),
+      );
+    } else if (lowerName.contains("twitch")) {
+      gradientColors = [
+        Color(0xFF9146FF), // Morado Twitch
+        Color(0xFFB877FF), // Morado más claro
+      ];
+      iconWidget = ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds),
+        blendMode: BlendMode.srcIn,
+        child: Image.asset(
+          'assets/icons/twitchicon.png',
+          width: 20,
+          height: 20,
+          color: Colors.white,
+        ),
+      );
+    } else if (lowerName.contains("facebook")) {
+      gradientColors = [
+        Color(0xFF1877F2), // Azul Facebook
+        Color(0xFF42A5F5), // Azul más claro
+      ];
+      iconWidget = ShaderMask(
+        shaderCallback: (bounds) => LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(bounds),
+        blendMode: BlendMode.srcIn,
+        child: Image.asset(
+          'assets/icons/facebookicon.png',
+          width: 20,
+          height: 20,
+          color: Colors.white,
+        ),
       );
     } else {
-      return Icon(Icons.link, color: Colors.grey[600], size: 20);
+      gradientColors = [
+        Colors.grey.shade400,
+        Colors.grey.shade600,
+      ];
+      iconWidget = Icon(Icons.link, color: Colors.white, size: 18);
     }
+
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+          child: Container(
+            color: Colors.white.withOpacity(0.6),
+            child: Center(child: iconWidget),
+          ),
+        ),
+      ),
+    );
   }
 
   // ===== MÉTODO MEJORADO PARA CONSTRUIR URLs =====
@@ -435,64 +577,17 @@ class InfluencerDetailPage extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16),
+        
+        // Summary del influencer
         Text(
           influencer.summary,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        SizedBox(height: 16),
-        
-        // Estadísticas
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildStatItem(
-              context,
-              "Seguidores",
-              _formatFollowersCount(influencer.followersCount),
-              Icons.people,
-            ),
-            _buildStatItem(
-              context,
-              "Colaboraciones",
-              influencer.collaborationsCount.toString(),
-              Icons.handshake,
-            ),
-            _buildStatItem(
-              context,
-              "Valoración",
-              influencer.rating.toStringAsFixed(1),
-              Icons.star,
-            ),
-          ],
-        ),
-        SizedBox(height: 24),
-        
-        // Descripción
-        _buildSectionTitle(context, "Descripción"),
-        Text(
-          influencer.description,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
+        
         SizedBox(height: 24),
         
-        // Especialidades
-        if (influencer.specialties.isNotEmpty) ...[
-          _buildSectionTitle(context, "Especialidades"),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 4.0,
-            children: influencer.specialties
-                .map((specialty) => Chip(
-                      label: Text(specialty),
-                      backgroundColor: Colors.grey.shade100,
-                    ))
-                .toList(),
-          ),
-          SizedBox(height: 24),
-        ],
-        
         // Redes sociales
-        _buildSectionTitle(context, "Redes"),
+        _buildSectionTitle(context, "Redes Sociales"),
         SizedBox(height: 8),
         if (filteredSocials.isEmpty)
           Text("No hay redes sociales disponibles.",
@@ -541,8 +636,59 @@ class InfluencerDetailPage extends StatelessWidget {
         SizedBox(height: 24),
         
         
-        // Portafolio
-        _buildSectionTitle(context, "Portafolio"),
+        // Descripción
+        _buildSectionTitle(context, "Descripción"),
+        Text(
+          influencer.description,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        SizedBox(height: 24),
+        
+        // Especialidades
+        if (influencer.specialties.isNotEmpty) ...[
+          _buildSectionTitle(context, "Especialidades"),
+          Wrap(
+            spacing: 8.0,
+            runSpacing: 4.0,
+            children: influencer.specialties
+                .map((specialty) => Chip(
+                      label: Text(specialty),
+                      backgroundColor: Colors.grey.shade100,
+                    ))
+                .toList(),
+          ),
+          SizedBox(height: 24),
+        ],
+
+        // Ubicación
+        _buildSectionTitle(context, "Ubicación"),
+        if (influencer.addresses.isEmpty)
+          Text("No hay ubicación disponible.",
+              style: TextStyle(color: Colors.grey))
+        else
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: influencer.addresses
+                .map((address) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.location_on_outlined,
+                              size: 18, color: Colors.grey[700]),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(address,
+                                style: Theme.of(context).textTheme.bodyLarge),
+                          ),
+                        ],
+                      ),
+                    ))
+                .toList(),
+          ),
+        SizedBox(height: 24),
+
+        // Galería
+        _buildSectionTitle(context, "Galería"),
         if (influencer.portfolioFiles.isEmpty)
           Text("No hay imágenes en el portafolio.",
               style: TextStyle(color: Colors.grey))
@@ -722,6 +868,7 @@ class InfluencerDetailPage extends StatelessWidget {
         SizedBox(height: 30),
       ],
     );
+    
   }
 
   Widget _buildStatItem(BuildContext context, String label, String value, IconData icon) {
