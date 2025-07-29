@@ -565,23 +565,68 @@ class InfluencerDetailPage extends StatelessWidget {
     return Container(
       width: 40,
       height: 40,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
-          colors: gradientColors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-          child: Container(
-            color: Colors.white.withOpacity(0.6),
-            child: Center(child: iconWidget),
+      child: Stack(
+        clipBehavior: Clip.none, // Permite que el contenido rotado sobresalga
+        children: [
+          // Fondo con rotación (sin recorte) - posicionado un poco más abajo
+          Positioned(
+            top: 4, // Mover la capa rotada 2 píxeles hacia abajo
+            left: 5,
+            child: Transform.rotate(
+              angle: 15 * 3.14159 / 180, // 30 grados en radianes
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    colors: gradientColors,
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+          // Segunda capa con border radius
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                color: Colors.white, // Capa blanca sólida como base
+              ),
+            ),
+          ),
+          // Tercera capa con gradiente suave
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: gradientColors.map((color) => color.withOpacity(0.4)).toList(),
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Capa de filtro blur
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                child: Container(
+                  color: Colors.white.withOpacity(0.2),
+                ),
+              ),
+            ),
+          ),
+          // Logo centrado al frente
+          Center(child: iconWidget),
+        ],
       ),
     );
   }
