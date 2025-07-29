@@ -387,11 +387,17 @@ class InfluencerDetailPage extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-              child: Container(
-                color: Colors.white.withOpacity(0.3),
-              ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                    child: Container(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Center(
@@ -570,7 +576,7 @@ class InfluencerDetailPage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
           child: Container(
             color: Colors.white.withOpacity(0.6),
             child: Center(child: iconWidget),
@@ -615,6 +621,45 @@ class InfluencerDetailPage extends StatelessWidget {
     return url; // Fallback
   }
 
+  // ===== MÉTODO PARA OBTENER COLORES DE DEGRADADO POR RED SOCIAL =====
+  List<Color> _getSocialGradientColors(String socialName) {
+    String lowerName = socialName.toLowerCase();
+    
+    if (lowerName.contains("instagram")) {
+      return [
+        Color(0xFFF58529), // Naranja
+        Color(0xFFDD2A7B), // Rosa
+        Color(0xFF8134AF), // Morado
+        Color(0xFF515BD4), // Azul
+      ];
+    } else if (lowerName.contains("tiktok")) {
+      return [
+        Color(0xFF00F2EA), // Turquesa
+        Color(0xFFEE1D52), // Rosa
+      ];
+    } else if (lowerName.contains("youtube")) {
+      return [
+        Color(0xFFFF0000), // Rojo YouTube
+        Color(0xFF282828), // Rojo más oscuro
+      ];
+    } else if (lowerName.contains("twitch")) {
+      return [
+        Color(0xFF9146FF), // Morado Twitch
+        Color(0xFFB877FF), // Morado más claro
+      ];
+    } else if (lowerName.contains("facebook")) {
+      return [
+        Color(0xFF1877F2), // Azul Facebook
+        Color(0xFF42A5F5), // Azul más claro
+      ];
+    } else {
+      return [
+        Colors.grey.shade400,
+        Colors.grey.shade600,
+      ];
+    }
+  }
+
   Widget _buildStatColumn(String value, String label) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -629,7 +674,7 @@ class InfluencerDetailPage extends StatelessWidget {
         SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(fontWeight: FontWeight.w100, color: Colors.grey[700], fontSize: 12),
+          style: TextStyle(fontWeight: FontWeight.w100, color: Colors.black54, fontSize: 12),
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
           textAlign: TextAlign.center,
@@ -761,28 +806,50 @@ class InfluencerDetailPage extends StatelessWidget {
 
               return Container(
                 width: double.infinity,
-                margin: EdgeInsets.only(bottom: 8),
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    side: BorderSide(color: Colors.grey.shade300, width: 1),
-                    backgroundColor: Colors.white,
+                margin: EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                    colors: _getSocialGradientColors(social.name),
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  onPressed: () {
-                    launchUrl(Uri.parse(url));
-                  },
-                  child: Row(
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Stack(
                     children: [
-                      _getSocialIcon(social.name),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: _buildSocials(context, exampleSocials.where((mockSocial) => 
-                          mockSocial.socialName.toLowerCase() == social.name.toLowerCase()).toList()),
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                          child: Container(
+                            color: Colors.white.withOpacity(0.91),
+                          ),
+                        ),
                       ),
-                      //Icon(Icons.open_in_new, size: 18, color: Colors.grey[600]),
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(8),
+                          onTap: () {
+                            launchUrl(Uri.parse(url));
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                            child: Row(
+                              children: [
+                                _getSocialIcon(social.name),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildSocials(context, exampleSocials.where((mockSocial) => 
+                                    mockSocial.socialName.toLowerCase() == social.name.toLowerCase()).toList()),
+                                ),
+                                //Icon(Icons.open_in_new, size: 18, color: Colors.grey[600]),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
