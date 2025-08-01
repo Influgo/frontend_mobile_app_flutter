@@ -4,6 +4,7 @@ import 'package:frontend_mobile_app_flutter/features/events/data/models/event_mo
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/card_info_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/pill_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/section_title_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/application_page.dart';
 
 class EventDetailPage extends StatelessWidget {
   final Event event;
@@ -12,13 +13,16 @@ class EventDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat dateFormat = DateFormat('EEEE d MMM yyyy', 'es');
-    final DateFormat timeFormat = DateFormat('h:mma', 'es');
+    final DateFormat dayFormat = DateFormat('EEEE d', 'es'); // Lunes 21
+    final DateFormat dateFormat = DateFormat('d MMM yyyy', 'es');
+    final DateFormat timeFormat = DateFormat('h:mm a', 'es');
 
     final String formattedDate =
         dateFormat.format(event.eventDetailsStartDateEvent);
+    final String formattedDayDate =
+        dayFormat.format(event.eventDetailsStartDateEvent);
     final String formattedTimeRange =
-        '${timeFormat.format(event.eventDetailsStartDateEvent)} – ${timeFormat.format(event.eventDetailsEndDateEvent)}';
+        'de ${timeFormat.format(event.eventDetailsStartDateEvent)} - ${timeFormat.format(event.eventDetailsEndDateEvent)}';
 
     final String defaultImageUrl =
         'https://cdn.pixabay.com/photo/2024/11/25/10/38/mountains-9223041_1280.jpg';
@@ -28,6 +32,7 @@ class EventDetailPage extends StatelessWidget {
         : defaultImageUrl;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF9F9F9),
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
@@ -87,7 +92,7 @@ class EventDetailPage extends StatelessWidget {
                       const SizedBox(height: 24),
                       SectionTitleWidget("Detalles del evento"),
                       Text(
-                        '$formattedDate de $formattedTimeRange',
+                        '$formattedDayDate $formattedTimeRange',
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(height: 24),
@@ -118,10 +123,70 @@ class EventDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       SectionTitleWidget("Ubicación"),
-                      Text(
-                        "Jr. Enrique Barreda 234 Urb Las Palmeras, La Molina, Lima- Perú",
-                        style: const TextStyle(fontSize: 14),
+                      if (event.address.isEmpty || event.address == 'Sin dirección')
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.location_on_outlined,
+                                  size: 18, color: Colors.grey[700]),
+                              const SizedBox(width: 8),
+                              const Expanded(
+                                child: Text(
+                                  "Jr. Enrique Barreda 234 Urb Las Palmeras, La Molina, Lima- Perú",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.location_on_outlined,
+                                  size: 18, color: Colors.grey[700]),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  event.address,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ApplicationPage(event: event),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          child: const Text(
+                            'Postular',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                       ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),

@@ -16,7 +16,7 @@ class CardInfoWidget extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xfff3f4f6),
+        color: const Color(0xFFF2F2F7),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

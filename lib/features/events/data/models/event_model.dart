@@ -82,6 +82,7 @@ class Event {
   final double jobDetailsPayFare;
   final bool jobDetailsShowPayment;
   final int jobDetailsQuantityOfPeople;
+  final String address;
 
   Event({
     required this.id,
@@ -95,6 +96,7 @@ class Event {
     required this.jobDetailsPayFare,
     required this.jobDetailsShowPayment,
     required this.jobDetailsQuantityOfPeople,
+    required this.address,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -117,6 +119,7 @@ class Event {
         jobDetailsPayFare: (json['jobDetailsPayFare'] ?? 0).toDouble(),
         jobDetailsShowPayment: json['jobDetailsShowPayment'] ?? false,
         jobDetailsQuantityOfPeople: json['jobDetailsQuantityOfPeople'] ?? 0,
+        address: json['address'] ?? 'Sin dirección',
       );
     } catch (e) {
       debugPrint('Error parsing event: $e');

@@ -90,6 +90,7 @@ class ExploraDetailPage extends StatelessWidget {
         designLogoTopPosition + designLogoDiameter + 10;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF9F9F9),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
