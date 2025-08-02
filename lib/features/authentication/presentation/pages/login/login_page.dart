@@ -61,7 +61,7 @@ class LoginPageState extends State<LoginPage> {
         String token = responseData['token'] ?? '';
         String userIdentifier = responseData['userIdentifier'] ?? '';
         String userId = responseData['userId']?.toString() ?? '';
-        
+
         if (token.isNotEmpty) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
@@ -70,10 +70,10 @@ class LoginPageState extends State<LoginPage> {
           logger.i('userIdentifier almacenado exitosamente');
           await prefs.setString('userId', userId);
           logger.i('userId almacenado exitosamente');
-          
+
           // Obtener el rol del usuario desde el endpoint de account
           await _fetchAndStoreUserRole(token, userIdentifier, userId, prefs, logger);
-          
+
           logger.i('Token: $token');
           logger.i('userIdentifier: $userIdentifier');
           logger.i('userId: $userId');
@@ -99,7 +99,7 @@ class LoginPageState extends State<LoginPage> {
     try {
       // Usar userIdentifier primero, si no está disponible usar userId
       final identifier = userIdentifier.isNotEmpty ? userIdentifier : userId;
-      
+
       final accountResponse = await http.get(
         Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$identifier'),
         headers: {
@@ -110,7 +110,7 @@ class LoginPageState extends State<LoginPage> {
 
       if (accountResponse.statusCode == 200) {
         final Map<String, dynamic> accountData = json.decode(accountResponse.body);
-        
+
         // Extraer el rol del usuario de roles[0].role.name
         String userRole = '';
         if (accountData['roles'] != null && accountData['roles'].isNotEmpty) {
@@ -119,7 +119,7 @@ class LoginPageState extends State<LoginPage> {
             userRole = roles[0]['role']['name'] ?? '';
           }
         }
-        
+
         if (userRole.isNotEmpty) {
           await prefs.setString('userRole', userRole);
           logger.i('userRole almacenado exitosamente: $userRole');
@@ -142,123 +142,131 @@ class LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween, // Distribuye los elementos
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const InfluyoLogo(),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Iniciar sesión',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Ingresa tus datos para acceder a tu cuenta',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 32),
-                      CustomEmailOrNumberField(
-                        label: 'Correo, número o teléfono',
-                        controller: _identifierController,
-                        maxLength: 100,
-                      ),
-                      const SizedBox(height: 16),
-                      PasswordField(
-                        controller: _passwordController,
-                        label: "Contraseña",
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ForgotPasswordPage(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const InfluyoLogo(),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Iniciar sesión',
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
                               ),
-                            );
-                          },
-                          child: const Text('¿Olvidaste tu contraseña?'),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Ingresa tus datos para acceder a tu cuenta',
+                              style: TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            const SizedBox(height: 32),
+                            CustomEmailOrNumberField(
+                              label: 'Correo, número o teléfono',
+                              controller: _identifierController,
+                              maxLength: 100,
+                            ),
+                            const SizedBox(height: 16),
+                            PasswordField(
+                              controller: _passwordController,
+                              label: "Contraseña",
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => const ForgotPasswordPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text('¿Olvidaste tu contraseña?'),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _validateAndLogin,
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 24),
+                                  backgroundColor: const Color.fromARGB(255, 34, 34, 34),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Iniciar sesión',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Ingresar como invitado',
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 34, 34, 34),
+                                  decoration: TextDecoration.underline,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _validateAndLogin,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 24),
-                            backgroundColor:
-                                const Color.fromARGB(255, 34, 34, 34),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 30),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text.rich(
+                            TextSpan(
+                              text: '¿No tienes una cuenta? ',
+                              style: const TextStyle(fontSize: 14),
+                              children: [
+                                TextSpan(
+                                  text: 'Regístrate',
+                                  style: const TextStyle(
+                                    color: Color(0xFF6A6A6A),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.of(context).pushReplacement(
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, _, __) => const RegisterPage(),
+                                        ),
+                                      );
+                                    },
+                                ),
+                              ],
                             ),
                           ),
-                          child: const Text(
-                            'Iniciar sesión',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Ingresar como invitado',
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 34, 34, 34),
-                            decoration: TextDecoration.underline,
-                            fontSize: 13,
-                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text.rich(
-                  TextSpan(
-                    text: '¿No tienes una cuenta? ',
-                    style: const TextStyle(fontSize: 14),
-                    children: [
-                      TextSpan(
-                        text: 'Regístrate',
-                        style: const TextStyle(
-                          color: Color(0xFF6A6A6A),
-                          decoration: TextDecoration.underline,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            Navigator.of(context).pushReplacement(
-                              PageRouteBuilder(
-                                pageBuilder: (context, _, __) =>
-                                    const RegisterPage(),
-                              ),
-                            );
-                          },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
