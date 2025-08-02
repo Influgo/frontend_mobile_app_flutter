@@ -83,11 +83,14 @@ class _Step2InfluencerRegisterPageState
     super.dispose();
   }
 
-  void validateAndContinue() {
+  Future<void> validateAndContinue() async {
     if (isProcessing) return;
     setState(() {
       isProcessing = true;
     });
+
+    bool valid = false;
+
     setState(() {
       if (!showInstagramField && !showTiktokField) {
         socialMediaEmpty =
@@ -118,55 +121,61 @@ class _Step2InfluencerRegisterPageState
         twitchEmpty = null;
       }
 
-      if ([
+      valid = [
         socialMediaEmpty,
         instagramEmpty,
         tiktokEmpty,
         youtubeEmpty,
         twitchEmpty
-      ].every((error) => error == null)) {
-        var logger = Logger();
-        List<Map<String, String>> socials = [];
-
-        if (showInstagramField) {
-          socials.add({
-            "name": "Instagram",
-            "socialUrl":
-            "https://instagram.com/${instagramController.text.trim()}"
-          });
-        }
-        if (showTiktokField) {
-          socials.add({
-            "name": "Tiktok",
-            "socialUrl":
-            "https://www.tiktok.com/@${tiktokController.text.trim()}"
-          });
-        }
-        if (showYoutubeField) {
-          socials.add({
-            "name": "Youtube",
-            "socialUrl":
-            "https://www.youtube.com/@${youtubeController.text.trim()}"
-          });
-        }
-        if (showTwitchField) {
-          socials.add({
-            "name": "Twitch",
-            "socialUrl": "https://www.twitch.tv/${twitchController.text.trim()}"
-          });
-        }
-
-        Map<String, dynamic> requestBody = {
-          "socials": socials,
-        };
-
-        logger.i('Request Body: $requestBody');
-        _saveDataLocally();
-        RegisterPage.updateRequestBody(context, requestBody);
-        FocusScope.of(context).unfocus();
-        RegisterPage.goToNextStep(context);
-      }
+      ].every((error) => error == null);
     });
+
+    if (valid) {
+      var logger = Logger();
+      List<Map<String, String>> socials = [];
+
+      if (showInstagramField) {
+        socials.add({
+          "name": "Instagram",
+          "socialUrl":
+          "https://instagram.com/${instagramController.text.trim()}"
+        });
+      }
+      if (showTiktokField) {
+        socials.add({
+          "name": "Tiktok",
+          "socialUrl":
+          "https://www.tiktok.com/@${tiktokController.text.trim()}"
+        });
+      }
+      if (showYoutubeField) {
+        socials.add({
+          "name": "Youtube",
+          "socialUrl":
+          "https://www.youtube.com/@${youtubeController.text.trim()}"
+        });
+      }
+      if (showTwitchField) {
+        socials.add({
+          "name": "Twitch",
+          "socialUrl":
+          "https://www.twitch.tv/${twitchController.text.trim()}"
+        });
+      }
+
+      Map<String, dynamic> requestBody = {
+        "socials": socials,
+      };
+
+      logger.i('Request Body: $requestBody');
+      await _saveDataLocally();
+      RegisterPage.updateRequestBody(context, requestBody);
+
+      FocusScope.of(context).unfocus();
+      await Future.delayed(const Duration(milliseconds: 500));
+      RegisterPage.goToNextStep(context);
+    }
+
     setState(() {
       isProcessing = false;
     });
@@ -220,7 +229,7 @@ class _Step2InfluencerRegisterPageState
                             showInstagramField = value ?? false;
                           });
                           if (showInstagramField) {
-                            Future.delayed(Duration(milliseconds: 100),
+                            Future.delayed(const Duration(milliseconds: 100),
                                     () {
                                   FocusScope.of(context)
                                       .requestFocus(instagramFocusNode);
@@ -259,7 +268,7 @@ class _Step2InfluencerRegisterPageState
                             showTiktokField = value ?? false;
                           });
                           if (showTiktokField) {
-                            Future.delayed(Duration(milliseconds: 100),
+                            Future.delayed(const Duration(milliseconds: 100),
                                     () {
                                   FocusScope.of(context)
                                       .requestFocus(tiktokFocusNode);
@@ -305,7 +314,7 @@ class _Step2InfluencerRegisterPageState
                             showYoutubeField = value ?? false;
                           });
                           if (showYoutubeField) {
-                            Future.delayed(Duration(milliseconds: 100),
+                            Future.delayed(const Duration(milliseconds: 100),
                                     () {
                                   FocusScope.of(context)
                                       .requestFocus(youtubeFocusNode);
@@ -344,7 +353,7 @@ class _Step2InfluencerRegisterPageState
                             showTwitchField = value ?? false;
                           });
                           if (showTwitchField) {
-                            Future.delayed(Duration(milliseconds: 100),
+                            Future.delayed(const Duration(milliseconds: 100),
                                     () {
                                   FocusScope.of(context)
                                       .requestFocus(twitchFocusNode);
