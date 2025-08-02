@@ -55,13 +55,11 @@ class LoginPageState extends State<LoginPage> {
       logger.i('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Decodificar la respuesta JSON
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        // Extraer el token
         String token = responseData['token'] ?? '';
         String userIdentifier = responseData['userIdentifier'] ?? '';
         String userId = responseData['userId']?.toString() ?? '';
-        
+
         if (token.isNotEmpty) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
@@ -70,10 +68,9 @@ class LoginPageState extends State<LoginPage> {
           logger.i('userIdentifier almacenado exitosamente');
           await prefs.setString('userId', userId);
           logger.i('userId almacenado exitosamente');
-          
-          // Obtener el rol del usuario desde el endpoint de account
+
           await _fetchAndStoreUserRole(token, userIdentifier, userId, prefs, logger);
-          
+
           logger.i('Token: $token');
           logger.i('userIdentifier: $userIdentifier');
           logger.i('userId: $userId');
@@ -97,9 +94,8 @@ class LoginPageState extends State<LoginPage> {
 
   Future<void> _fetchAndStoreUserRole(String token, String userIdentifier, String userId, SharedPreferences prefs, Logger logger) async {
     try {
-      // Usar userIdentifier primero, si no está disponible usar userId
       final identifier = userIdentifier.isNotEmpty ? userIdentifier : userId;
-      
+
       final accountResponse = await http.get(
         Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$identifier'),
         headers: {
@@ -110,8 +106,7 @@ class LoginPageState extends State<LoginPage> {
 
       if (accountResponse.statusCode == 200) {
         final Map<String, dynamic> accountData = json.decode(accountResponse.body);
-        
-        // Extraer el rol del usuario de roles[0].role.name
+
         String userRole = '';
         if (accountData['roles'] != null && accountData['roles'].isNotEmpty) {
           final roles = accountData['roles'] as List;
@@ -119,7 +114,7 @@ class LoginPageState extends State<LoginPage> {
             userRole = roles[0]['role']['name'] ?? '';
           }
         }
-        
+
         if (userRole.isNotEmpty) {
           await prefs.setString('userRole', userRole);
           logger.i('userRole almacenado exitosamente: $userRole');
@@ -141,10 +136,10 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false, // <- Esto es importante
       body: SafeArea(
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceBetween, // Distribuye los elementos
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -185,7 +180,7 @@ class LoginPageState extends State<LoginPage> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const ForgotPasswordPage(),
+                                const ForgotPasswordPage(),
                               ),
                             );
                           },
@@ -200,7 +195,7 @@ class LoginPageState extends State<LoginPage> {
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 24),
                             backgroundColor:
-                                const Color.fromARGB(255, 34, 34, 34),
+                            const Color.fromARGB(255, 34, 34, 34),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5),
                             ),
@@ -248,7 +243,7 @@ class LoginPageState extends State<LoginPage> {
                             Navigator.of(context).pushReplacement(
                               PageRouteBuilder(
                                 pageBuilder: (context, _, __) =>
-                                    const RegisterPage(),
+                                const RegisterPage(),
                               ),
                             );
                           },

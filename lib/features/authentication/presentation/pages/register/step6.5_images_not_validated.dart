@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
-import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
 class Step65ImagesNotValidatedPage extends StatefulWidget {
@@ -21,15 +21,14 @@ class Step65ImagesNotValidatedPage extends StatefulWidget {
 class _Step65ImagesNotValidatedPageState
     extends State<Step65ImagesNotValidatedPage> {
   void retryProcess() {
-    // Opción alternativa: usar el método estático para navegar al Step3
-    // pero primero necesitamos regresar al contexto de RegisterPage
-    Navigator.of(context).popUntil(
-        (route) => route.settings.name == '/register' || route.isFirst);
-
-    // Luego navegar al Step3 usando el método estático
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      RegisterPage.goToStep(context, 3);
-    });
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => Step4RegisterPage(
+          onImageCaptured: (image) {},
+        ),
+      ),
+          (route) => false,
+    );
   }
 
   @override
@@ -78,7 +77,7 @@ class _Step65ImagesNotValidatedPageState
                     child: Text(
                       'Error al registrar las fotos',
                       style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                      TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
                       textAlign: TextAlign.center,
                     ),
                   ),

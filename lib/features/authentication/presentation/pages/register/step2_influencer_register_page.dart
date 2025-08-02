@@ -83,15 +83,18 @@ class _Step2InfluencerRegisterPageState
     super.dispose();
   }
 
-  void validateAndContinue() {
+  Future<void> validateAndContinue() async {
     if (isProcessing) return;
     setState(() {
       isProcessing = true;
     });
+
+    bool valid = false;
+
     setState(() {
       if (!showInstagramField && !showTiktokField) {
         socialMediaEmpty =
-            'Debe seleccionar al menos Instagram o Tiktok como red social';
+        'Debe seleccionar al menos Instagram o Tiktok como red social';
       } else {
         socialMediaEmpty = null;
         if (showInstagramField && instagramController.text.trim().isEmpty) {
@@ -118,55 +121,61 @@ class _Step2InfluencerRegisterPageState
         twitchEmpty = null;
       }
 
-      if ([
+      valid = [
         socialMediaEmpty,
         instagramEmpty,
         tiktokEmpty,
         youtubeEmpty,
         twitchEmpty
-      ].every((error) => error == null)) {
-        var logger = Logger();
-        List<Map<String, String>> socials = [];
-
-        if (showInstagramField) {
-          socials.add({
-            "name": "Instagram",
-            "socialUrl":
-                "https://instagram.com/${instagramController.text.trim()}"
-          });
-        }
-        if (showTiktokField) {
-          socials.add({
-            "name": "Tiktok",
-            "socialUrl":
-                "https://www.tiktok.com/@${tiktokController.text.trim()}"
-          });
-        }
-        if (showYoutubeField) {
-          socials.add({
-            "name": "Youtube",
-            "socialUrl":
-                "https://www.youtube.com/@${youtubeController.text.trim()}"
-          });
-        }
-        if (showTwitchField) {
-          socials.add({
-            "name": "Twitch",
-            "socialUrl": "https://www.twitch.tv/${twitchController.text.trim()}"
-          });
-        }
-
-        Map<String, dynamic> requestBody = {
-          "socials": socials,
-        };
-
-        logger.i('Request Body: $requestBody');
-        _saveDataLocally();
-        RegisterPage.updateRequestBody(context, requestBody);
-        FocusScope.of(context).unfocus();
-        RegisterPage.goToNextStep(context);
-      }
+      ].every((error) => error == null);
     });
+
+    if (valid) {
+      var logger = Logger();
+      List<Map<String, String>> socials = [];
+
+      if (showInstagramField) {
+        socials.add({
+          "name": "Instagram",
+          "socialUrl":
+          "https://instagram.com/${instagramController.text.trim()}"
+        });
+      }
+      if (showTiktokField) {
+        socials.add({
+          "name": "Tiktok",
+          "socialUrl":
+          "https://www.tiktok.com/@${tiktokController.text.trim()}"
+        });
+      }
+      if (showYoutubeField) {
+        socials.add({
+          "name": "Youtube",
+          "socialUrl":
+          "https://www.youtube.com/@${youtubeController.text.trim()}"
+        });
+      }
+      if (showTwitchField) {
+        socials.add({
+          "name": "Twitch",
+          "socialUrl":
+          "https://www.twitch.tv/${twitchController.text.trim()}"
+        });
+      }
+
+      Map<String, dynamic> requestBody = {
+        "socials": socials,
+      };
+
+      logger.i('Request Body: $requestBody');
+      await _saveDataLocally();
+      RegisterPage.updateRequestBody(context, requestBody);
+
+      FocusScope.of(context).unfocus();
+      await Future.delayed(const Duration(milliseconds: 500));
+      RegisterPage.goToNextStep(context);
+    }
+
     setState(() {
       isProcessing = false;
     });
@@ -176,7 +185,8 @@ class _Step2InfluencerRegisterPageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
+      resizeToAvoidBottomInset: false,
+      body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
@@ -184,207 +194,215 @@ class _Step2InfluencerRegisterPageState
               children: [
                 const InfluyoLogo(),
                 GradientBars(barCount: 2),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 20.0),
-                      children: [
-                        const Text(
-                          'Ingresa tus redes sociales',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Ingresa el usuario de las redes sociales que administras',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Instagram',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showInstagramField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showInstagramField = value ?? false;
-                                });
-                                if (showInstagramField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(instagramFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showInstagramField) ...[
-                          CustomUsernameField(
-                            label: 'Usuario de Instagram',
-                            controller: instagramController,
-                            maxLength: 100,
-                            focusNode: instagramFocusNode,
-                          ),
-                          if (instagramEmpty != null)
-                            ErrorTextWidget(error: instagramEmpty!),
-                          const SizedBox(height: 8),
-                        ],
-                        const FormSeparator(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Tiktok',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showTiktokField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showTiktokField = value ?? false;
-                                });
-                                if (showTiktokField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(tiktokFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showTiktokField) ...[
-                          CustomUsernameField(
-                            label: 'Usuario de Tiktok',
-                            controller: tiktokController,
-                            maxLength: 100,
-                            focusNode: tiktokFocusNode,
-                          ),
-                          if (tiktokEmpty != null)
-                            ErrorTextWidget(error: tiktokEmpty!),
-                        ],
-                        if (socialMediaEmpty != null)
-                          ErrorTextWidget(error: socialMediaEmpty!),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Otras redes sociales (opcional)',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Youtube',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showYoutubeField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showYoutubeField = value ?? false;
-                                });
-                                if (showYoutubeField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(youtubeFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showYoutubeField) ...[
-                          CustomUsernameField(
-                            label: 'Canal de Youtube',
-                            controller: youtubeController,
-                            maxLength: 100,
-                            focusNode: youtubeFocusNode,
-                          ),
-                          if (youtubeEmpty != null)
-                            ErrorTextWidget(error: youtubeEmpty!),
-                          const SizedBox(height: 8),
-                        ],
-                        const FormSeparator(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Twitch',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showTwitchField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showTwitchField = value ?? false;
-                                });
-                                if (showTwitchField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(twitchFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showTwitchField) ...[
-                          CustomUsernameField(
-                            label: 'Canal de Twitch',
-                            controller: twitchController,
-                            maxLength: 100,
-                            focusNode: twitchFocusNode,
-                          ),
-                          if (twitchEmpty != null)
-                            ErrorTextWidget(error: twitchEmpty!),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
-          Positioned(
-            bottom: 16,
-            left: 30,
-            right: 30,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF222222),
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-              ),
-              onPressed: validateAndContinue,
-              child: const Text(
-                'Continuar',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Ingresa tus redes sociales',
+                    style: TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Ingresa el usuario de las redes sociales que administras',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Instagram',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showInstagramField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showInstagramField = value ?? false;
+                          });
+                          if (showInstagramField) {
+                            Future.delayed(const Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(instagramFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showInstagramField) ...[
+                    CustomUsernameField(
+                      label: 'Usuario de Instagram',
+                      controller: instagramController,
+                      maxLength: 100,
+                      focusNode: instagramFocusNode,
+                    ),
+                    if (instagramEmpty != null)
+                      ErrorTextWidget(error: instagramEmpty!),
+                    const SizedBox(height: 8),
+                  ],
+                  const FormSeparator(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tiktok',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showTiktokField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showTiktokField = value ?? false;
+                          });
+                          if (showTiktokField) {
+                            Future.delayed(const Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(tiktokFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showTiktokField) ...[
+                    CustomUsernameField(
+                      label: 'Usuario de Tiktok',
+                      controller: tiktokController,
+                      maxLength: 100,
+                      focusNode: tiktokFocusNode,
+                    ),
+                    if (tiktokEmpty != null)
+                      ErrorTextWidget(error: tiktokEmpty!),
+                  ],
+                  if (socialMediaEmpty != null)
+                    ErrorTextWidget(error: socialMediaEmpty!),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Otras redes sociales (opcional)',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Youtube',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showYoutubeField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showYoutubeField = value ?? false;
+                          });
+                          if (showYoutubeField) {
+                            Future.delayed(const Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(youtubeFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showYoutubeField) ...[
+                    CustomUsernameField(
+                      label: 'Canal de Youtube',
+                      controller: youtubeController,
+                      maxLength: 100,
+                      focusNode: youtubeFocusNode,
+                    ),
+                    if (youtubeEmpty != null)
+                      ErrorTextWidget(error: youtubeEmpty!),
+                    const SizedBox(height: 8),
+                  ],
+                  const FormSeparator(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Twitch',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showTwitchField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showTwitchField = value ?? false;
+                          });
+                          if (showTwitchField) {
+                            Future.delayed(const Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(twitchFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showTwitchField) ...[
+                    CustomUsernameField(
+                      label: 'Canal de Twitch',
+                      controller: twitchController,
+                      maxLength: 100,
+                      focusNode: twitchFocusNode,
+                    ),
+                    if (twitchEmpty != null)
+                      ErrorTextWidget(error: twitchEmpty!),
+                  ],
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF222222),
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                      ),
+                      onPressed: isProcessing ? null : validateAndContinue,
+                      child: isProcessing
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : const Text(
+                        'Continuar',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),

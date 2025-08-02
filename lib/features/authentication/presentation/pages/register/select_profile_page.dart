@@ -18,6 +18,9 @@ class SelectProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Solución: Cierra el teclado al entrar a esta pantalla
+    FocusScope.of(context).unfocus();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -81,7 +84,7 @@ class SelectProfilePage extends StatelessWidget {
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
-                                        const LoginPage(),
+                                const LoginPage(),
                                 transitionsBuilder: (context, animation,
                                     secondaryAnimation, child) {
                                   return child;
