@@ -29,20 +29,17 @@ class _Step2EntrepreneurRegisterPageState
   final TextEditingController facebookController = TextEditingController();
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController youtubeController = TextEditingController();
-  //final TextEditingController twitchController = TextEditingController();
   bool isProcessing = false;
 
   final FocusNode instagramFocusNode = FocusNode();
   final FocusNode facebookFocusNode = FocusNode();
   final FocusNode tiktokFocusNode = FocusNode();
   final FocusNode youtubeFocusNode = FocusNode();
-  //final FocusNode twitchFocusNode = FocusNode();
 
   bool showInstagramField = false;
   bool showFacebookField = false;
   bool showTiktokField = false;
   bool showYoutubeField = false;
-  //bool showTwitchField = false;
 
   String? businessNameEmpty;
   String? businessNicknameEmpty;
@@ -52,7 +49,6 @@ class _Step2EntrepreneurRegisterPageState
   String? facebookEmpty;
   String? tiktokEmpty;
   String? youtubeEmpty;
-  //String? twitchEmpty;
 
   @override
   void initState() {
@@ -73,14 +69,12 @@ class _Step2EntrepreneurRegisterPageState
       facebookController.text = prefs.getString('facebook_register') ?? '';
       tiktokController.text = prefs.getString('tiktok_register') ?? '';
       youtubeController.text = prefs.getString('youtube_register') ?? '';
-      //twitchController.text = prefs.getString('twitch_register') ?? '';
       showInstagramField =
           prefs.getBool('show_instagram_field_register') ?? false;
       showFacebookField =
           prefs.getBool('show_facebook_field_register') ?? false;
       showTiktokField = prefs.getBool('show_tiktok_field_register') ?? false;
       showYoutubeField = prefs.getBool('show_youtube_field_register') ?? false;
-      //showTwitchField = prefs.getBool('show_twitch_field_register') ?? false;
     });
   }
 
@@ -95,12 +89,10 @@ class _Step2EntrepreneurRegisterPageState
     await prefs.setString('facebook_register', facebookController.text);
     await prefs.setString('tiktok_register', tiktokController.text);
     await prefs.setString('youtube_register', youtubeController.text);
-    //await prefs.setString('twitch_register', twitchController.text);
     await prefs.setBool('show_instagram_field_register', showInstagramField);
     await prefs.setBool('show_facebook_field_register', showFacebookField);
     await prefs.setBool('show_tiktok_field_register', showTiktokField);
     await prefs.setBool('show_youtube_field_register', showYoutubeField);
-    //await prefs.setBool('show_twitch_field_register', showTwitchField);
   }
 
   @override
@@ -109,15 +101,19 @@ class _Step2EntrepreneurRegisterPageState
     facebookFocusNode.dispose();
     tiktokFocusNode.dispose();
     youtubeFocusNode.dispose();
-    //twitchFocusNode.dispose();
     super.dispose();
   }
 
-  void validateAndContinue() {
+  Future<void> validateAndContinue() async {
     if (isProcessing) return;
     setState(() {
       isProcessing = true;
     });
+
+    // Cierra el teclado y espera un momento para que el teclado se oculte realmente
+    FocusScope.of(context).unfocus();
+    await Future.delayed(const Duration(milliseconds: 400));
+
     setState(() {
       businessNameEmpty = businessNameController.text.trim().isEmpty
           ? 'Nombre del emprendimiento es requerido'
@@ -158,13 +154,6 @@ class _Step2EntrepreneurRegisterPageState
       } else {
         youtubeEmpty = null;
       }
-      /*
-      if (showTwitchField && twitchController.text.trim().isEmpty) {
-        twitchEmpty = 'Debe ingresar su canal de Twitch';
-      } else {
-        twitchEmpty = null;
-      }
-      */
 
       if ([
         businessNameEmpty,
@@ -175,7 +164,6 @@ class _Step2EntrepreneurRegisterPageState
         facebookEmpty,
         tiktokEmpty,
         youtubeEmpty,
-        //twitchEmpty
       ].every((error) => error == null)) {
         var logger = Logger();
         List<Map<String, String>> socials = [];
@@ -208,14 +196,6 @@ class _Step2EntrepreneurRegisterPageState
             "https://www.youtube.com/@${youtubeController.text.trim()}"
           });
         }
-        /*
-        if (showTwitchField) {
-          socials.add({
-            "name": "Twitch",
-            "socialUrl": "https://www.twitch.tv/${twitchController.text.trim()}"
-          });
-        }
-        */
         Map<String, dynamic> requestBody = {
           "entrepreneurshipName": businessNameController.text.trim(),
           "entrepreneursNickname": businessNicknameController.text.trim(),
@@ -226,7 +206,6 @@ class _Step2EntrepreneurRegisterPageState
         logger.i('Request Body: $requestBody');
         _saveDataLocally();
         RegisterPage.updateRequestBody(context, requestBody);
-        FocusScope.of(context).unfocus();
         RegisterPage.goToNextStep(context);
       }
     });
@@ -477,8 +456,17 @@ class _Step2EntrepreneurRegisterPageState
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
                       ),
-                      onPressed: validateAndContinue,
-                      child: const Text(
+                      onPressed: isProcessing ? null : validateAndContinue,
+                      child: isProcessing
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : const Text(
                         'Continuar',
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
