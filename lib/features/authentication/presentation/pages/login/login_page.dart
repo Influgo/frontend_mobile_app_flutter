@@ -55,9 +55,7 @@ class LoginPageState extends State<LoginPage> {
       logger.i('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Decodificar la respuesta JSON
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        // Extraer el token
         String token = responseData['token'] ?? '';
         String userIdentifier = responseData['userIdentifier'] ?? '';
         String userId = responseData['userId']?.toString() ?? '';
@@ -71,7 +69,6 @@ class LoginPageState extends State<LoginPage> {
           await prefs.setString('userId', userId);
           logger.i('userId almacenado exitosamente');
 
-          // Obtener el rol del usuario desde el endpoint de account
           await _fetchAndStoreUserRole(token, userIdentifier, userId, prefs, logger);
 
           logger.i('Token: $token');
@@ -97,7 +94,6 @@ class LoginPageState extends State<LoginPage> {
 
   Future<void> _fetchAndStoreUserRole(String token, String userIdentifier, String userId, SharedPreferences prefs, Logger logger) async {
     try {
-      // Usar userIdentifier primero, si no está disponible usar userId
       final identifier = userIdentifier.isNotEmpty ? userIdentifier : userId;
 
       final accountResponse = await http.get(
@@ -111,7 +107,6 @@ class LoginPageState extends State<LoginPage> {
       if (accountResponse.statusCode == 200) {
         final Map<String, dynamic> accountData = json.decode(accountResponse.body);
 
-        // Extraer el rol del usuario de roles[0].role.name
         String userRole = '';
         if (accountData['roles'] != null && accountData['roles'].isNotEmpty) {
           final roles = accountData['roles'] as List;
@@ -141,123 +136,85 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false, // <- Esto es importante
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: IntrinsicHeight(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const InfluyoLogo(),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Iniciar sesión',
-                              style: TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Ingresa tus datos para acceder a tu cuenta',
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 32),
-                            CustomEmailOrNumberField(
-                              label: 'Correo, número o teléfono',
-                              controller: _identifierController,
-                              maxLength: 100,
-                            ),
-                            const SizedBox(height: 16),
-                            PasswordField(
-                              controller: _passwordController,
-                              label: "Contraseña",
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => const ForgotPasswordPage(),
-                                    ),
-                                  );
-                                },
-                                child: const Text('¿Olvidaste tu contraseña?'),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: _validateAndLogin,
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 24),
-                                  backgroundColor: const Color.fromARGB(255, 34, 34, 34),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Iniciar sesión',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Ingresar como invitado',
-                                style: TextStyle(
-                                  color: const Color.fromARGB(255, 34, 34, 34),
-                                  decoration: TextDecoration.underline,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ],
+                      const InfluyoLogo(),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Iniciar sesión',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 30),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text.rich(
-                            TextSpan(
-                              text: '¿No tienes una cuenta? ',
-                              style: const TextStyle(fontSize: 14),
-                              children: [
-                                TextSpan(
-                                  text: 'Regístrate',
-                                  style: const TextStyle(
-                                    color: Color(0xFF6A6A6A),
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Navigator.of(context).pushReplacement(
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, _, __) => const RegisterPage(),
-                                        ),
-                                      );
-                                    },
-                                ),
-                              ],
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Ingresa tus datos para acceder a tu cuenta',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 32),
+                      CustomEmailOrNumberField(
+                        label: 'Correo, número o teléfono',
+                        controller: _identifierController,
+                        maxLength: 100,
+                      ),
+                      const SizedBox(height: 16),
+                      PasswordField(
+                        controller: _passwordController,
+                        label: "Contraseña",
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                const ForgotPasswordPage(),
+                              ),
+                            );
+                          },
+                          child: const Text('¿Olvidaste tu contraseña?'),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _validateAndLogin,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            backgroundColor:
+                            const Color.fromARGB(255, 34, 34, 34),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
                             ),
+                          ),
+                          child: const Text(
+                            'Iniciar sesión',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Ingresar como invitado',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 34, 34, 34),
+                            decoration: TextDecoration.underline,
+                            fontSize: 13,
                           ),
                         ),
                       ),
@@ -265,8 +222,38 @@ class LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text.rich(
+                  TextSpan(
+                    text: '¿No tienes una cuenta? ',
+                    style: const TextStyle(fontSize: 14),
+                    children: [
+                      TextSpan(
+                        text: 'Regístrate',
+                        style: const TextStyle(
+                          color: Color(0xFF6A6A6A),
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.of(context).pushReplacement(
+                              PageRouteBuilder(
+                                pageBuilder: (context, _, __) =>
+                                const RegisterPage(),
+                              ),
+                            );
+                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
