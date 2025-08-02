@@ -23,7 +23,7 @@ class _Step2EntrepreneurRegisterPageState
     extends State<Step2EntrepreneurRegisterPage> {
   final TextEditingController businessNameController = TextEditingController();
   final TextEditingController businessNicknameController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController rucController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
   final TextEditingController facebookController = TextEditingController();
@@ -126,13 +126,13 @@ class _Step2EntrepreneurRegisterPageState
           ? 'Nickname del emprendimiento es requerido'
           : null;
       rucEmpty = rucController.text.trim().isNotEmpty &&
-              rucController.text.trim().length != 11
+          rucController.text.trim().length != 11
           ? 'RUC debe tener 11 dígitos'
           : null;
 
       if (!showInstagramField && !showTiktokField) {
         socialMediaEmpty =
-            'Debe seleccionar al menos Instagram o Tiktok como red social';
+        'Debe seleccionar al menos Instagram o Tiktok como red social';
       } else {
         socialMediaEmpty = null;
         if (showInstagramField && instagramController.text.trim().isEmpty) {
@@ -184,28 +184,28 @@ class _Step2EntrepreneurRegisterPageState
           socials.add({
             "name": "Instagram",
             "socialUrl":
-                "https://instagram.com/${instagramController.text.trim()}"
+            "https://instagram.com/${instagramController.text.trim()}"
           });
         }
         if (showFacebookField) {
           socials.add({
             "name": "Facebook",
             "socialUrl":
-                "https://www.facebook.com/${facebookController.text.trim()}"
+            "https://www.facebook.com/${facebookController.text.trim()}"
           });
         }
         if (showTiktokField) {
           socials.add({
             "name": "Tiktok",
             "socialUrl":
-                "https://www.tiktok.com/@${tiktokController.text.trim()}"
+            "https://www.tiktok.com/@${tiktokController.text.trim()}"
           });
         }
         if (showYoutubeField) {
           socials.add({
             "name": "Youtube",
             "socialUrl":
-                "https://www.youtube.com/@${youtubeController.text.trim()}"
+            "https://www.youtube.com/@${youtubeController.text.trim()}"
           });
         }
         /*
@@ -239,263 +239,257 @@ class _Step2EntrepreneurRegisterPageState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
-            child: Column(
-              children: [
-                const InfluyoLogo(),
-                GradientBars(barCount: 2),
-                const Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Ingresa los datos de tu emprendimiento',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-                    ),
-                  ),
+      resizeToAvoidBottomInset: false,
+      body: Padding(
+        padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
+        child: Column(
+          children: [
+            const InfluyoLogo(),
+            GradientBars(barCount: 2),
+            const Padding(
+              padding:
+              EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Ingresa los datos de tu emprendimiento',
+                  style:
+                  TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
                 ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Rellena los campos',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 20.0),
-                      children: [
-                        CustomNameField(
-                            label: 'Nombre del emprendimiento',
-                            controller: businessNameController,
-                            maxLength: 100),
-                        if (businessNameEmpty != null)
-                          ErrorTextWidget(error: businessNameEmpty!),
-                        const SizedBox(height: 16),
-                        CustomEmailField(
-                            label: 'Nickname del emprendimiento',
-                            controller: businessNicknameController,
-                            maxLength: 100),
-                        if (businessNicknameEmpty != null)
-                          ErrorTextWidget(error: businessNicknameEmpty!),
-                        const SizedBox(height: 16),
-                        CustomNumberField(
-                          label: 'RUC',
-                          controller: rucController,
-                          maxLength: 11,
-                        ),
-                        if (rucEmpty != null) ErrorTextWidget(error: rucEmpty!),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Ingresa tus redes sociales',
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Ingresa el usuario de las redes sociales que administras',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Instagram',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showInstagramField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showInstagramField = value ?? false;
-                                });
-                                if (showInstagramField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(instagramFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showInstagramField) ...[
-                          CustomUsernameField(
-                            label: 'Usuario de Instagram',
-                            controller: instagramController,
-                            maxLength: 100,
-                            focusNode: instagramFocusNode,
-                          ),
-                          if (instagramEmpty != null)
-                            ErrorTextWidget(error: instagramEmpty!),
-                          const SizedBox(height: 8),
-                        ],
-                        const FormSeparator(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Tiktok',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showTiktokField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showTiktokField = value ?? false;
-                                });
-                                if (showTiktokField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(tiktokFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showTiktokField) ...[
-                          CustomUsernameField(
-                            label: 'Usuario de Tiktok',
-                            controller: tiktokController,
-                            maxLength: 100,
-                            focusNode: tiktokFocusNode,
-                          ),
-                          if (tiktokEmpty != null)
-                            ErrorTextWidget(error: tiktokEmpty!),
-                        ],
-                        if (socialMediaEmpty != null)
-                          ErrorTextWidget(error: socialMediaEmpty!),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Otras redes sociales (opcional)',
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Youtube',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showYoutubeField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showYoutubeField = value ?? false;
-                                });
-                                if (showYoutubeField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(youtubeFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showYoutubeField) ...[
-                          CustomUsernameField(
-                            label: 'Canal de Youtube',
-                            controller: youtubeController,
-                            maxLength: 100,
-                            focusNode: youtubeFocusNode,
-                          ),
-                          if (youtubeEmpty != null)
-                            ErrorTextWidget(error: youtubeEmpty!),
-                          const SizedBox(height: 8),
-                        ],
-                        const FormSeparator(),
-                        
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Facebook',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            Checkbox(
-                              value: showFacebookField,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  showFacebookField = value ?? false;
-                                });
-                                if (showFacebookField) {
-                                  Future.delayed(Duration(milliseconds: 100),
-                                      () {
-                                    FocusScope.of(context)
-                                        .requestFocus(facebookFocusNode);
-                                  });
-                                }
-                              },
-                              activeColor: Colors.black,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        if (showFacebookField) ...[
-                          CustomUsernameField(
-                            label: 'Página de Facebook',
-                            controller: facebookController,
-                            maxLength: 100,
-                            focusNode: facebookFocusNode,
-                          ),
-                          if (facebookEmpty != null)
-                            ErrorTextWidget(error: facebookEmpty!),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 16,
-            left: 30,
-            right: 30,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF222222),
-                padding: const EdgeInsets.symmetric(vertical: 24),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-              ),
-              onPressed: validateAndContinue,
-              child: const Text(
-                'Continuar',
-                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
-          ),
-        ],
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Rellena los campos',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 20.0),
+                children: [
+                  CustomNameField(
+                      label: 'Nombre del emprendimiento',
+                      controller: businessNameController,
+                      maxLength: 100),
+                  if (businessNameEmpty != null)
+                    ErrorTextWidget(error: businessNameEmpty!),
+                  const SizedBox(height: 16),
+                  CustomEmailField(
+                      label: 'Nickname del emprendimiento',
+                      controller: businessNicknameController,
+                      maxLength: 100),
+                  if (businessNicknameEmpty != null)
+                    ErrorTextWidget(error: businessNicknameEmpty!),
+                  const SizedBox(height: 16),
+                  CustomNumberField(
+                    label: 'RUC',
+                    controller: rucController,
+                    maxLength: 11,
+                  ),
+                  if (rucEmpty != null) ErrorTextWidget(error: rucEmpty!),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Ingresa tus redes sociales',
+                    style: TextStyle(
+                        fontSize: 22, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Ingresa el usuario de las redes sociales que administras',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Instagram',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showInstagramField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showInstagramField = value ?? false;
+                          });
+                          if (showInstagramField) {
+                            Future.delayed(Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(instagramFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showInstagramField) ...[
+                    CustomUsernameField(
+                      label: 'Usuario de Instagram',
+                      controller: instagramController,
+                      maxLength: 100,
+                      focusNode: instagramFocusNode,
+                    ),
+                    if (instagramEmpty != null)
+                      ErrorTextWidget(error: instagramEmpty!),
+                    const SizedBox(height: 8),
+                  ],
+                  const FormSeparator(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tiktok',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showTiktokField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showTiktokField = value ?? false;
+                          });
+                          if (showTiktokField) {
+                            Future.delayed(Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(tiktokFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showTiktokField) ...[
+                    CustomUsernameField(
+                      label: 'Usuario de Tiktok',
+                      controller: tiktokController,
+                      maxLength: 100,
+                      focusNode: tiktokFocusNode,
+                    ),
+                    if (tiktokEmpty != null)
+                      ErrorTextWidget(error: tiktokEmpty!),
+                  ],
+                  if (socialMediaEmpty != null)
+                    ErrorTextWidget(error: socialMediaEmpty!),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Otras redes sociales (opcional)',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Youtube',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showYoutubeField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showYoutubeField = value ?? false;
+                          });
+                          if (showYoutubeField) {
+                            Future.delayed(Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(youtubeFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showYoutubeField) ...[
+                    CustomUsernameField(
+                      label: 'Canal de Youtube',
+                      controller: youtubeController,
+                      maxLength: 100,
+                      focusNode: youtubeFocusNode,
+                    ),
+                    if (youtubeEmpty != null)
+                      ErrorTextWidget(error: youtubeEmpty!),
+                    const SizedBox(height: 8),
+                  ],
+                  const FormSeparator(),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Facebook',
+                        style:
+                        TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Checkbox(
+                        value: showFacebookField,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            showFacebookField = value ?? false;
+                          });
+                          if (showFacebookField) {
+                            Future.delayed(Duration(milliseconds: 100),
+                                    () {
+                                  FocusScope.of(context)
+                                      .requestFocus(facebookFocusNode);
+                                });
+                          }
+                        },
+                        activeColor: Colors.black,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (showFacebookField) ...[
+                    CustomUsernameField(
+                      label: 'Página de Facebook',
+                      controller: facebookController,
+                      maxLength: 100,
+                      focusNode: facebookFocusNode,
+                    ),
+                    if (facebookEmpty != null)
+                      ErrorTextWidget(error: facebookEmpty!),
+                  ],
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF222222),
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                      ),
+                      onPressed: validateAndContinue,
+                      child: const Text(
+                        'Continuar',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
