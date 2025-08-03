@@ -15,6 +15,7 @@ import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/security/security_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/terms_and_condition/terms_and_condition_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/login/login_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/modals/account_under_review_modal.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -302,6 +303,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     if (items[index] == 'Cerrar sesión') {
                       _showLogoutDialog(context);
+                    } else if (items[index] == 'Métodos de pago' && userRole?.toUpperCase() == 'INFLUENCER') {
+                      _showAccountUnderReviewModal();
                     } else {
                       navigateToPage(context, items[index]);
                     }
@@ -469,6 +472,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  void _showAccountUnderReviewModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AccountUnderReviewModal(
+          onClose: () {
+            Navigator.of(context).pop();
+          },
         );
       },
     );
