@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/media_validation_helper.dart';
 
 class EntrepreneurshipProfilePage extends StatefulWidget {
   const EntrepreneurshipProfilePage({super.key});
@@ -1179,9 +1180,8 @@ class _EntrepreneurshipProfilePageState
     );
   }
 
-  // NUEVO: Lógica para seleccionar archivos extra
+  // Archivos extra con validación
   Future<void> _pickExtraFile(String type) async {
-    // type: 'IMAGE' o 'VIDEO'
     if (type == 'IMAGE' &&
         _localExtraImages.length + _getExistingFilesCount('IMAGE') >=
             _maxExtraImages) {
@@ -1205,14 +1205,14 @@ class _EntrepreneurshipProfilePageState
             children: <Widget>[
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Galería'),
+                title: Text(type == 'IMAGE' ? 'Galería (Imágenes)' : 'Galería (Videos)'),
                 onTap: () {
                   Navigator.pop(context, ImageSource.gallery);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: const Text('Cámara'),
+                title: Text(type == 'IMAGE' ? 'Cámara (Foto)' : 'Cámara (Video)'),
                 onTap: () {
                   Navigator.pop(context, ImageSource.camera);
                 },
@@ -1226,29 +1226,131 @@ class _EntrepreneurshipProfilePageState
     if (source == null) return;
 
     if (type == 'IMAGE') {
-      final XFile? pickedFile = await _picker.pickImage(
-          source: source, imageQuality: 70, maxWidth: 1200);
-      if (pickedFile != null) {
-        setState(() {
-          _localExtraImages.add(File(pickedFile.path));
-          _checkForChanges();
-        });
-      }
+      await _pickAndValidateImages(source);
     } else if (type == 'VIDEO') {
-      final XFile? pickedFile = await _picker.pickVideo(
-          source: source, maxDuration: const Duration(minutes: 1));
-      if (pickedFile != null) {
-        // Validar tamaño o duración si es necesario (ImagePicker.maxDuration es una sugerencia)
-        // File video = File(pickedFile.path);
-        // int fileSizeInBytes = video.lengthSync();
-        // double fileSizeInMB = fileSizeInBytes / (1024 * 1024);
-        // if (fileSizeInMB > TU_LIMITE_DE_MB) { showSnackBar("Video demasiado grande"); return; }
-        setState(() {
-          _localExtraVideos.add(File(pickedFile.path));
-          _checkForChanges();
-        });
-      }
+      await _pickAndValidateVideo(source);
     }
+  }
+
+  Future<void> _pickAndValidateImages(ImageSource source) async {
+    try {
+      if (source == ImageSource.gallery) {
+        // Para galería, permitir selección múltiple
+        final List<XFile>? pickedFiles = await _picker.pickMultipleMedia(
+          imageQuality: 70,
+          maxWidth: 1200,
+        );
+        
+        if (pickedFiles != null && pickedFiles.isNotEmpty) {
+          // Filtrar solo imágenes
+          final List<File> imageFiles = pickedFiles
+              .where((file) => _isImageFile(file.path))
+              .map((file) => File(file.path))
+              .toList();
+          
+          if (imageFiles.isNotEmpty) {
+            await _validateAndAddImages(imageFiles);
+          } else {
+            showSnackBar("No se seleccionaron imágenes válidas.", isError: true);
+          }
+        }
+      } else {
+        // Para cámara, solo una imagen
+        final XFile? pickedFile = await _picker.pickImage(
+          source: source,
+          imageQuality: 70,
+          maxWidth: 1200,
+        );
+        
+        if (pickedFile != null) {
+          await _validateAndAddImages([File(pickedFile.path)]);
+        }
+      }
+    } catch (e) {
+      showSnackBar("Error al seleccionar imágenes: $e", isError: true);
+    }
+  }
+
+  Future<void> _pickAndValidateVideo(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickVideo(
+        source: source,
+        maxDuration: const Duration(minutes: 2), // Permitimos 2 min para luego validar exactamente 1 min
+      );
+      
+      if (pickedFile != null) {
+        await _validateAndAddVideo(File(pickedFile.path));
+      }
+    } catch (e) {
+      showSnackBar("Error al seleccionar video: $e", isError: true);
+    }
+  }
+
+  Future<void> _validateAndAddImages(List<File> imageFiles) async {
+    // Mostrar loading
+    showSnackBar("Validando imágenes...");
+    
+    final validationResult = await MediaValidationHelper.validateMultipleFiles(
+      imageFiles, 
+      'IMAGE'
+    );
+    
+    final List<File> validFiles = validationResult['validFiles'];
+    final List<String> errorMessages = validationResult['errorMessages'];
+    
+    // Verificar límites después de la validación
+    final int availableSlots = _maxExtraImages - (_localExtraImages.length + _getExistingFilesCount('IMAGE'));
+    final List<File> filesToAdd = validFiles.take(availableSlots).toList();
+    
+    if (filesToAdd.isNotEmpty) {
+      setState(() {
+        _localExtraImages.addAll(filesToAdd);
+        _checkForChanges();
+      });
+    }
+    
+    // Mostrar mensaje de resultado
+    String message = MediaValidationHelper.getValidationSummaryMessage(validationResult);
+    
+    if (filesToAdd.length < validFiles.length) {
+      message += " Algunas imágenes no se agregaron por límite de espacio.";
+    }
+    
+    showSnackBar(message, isError: errorMessages.isNotEmpty);
+    
+    // Mostrar errores específicos si los hay
+    if (errorMessages.isNotEmpty) {
+      Future.delayed(const Duration(seconds: 2), () {
+        showSnackBar(errorMessages.first, isError: true);
+      });
+    }
+  }
+
+  Future<void> _validateAndAddVideo(File videoFile) async {
+    // Mostrar loading
+    showSnackBar("Validando video...");
+    
+    final validationResult = await MediaValidationHelper.validateVideo(videoFile);
+    
+    if (validationResult.isValid) {
+      setState(() {
+        _localExtraVideos.add(videoFile);
+        _checkForChanges();
+      });
+      
+      String durationText = validationResult.videoDuration != null 
+          ? MediaValidationHelper.formatDuration(validationResult.videoDuration!)
+          : "";
+      
+      showSnackBar("Video agregado exitosamente${durationText.isNotEmpty ? ' ($durationText)' : ''}.");
+    } else {
+      showSnackBar(validationResult.errorMessage ?? "Error al validar el video.", isError: true);
+    }
+  }
+
+  bool _isImageFile(String filePath) {
+    final extension = filePath.toLowerCase().split('.').last;
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].contains(extension);
   }
 
   void _removeLocalExtraFile(File file, String type) {
