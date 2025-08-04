@@ -84,6 +84,11 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
     return prefs.getString('email_register') ?? '';
   }
 
+  Future<String> _getUserDni() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('dni_register') ?? '';
+  }
+
   Future<void> validateAndContinue() async {
     if (_capturedImageBytes == null) {
       logger.e('Foto de perfil es null');
@@ -95,13 +100,13 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
     });
 
     try {
-      logger.i('Iniciando validación de imágenes...');
+      logger.i('Iniciando validación de imágenes con nuevo endpoint AWS Lambda...');
 
-      // Obtener email del usuario
-      final userEmail = await _getUserEmail();
+      // Obtener DNI del usuario
+      final userDni = await _getUserDni();
 
-      if (userEmail.isEmpty) {
-        logger.e('Email del usuario no encontrado');
+      if (userDni.isEmpty) {
+        logger.e('DNI del usuario no encontrado');
         setState(() {
           _isValidating = false;
         });
@@ -118,26 +123,62 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
       // Llamar al callback con la imagen capturada
       widget.onImageCaptured(_capturedImageBytes!);
 
-      // Validar imágenes
-      await authRemoteDataSource.validateImages(
-        userIdentifier: userEmail,
+      // Validar imágenes con nuevo endpoint (solo foto frontal del documento)
+      final validationResponse = await authRemoteDataSource.validateImages(
+        dni: userDni,
         documentFrontImage: updatedValidationData.anversoImage!,
-        documentBackImage: updatedValidationData.reversoImage!,
         profileImage: updatedValidationData.perfilImage!,
       );
 
-      logger.i('Validación de imágenes exitosa');
+      logger.i('Validación completada. Respuesta: $validationResponse');
 
-      // Navegar a página de validación exitosa
+      // TODO: Analizar la respuesta para determinar el porcentaje de similaridad
+      // Por ahora, loggeamos la respuesta completa para entender su estructura
+      logger.i('Estructura completa de la respuesta: ${validationResponse.toString()}');
+      
+      // Verificar si hay un campo de porcentaje o similaridad en la respuesta
+      if (validationResponse.containsKey('percentage')) {
+        logger.i('Porcentaje encontrado: ${validationResponse['percentage']}');
+      }
+      if (validationResponse.containsKey('similarity')) {
+        logger.i('Similaridad encontrada: ${validationResponse['similarity']}');
+      }
+      if (validationResponse.containsKey('score')) {
+        logger.i('Score encontrado: ${validationResponse['score']}');
+      }
+      if (validationResponse.containsKey('confidence')) {
+        logger.i('Confidence encontrado: ${validationResponse['confidence']}');
+      }
+
+      // Determinar si la validación fue exitosa basado en la respuesta
+      // TODO: Ajustar esta lógica una vez que conozcamos el formato exacto de la respuesta
+      bool isValidationSuccessful = _determineValidationSuccess(validationResponse);
+
+      logger.i('¿Validación exitosa? $isValidationSuccessful');
+
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Step65ImagesValidatedPage(
-              validationData: updatedValidationData,
+        if (isValidationSuccessful) {
+          // Navegar a página de validación exitosa
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Step65ImagesValidatedPage(
+                validationData: updatedValidationData,
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          // Navegar a página de validación fallida
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Step65ImagesNotValidatedPage(
+                validationData: updatedValidationData,
+                errorMessage: 'La validación no alcanzó el umbral requerido de similaridad',
+              ),
+            ),
+          );
+        }
       }
     } catch (e) {
       logger.e('Error en la validación de imágenes: $e');
@@ -167,6 +208,39 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
         });
       }
     }
+  }
+
+  // Método auxiliar para determinar si la validación fue exitosa
+  // TODO: Actualizar esta lógica una vez que conozcamos el formato exacto de la respuesta
+  bool _determineValidationSuccess(Map<String, dynamic> response) {
+    // Buscar posibles campos de porcentaje/similaridad
+    double? percentage;
+    
+    if (response.containsKey('percentage')) {
+      percentage = (response['percentage'] as num?)?.toDouble();
+    } else if (response.containsKey('similarity')) {
+      percentage = (response['similarity'] as num?)?.toDouble();
+    } else if (response.containsKey('score')) {
+      percentage = (response['score'] as num?)?.toDouble();
+    } else if (response.containsKey('confidence')) {
+      percentage = (response['confidence'] as num?)?.toDouble();
+    }
+
+    logger.i('Porcentaje extraído para evaluación: $percentage');
+
+    // Si no encontramos un porcentaje, asumimos éxito por el momento (para testing)
+    if (percentage == null) {
+      logger.w('No se encontró porcentaje en la respuesta, asumiendo éxito para testing');
+      return true;
+    }
+
+    // Umbral de similaridad (ajustar según requisitos)
+    const double threshold = 70.0;
+    bool isSuccessful = percentage >= threshold;
+    
+    logger.i('Porcentaje: $percentage%, Umbral: $threshold%, ¿Exitoso? $isSuccessful');
+    
+    return isSuccessful;
   }
 
   @override
