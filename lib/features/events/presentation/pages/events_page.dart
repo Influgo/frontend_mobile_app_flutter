@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/events/domain/repositories/event_repository_impl.dart';
 import 'package:frontend_mobile_app_flutter/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/event_card_widget.dart';
@@ -179,6 +180,7 @@ class _EventsPageState extends State<EventsPage> {
   bool _isLoading = true;
   String? _errorMessage;
   List<Event> _allEvents = []; // Almacena todos los eventos originales
+  String? _userRole; // Para almacenar el rol del usuario
 
   // Listas pre-procesadas para la UI
   List<Event> _highestPayingEvents = [];
@@ -190,7 +192,20 @@ class _EventsPageState extends State<EventsPage> {
     super.initState();
     // Instanciamos el use case aquí, asegurando que el servicio se crea una vez.
     _useCase = GetEventsUseCase(EventRepositoryImpl(EventService()));
+    _loadUserRole();
     _fetchEvents();
+  }
+
+  Future<void> _loadUserRole() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedUserRole = prefs.getString('userRole');
+      setState(() {
+        _userRole = storedUserRole;
+      });
+    } catch (e) {
+      debugPrint('Error al cargar rol del usuario: $e');
+    }
   }
 
   Future<void> _fetchEvents() async {
@@ -281,11 +296,13 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
       body: _buildContent(),
-      floatingActionButton: CustomFAB(
-        onPressed: () {
-          Navigator.pushNamed(context, '/add-event');
-        },
-      ),
+      floatingActionButton: _userRole?.toUpperCase() == 'ENTREPRENEUR' 
+        ? CustomFAB(
+            onPressed: () {
+              Navigator.pushNamed(context, '/add-event');
+            },
+          )
+        : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
