@@ -7,6 +7,8 @@ import 'package:frontend_mobile_app_flutter/features/events/data/models/event_mo
 import 'package:frontend_mobile_app_flutter/features/events/data/services/event_service.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/horizontal_event_cards_section.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/custom_fab_widget.dart';
+import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/scrollable_filters_events.dart';
+import 'package:frontend_mobile_app_flutter/core/constants/filter_constants.dart';
 
 // class EventsPage extends StatefulWidget {
 //   const EventsPage({super.key});
@@ -182,6 +184,15 @@ class _EventsPageState extends State<EventsPage> {
   List<Event> _allEvents = []; // Almacena todos los eventos originales
   String? _userRole; // Para almacenar el rol del usuario
 
+  // Filtros básicos y avanzados
+  String _selectedCategory = "Todos";
+  List<String> _advancedSelectedCategories = [];
+  String _selectedLocation = "Todos";
+  String _selectedEventType = "Todos";
+
+  // Categorías para eventos
+  List<String> _categories = ["Todos", ...FilterConstants.categories];
+
   // Listas pre-procesadas para la UI
   List<Event> _highestPayingEvents = [];
   List<Event> _mostRecentEvents = [];
@@ -234,9 +245,52 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
+  // Método para obtener eventos filtrados
+  List<Event> _getFilteredEvents() {
+    List<Event> filtered = _allEvents;
+
+    // Filtrar por categoría básica (solo si no hay filtros avanzados activos)
+    if (_selectedCategory != "Todos" && !_hasAdvancedFiltersActive()) {
+      // Nota: Como no hay campo de categoría en el modelo Event actual,
+      // este filtro es solo visual por ahora
+      // filtered = filtered.where((e) => e.category == _selectedCategory).toList();
+    }
+
+    // Filtrar por categorías avanzadas
+    if (_advancedSelectedCategories.isNotEmpty) {
+      // Nota: Como no hay campo de categoría en el modelo Event actual,
+      // este filtro es solo visual por ahora
+      // filtered = filtered.where((e) => _advancedSelectedCategories.contains(e.category)).toList();
+    }
+
+    // Filtrar por ubicación
+    if (_selectedLocation != "Todos") {
+      // Nota: Como no hay campo de ubicación en el modelo Event actual,
+      // este filtro es solo visual por ahora
+      // filtered = filtered.where((e) => e.location == _selectedLocation).toList();
+    }
+
+    // Filtrar por tipo de evento
+    if (_selectedEventType != "Todos") {
+      // Nota: Como no hay campo de tipo de evento en el modelo Event actual,
+      // este filtro es solo visual por ahora
+      // filtered = filtered.where((e) => e.eventType == _selectedEventType).toList();
+    }
+
+    return filtered;
+  }
+
+  bool _hasAdvancedFiltersActive() {
+    return _advancedSelectedCategories.isNotEmpty ||
+        _selectedLocation != "Todos" ||
+        _selectedEventType != "Todos";
+  }
+
   // Nuevo método para procesar y preparar las listas para mostrar
   void _processEventsForDisplay() {
-    if (_allEvents.isEmpty) {
+    final filteredEvents = _getFilteredEvents();
+
+    if (filteredEvents.isEmpty) {
       _highestPayingEvents = [];
       _mostRecentEvents = [];
       _mostRequestedEvents = [];
@@ -244,21 +298,48 @@ class _EventsPageState extends State<EventsPage> {
     }
 
     // Procesar "Más recientes"
-    final recentEvents = List<Event>.from(_allEvents)
+    final recentEvents = List<Event>.from(filteredEvents)
       ..sort((a, b) =>
           b.eventDetailsStartDateEvent.compareTo(a.eventDetailsStartDateEvent));
     _mostRecentEvents = recentEvents.take(5).toList();
 
     // Procesar "Mejor remunerados"
-    final bestPaid = List<Event>.from(_allEvents)
+    final bestPaid = List<Event>.from(filteredEvents)
       ..sort((a, b) => b.jobDetailsPayFare.compareTo(a.jobDetailsPayFare));
     _highestPayingEvents = bestPaid.take(5).toList();
 
     // Procesar "Más solicitados"
-    final mostDemanded = List<Event>.from(_allEvents)
+    final mostDemanded = List<Event>.from(filteredEvents)
       ..sort((a, b) =>
           b.jobDetailsQuantityOfPeople.compareTo(a.jobDetailsQuantityOfPeople));
     _mostRequestedEvents = mostDemanded.take(5).toList();
+  }
+
+  void _onAdvancedFiltersApplied(
+      List<String> categories, String location, String eventType) {
+    setState(() {
+      _advancedSelectedCategories = categories;
+      _selectedLocation = location;
+      _selectedEventType = eventType;
+      
+      if (_hasAdvancedFiltersActive()) {
+        _selectedCategory = "Todos";
+      }
+      _processEventsForDisplay();
+    });
+  }
+
+  void _onCategorySelected(String newCategory) {
+    setState(() {
+      _selectedCategory = newCategory;
+      
+      if (newCategory != "Todos") {
+        _advancedSelectedCategories = [];
+        _selectedLocation = "Todos";
+        _selectedEventType = "Todos";
+      }
+      _processEventsForDisplay();
+    });
   }
 
 
@@ -295,7 +376,20 @@ class _EventsPageState extends State<EventsPage> {
           ],
         ),
       ),
-      body: _buildContent(),
+      body: Column(
+        children: [
+          ScrollableFiltersEvents(
+            selectedCategory: _selectedCategory,
+            onCategorySelected: _onCategorySelected,
+            categories: _categories,
+            onAdvancedFiltersApplied: _onAdvancedFiltersApplied,
+            selectedCategories: _advancedSelectedCategories,
+            selectedLocation: _selectedLocation,
+            selectedEventType: _selectedEventType,
+          ),
+          Expanded(child: _buildContent()),
+        ],
+      ),
       floatingActionButton: _userRole?.toUpperCase() == 'ENTREPRENEUR' 
         ? CustomFAB(
             onPressed: () {
@@ -321,6 +415,8 @@ class _EventsPageState extends State<EventsPage> {
       return const Center(child: Text("No se encontraron eventos"));
     }
 
+    final filteredEvents = _getFilteredEvents();
+
     // Las listas ya están procesadas y listas para usar
     return RefreshIndicator(
       onRefresh: _fetchEvents,
@@ -328,43 +424,92 @@ class _EventsPageState extends State<EventsPage> {
         padding: const EdgeInsets.only(top: 16, left: 2, right: 2),
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          if (_highestPayingEvents.isNotEmpty)
-            Align(
-              alignment: Alignment.topLeft,
-              child: HorizontalEventCardsSection(
-                title: "Mejor remunerados",
-                cards: _highestPayingEvents // Usar la lista pre-procesada
-                    .map((e) => EventCardWidget(event: e))
-                    .toList(),
+          if (filteredEvents.isEmpty && (_hasAdvancedFiltersActive() || _selectedCategory != "Todos"))
+            Container(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                children: [
+                  Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Ups...',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'No encontramos eventos que coincidan con tus criterios de búsqueda. Prueba con otros.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[500],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _clearAllFilters,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      foregroundColor: Colors.black,
+                    ),
+                    child: const Text('Limpiar filtros'),
+                  ),
+                ],
               ),
-            ),
-          const SizedBox(height: 16),
-          if (_mostRecentEvents.isNotEmpty)
-            Align(
-              alignment: Alignment.topLeft,
-              child: HorizontalEventCardsSection(
-                title: "Más recientes",
-                cards: _mostRecentEvents // Usar la lista pre-procesada
-                    .map((e) => EventCardWidget(event: e))
-                    .toList(),
+            )
+          else ...[
+            if (_highestPayingEvents.isNotEmpty)
+              Align(
+                alignment: Alignment.topLeft,
+                child: HorizontalEventCardsSection(
+                  title: "Mejor remunerados",
+                  cards: _highestPayingEvents // Usar la lista pre-procesada
+                      .map((e) => EventCardWidget(event: e))
+                      .toList(),
+                ),
               ),
-            ),
-          const SizedBox(height: 16),
-          if (_mostRequestedEvents.isNotEmpty)
-            Align(
-              alignment: Alignment.topLeft,
-              child: HorizontalEventCardsSection(
-                title: "Más solicitados",
-                cards: _mostRequestedEvents // Usar la lista pre-procesada
-                    .map((e) => EventCardWidget(event: e))
-                    .toList(),
+            const SizedBox(height: 16),
+            if (_mostRecentEvents.isNotEmpty)
+              Align(
+                alignment: Alignment.topLeft,
+                child: HorizontalEventCardsSection(
+                  title: "Más recientes",
+                  cards: _mostRecentEvents // Usar la lista pre-procesada
+                      .map((e) => EventCardWidget(event: e))
+                      .toList(),
+                ),
               ),
-            ),
+            const SizedBox(height: 16),
+            if (_mostRequestedEvents.isNotEmpty)
+              Align(
+                alignment: Alignment.topLeft,
+                child: HorizontalEventCardsSection(
+                  title: "Más solicitados",
+                  cards: _mostRequestedEvents // Usar la lista pre-procesada
+                      .map((e) => EventCardWidget(event: e))
+                      .toList(),
+                ),
+              ),
+          ],
           // Considera un padding inferior para que el FAB no oculte contenido
           const SizedBox(height: 80),
         ],
       ),
     );
+  }
+
+  void _clearAllFilters() {
+    setState(() {
+      _selectedCategory = "Todos";
+      _advancedSelectedCategories = [];
+      _selectedLocation = "Todos";
+      _selectedEventType = "Todos";
+      _processEventsForDisplay();
+    });
   }
 }
 
