@@ -38,141 +38,178 @@ class InfluencerResponse {
 class Influencer {
   final int id;
   final String influencerName;
-  final String influencerNickname;
-  final String influencerHandle; // @username
+  final String alias;
   final String category;
   final String summary;
   final String description;
-  final bool showRealName;
   final List<String> addresses;
-  final List<String> specialties;
+  final List<String> influencerFocus;
   final List<SocialDto> socialDtos;
-  final MediaFile? influencerProfileImage;
+  final MediaFile? influencerLogo;
   final MediaFile? influencerBanner;
-  final List<MediaFile> portfolioFiles;
-  final int followersCount;
-  final int collaborationsCount;
-  final double rating;
-  final bool isVerified;
-  final DateTime? createdAt;
+  final List<MediaFile> s3Files;
 
   Influencer({
     required this.id,
     required this.influencerName,
-    required this.influencerNickname,
-    required this.influencerHandle,
+    required this.alias,
     required this.category,
     required this.summary,
     required this.description,
-    required this.showRealName,
     required this.addresses,
-    required this.specialties,
+    required this.influencerFocus,
     required this.socialDtos,
-    this.influencerProfileImage,
+    this.influencerLogo,
     this.influencerBanner,
-    required this.portfolioFiles,
-    required this.followersCount,
-    required this.collaborationsCount,
-    required this.rating,
-    this.isVerified = false,
-    this.createdAt,
+    required this.s3Files,
   });
 
   factory Influencer.fromJson(Map<String, dynamic> json) {
-    // Debug: imprimir los datos que llegan
-    print('DEBUG - JSON recibido: $json');
-    
     return Influencer(
       id: json['id'] ?? 0,
-      //influencerName: json['influencerName'] ?? 
-                     //json['influencerInformationInfluencerName'] ?? 
-                     //json['name'] ?? 'N/A',
-      influencerName: json['entrepreneurshipInformationEntrepreneurshipName'] ?? 'N/A',
-      influencerNickname: json['influencerNickname'] ?? 
-                         json['influencerInformationInfluencerNickname'] ?? 
-                         json['nickname'] ?? 'N/A',
-      influencerHandle: json['influencerHandle'] ?? 
-                       json['influencerInformationInfluencerHandle'] ?? 
-                       json['handle'] ?? '@unknown',
-      category: json['category'] ?? 
-               json['influencerInformationCategory'] ?? 
-               json['influencerCategory'] ?? 'N/A',
+      influencerName: json['influencerInformationInfluencerName'] ?? 
+                     json['influencerName'] ?? 
+                     json['name'] ?? 
+                     json['eventName'] ?? // Fallback en caso de que sea un evento
+                     'N/A',
+      alias: json['alias'] ?? 'N/A',
+      category: json['influencerInformationInfluencerCategory'] ?? 
+               json['category'] ?? 'N/A',
       summary: json['summary'] ?? 
-              json['influencerInformationSummary'] ?? 
-              json['influencerSummary'] ?? 'N/A',
-      description: json['description'] ?? 
-                  json['influencerInformationDescription'] ?? 
-                  json['influencerDescription'] ?? 'N/A',
-      showRealName: json['showRealName'] ?? false,
-      addresses: json['addresses'] != null
-          ? List<String>.from(json['addresses'])
-          : json['influencerAddresses'] != null
-          ? List<String>.from(json['influencerAddresses'])
-          : [],
-      specialties: json['specialties'] != null
-          ? List<String>.from(json['specialties'])
-          : json['influencerSpecialties'] != null
-          ? List<String>.from(json['influencerSpecialties'])
-          : [],
-      socialDtos: json['socialDtos'] != null
-          ? (json['socialDtos'] as List)
-              .map((item) => SocialDto.fromJson(item))
-              .toList()
-          : json['socials'] != null
-          ? (json['socials'] as List)
-              .map((item) => SocialDto.fromJson(item))
-              .toList()
-          : [],
-      influencerProfileImage: json['influencerProfileImage'] != null
-          ? MediaFile.fromJson(json['influencerProfileImage'])
-          : json['profileImage'] != null
-          ? MediaFile.fromJson(json['profileImage'])
-          : null,
-      influencerBanner: json['influencerBanner'] != null
-          ? MediaFile.fromJson(json['influencerBanner'])
-          : json['banner'] != null
-          ? MediaFile.fromJson(json['banner'])
-          : null,
-      portfolioFiles: json['portfolioFiles'] != null
-          ? (json['portfolioFiles'] as List)
-              .map((item) => MediaFile.fromJson(item))
-              .toList()
-          : json['portfolio'] != null
-          ? (json['portfolio'] as List)
-              .map((item) => MediaFile.fromJson(item))
-              .toList()
-          : [],
-      followersCount: json['followersCount'] ?? json['followers'] ?? 0,
-      collaborationsCount: json['collaborationsCount'] ?? json['collaborations'] ?? 0,
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      isVerified: json['isVerified'] ?? json['verified'] ?? false,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.tryParse(json['createdAt']) 
-          : null,
+              json['influencerInformationInfluencerSummary'] ??
+              json['influencerSummary'] ?? 
+              json['eventDescription'] ?? // Fallback en caso de que sea un evento
+              'N/A',
+      description: json['influencerInformationInfluencerDescription'] ?? 
+                  json['description'] ?? 
+                  json['eventDescription'] ?? // Fallback en caso de que sea un evento
+                  'N/A',
+      addresses: _parseStringList(json['addresses'] ?? json['influencerAddress']),
+      influencerFocus: _parseStringList(json['influencerFocus']),
+      socialDtos: _parseSocialDtos(json['socialDtos'] ?? json['socials']),
+      influencerLogo: _parseMediaFile(json['influencerLogo'] ?? 
+                                    json['influencerProfileImage'] ?? 
+                                    json['profileImage'] ??
+                                    json['s3File']), // Fallback al s3File si es un evento
+      influencerBanner: _parseMediaFile(json['influencerBanner'] ?? 
+                                       json['banner']),
+      s3Files: _parseMediaFileList(json['s3Files']),
     );
+  }
+
+  // Método para obtener redes sociales limitadas para tarjetas (máximo 2)
+  List<SocialDto> get socialDtosForCards {
+    // Si tiene 2 o menos redes, devolver todas
+    if (socialDtos.length <= 2) {
+      return socialDtos;
+    }
+    
+    // Si tiene más de 2, priorizar Instagram y TikTok
+    List<SocialDto> result = [];
+    
+    // Buscar Instagram y TikTok primero
+    SocialDto? instagram;
+    SocialDto? tiktok;
+    
+    for (SocialDto social in socialDtos) {
+      String socialName = social.name.toLowerCase();
+      if (socialName == 'instagram') {
+        instagram = social;
+      } else if (socialName == 'tiktok') {
+        tiktok = social;
+      }
+    }
+    
+    if (instagram != null) result.add(instagram);
+    if (tiktok != null) result.add(tiktok);
+    
+    // Si ya tenemos 2, devolver
+    if (result.length >= 2) {
+      return result;
+    }
+    
+    // Si no tenemos 2, agregar las primeras que no sean Instagram/TikTok
+    for (SocialDto social in socialDtos) {
+      if (result.length >= 2) break;
+      String socialName = social.name.toLowerCase();
+      if (socialName != 'instagram' && socialName != 'tiktok') {
+        result.add(social);
+      }
+    }
+    
+    return result;
+  }
+
+  static List<String> _parseStringList(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      return data.map((item) => item.toString()).toList();
+    }
+    if (data is String) {
+      return [data];
+    }
+    return [];
+  }
+
+  static List<SocialDto> _parseSocialDtos(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      List<SocialDto> allSocials = data.map((item) {
+        if (item is Map<String, dynamic>) {
+          return SocialDto.fromJson(item);
+        }
+        return null;
+      }).whereType<SocialDto>().toList();
+      
+      return allSocials;
+      
+    }
+    return [];
+  }
+
+  static MediaFile? _parseMediaFile(dynamic data) {
+    if (data == null) return null;
+    if (data is Map<String, dynamic>) {
+      try {
+        return MediaFile.fromJson(data);
+      } catch (e) {
+        print('Error parsing MediaFile: $e');
+        return null;
+      }
+    }
+    return null;
+  }
+
+  static List<MediaFile> _parseMediaFileList(dynamic data) {
+    if (data == null) return [];
+    if (data is List) {
+      return data.map((item) {
+        if (item is Map<String, dynamic>) {
+          try {
+            return MediaFile.fromJson(item);
+          } catch (e) {
+            print('Error parsing MediaFile in list: $e');
+            return null;
+          }
+        }
+        return null;
+      }).whereType<MediaFile>().toList();
+    }
+    return [];
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'influencerInformationInfluencerName': influencerName,
-      'influencerInformationInfluencerNickname': influencerNickname,
-      'influencerInformationInfluencerHandle': influencerHandle,
-      'influencerInformationCategory': category,
-      'influencerInformationSummary': summary,
-      'influencerInformationDescription': description,
-      'showRealName': showRealName,
-      'influencerAddresses': addresses,
-      'influencerSpecialties': specialties,
+      'alias': alias,
+      'influencerInformationInfluencerCategory': category,
+      'influencerInformationInfluencerSummary': summary,
+      'influencerInformationInfluencerDescription': description,
+      'influencerAddress': addresses,
       'socialDtos': socialDtos.map((social) => social.toJson()).toList(),
-      'influencerProfileImage': influencerProfileImage?.toJson(),
+      'influencerProfileImage': influencerLogo?.toJson(),
       'influencerBanner': influencerBanner?.toJson(),
-      'portfolioFiles': portfolioFiles.map((file) => file.toJson()).toList(),
-      'followersCount': followersCount,
-      'collaborationsCount': collaborationsCount,
-      'rating': rating,
-      'isVerified': isVerified,
-      'createdAt': createdAt?.toIso8601String(),
     };
   }
 }
@@ -191,8 +228,8 @@ class SocialDto {
 
   factory SocialDto.fromJson(Map<String, dynamic> json) {
     return SocialDto(
-      name: json['name'],
-      socialUrl: json['socialUrl'],
+      name: json['name'] ?? '',
+      socialUrl: json['socialUrl'] ?? '',
       followersCount: json['followersCount'],
     );
   }
@@ -221,10 +258,10 @@ class MediaFile {
 
   factory MediaFile.fromJson(Map<String, dynamic> json) {
     return MediaFile(
-      id: json['id'],
-      filename: json['filename'],
-      contentType: json['contentType'],
-      url: json['url'],
+      id: json['id'] ?? 0,
+      filename: json['filename'] ?? '',
+      contentType: json['contentType'] ?? '',
+      url: json['url'] ?? '',
     );
   }
 

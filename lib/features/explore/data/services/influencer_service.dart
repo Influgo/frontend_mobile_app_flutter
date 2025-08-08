@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/influencer_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 
 class InfluencerService {
   final String baseUrl = 'https://influyo-testing.ryzeon.me/api/v1';
@@ -20,10 +19,9 @@ class InfluencerService {
       throw Exception('No authentication token found');
     }
 
-    // Cambiar para influencer endpoint
-    //final uri = Uri.parse('$baseUrl/entities/influencer?page=$page&size=$size&sortField=$sortField'),
+    // Usar endpoint de influencer
     final response = await http.get(
-      Uri.parse('$baseUrl/entities/entrepreneur?page=$page&size=$size&sortField=$sortField'),
+      Uri.parse('$baseUrl/entities/influencer?page=$page&size=$size&sortField=$sortField'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -56,9 +54,8 @@ class InfluencerService {
       'name': name, // ← Parámetro de búsqueda por nombre
     };
 
-    // Cambiar para influencer endpoint
-    //final uri = Uri.parse('$baseUrl/entities/influencer').replace(
-    final uri = Uri.parse('$baseUrl/entities/entrepreneur').replace(
+    // Usar endpoint de influencer para búsqueda
+    final uri = Uri.parse('$baseUrl/entities/influencer').replace(
       queryParameters: queryParams,
     );
 
@@ -108,9 +105,8 @@ class InfluencerService {
       queryParams['location'] = location;
     }
 
-    // Cambiar para influencer endpoint
-    //final uri = Uri.parse('$baseUrl/entities/influencer').replace(
-    final uri = Uri.parse('$baseUrl/entities/entrepreneur').replace(
+    // Usar endpoint de influencer
+    final uri = Uri.parse('$baseUrl/entities/influencer').replace(
       queryParameters: queryParams,
     );
 

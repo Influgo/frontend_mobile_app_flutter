@@ -70,7 +70,7 @@ class InfluencerDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Datos de ejemplo para secciones faltantes
-    final exampleRating = influencer.rating;
+    final exampleRating = 4.5;
     final exampleTotalReviews = 76;
     final exampleReviews = [
       Review(
@@ -322,10 +322,10 @@ class InfluencerDetailPage extends StatelessWidget {
                       height: designLogoDiameter,
                       decoration: ShapeDecoration(
                         color: Colors.grey[200],
-                        image: influencer.influencerProfileImage?.url != null
+                        image: influencer.influencerLogo?.url != null
                             ? DecorationImage(
                                 image: NetworkImage(
-                                    influencer.influencerProfileImage!.url),
+                                    influencer.influencerLogo!.url),
                                 fit: BoxFit.cover,
                               )
                             : null,
@@ -336,7 +336,7 @@ class InfluencerDetailPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      child: influencer.influencerProfileImage?.url == null
+                      child: influencer.influencerLogo?.url == null
                           ? Icon(Icons.person,
                               size: designLogoRadius * 0.8,
                               color: Colors.grey[600])
@@ -728,48 +728,119 @@ class InfluencerDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSocials(BuildContext context, List<Socials> socials) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: socials.map((social) {
-        return Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStatColumn(
-                    social.userName,
-                    social.socialName
-                  ),
-                ],
+  Widget _buildRealSocialInfo(SocialDto social) {
+    // Extraer el usuario de la URL
+    String username = _extractUsernameFromUrl(social.socialUrl);
+    
+    // Obtener datos estáticos según la red social
+    Map<String, dynamic> staticData = _getStaticSocialData(social.name);
+    
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStatColumn(
+                username,
+                social.name
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Flexible(
-                    child: _buildStatColumn(
-                      social.ranking,
-                      "Seguidores",
-                    ),
-                  ),
-                  Flexible(
-                    child: _buildStatColumn(
-                      social.engagementValue ?? '',
-                      social.engagementMetric ?? '',
-                    ),
-                  ),
-                ],
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Flexible(
+                child: _buildStatColumn(
+                  staticData['followers'],
+                  staticData['followersLabel'],
+                ),
               ),
-            ),
-          ],
-        );
-      }).toList(),
+              Flexible(
+                child: _buildStatColumn(
+                  staticData['engagement'],
+                  staticData['engagementLabel'],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
+  }
+
+  Map<String, dynamic> _getStaticSocialData(String socialName) {
+    String lowerName = socialName.toLowerCase();
+    
+    if (lowerName.contains("instagram")) {
+      return {
+        'followers': '2.5k',
+        'followersLabel': 'Seguidores',
+        'engagement': '#15',
+        'engagementLabel': 'Ranking',
+      };
+    } else if (lowerName.contains("tiktok")) {
+      return {
+        'followers': '100.5K',
+        'followersLabel': 'Seguidores',
+        'engagement': '15M',
+        'engagementLabel': 'Me gustas',
+      };
+    } else if (lowerName.contains("youtube")) {
+      return {
+        'followers': '2.5k',
+        'followersLabel': 'Seguidores',
+        'engagement': '2.5k',
+        'engagementLabel': 'Visualizac.',
+      };
+    } else if (lowerName.contains("twitch")) {
+      return {
+        'followers': '3.2k',
+        'followersLabel': 'Seguidores',
+        'engagement': '1.8k',
+        'engagementLabel': 'Espectadores',
+      };
+    } else {
+      return {
+        'followers': '1.0k',
+        'followersLabel': 'Seguidores',
+        'engagement': 'N/A',
+        'engagementLabel': 'Métrica',
+      };
+    }
+  }
+
+  String _extractUsernameFromUrl(String url) {
+    // Si la URL ya contiene @, extraerlo
+    if (url.contains('@')) {
+      int atIndex = url.indexOf('@');
+      String afterAt = url.substring(atIndex + 1);
+      // Tomar solo el username sin parámetros adicionales
+      return '@${afterAt.split('/').first.split('?').first}';
+    }
+    
+    // Para URLs normales, extraer el username del final
+    try {
+      Uri uri = Uri.parse(url);
+      List<String> pathSegments = uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
+      if (pathSegments.isNotEmpty) {
+        String lastSegment = pathSegments.last;
+        return '@$lastSegment';
+      }
+    } catch (e) {
+      // Si falla el parsing, intentar extraer manualmente
+      String cleanUrl = url.replaceAll('https://', '').replaceAll('http://', '');
+      List<String> parts = cleanUrl.split('/');
+      if (parts.length > 1) {
+        return '@${parts.last}';
+      }
+    }
+    
+    return '@usuario';
   }
 
   Widget _buildContent(
@@ -808,22 +879,20 @@ class InfluencerDetailPage extends StatelessWidget {
                           ),
                     ),
                   ),
-                  if (influencer.isVerified) ...[
-                    SizedBox(width: 8),
-                    Icon(Icons.verified, color: Colors.blue, size: 24),
-                  ],
+                  SizedBox(width: 8),
+                  Icon(Icons.verified, color: Colors.blue, size: 20),
                 ],
               ),
-              SizedBox(height: 4),
+              SizedBox(height: 2),
               Text(
-                influencer.influencerHandle,
+                "@${influencer.alias}",
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: Colors.grey[600],
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w400,
                       fontSize: 13,
                     ),
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 10),
               PillWidget(influencer.category),
             ],
           ),
@@ -886,8 +955,7 @@ class InfluencerDetailPage extends StatelessWidget {
                                 _getSocialIcon(social.name),
                                 SizedBox(width: 16),
                                 Expanded(
-                                  child: _buildSocials(context, exampleSocials.where((mockSocial) => 
-                                    mockSocial.socialName.toLowerCase() == social.name.toLowerCase()).toList()),
+                                  child: _buildRealSocialInfo(social),
                                 ),
                                 //Icon(Icons.open_in_new, size: 18, color: Colors.grey[600]),
                               ],
@@ -910,22 +978,6 @@ class InfluencerDetailPage extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: 24),
-        
-        // Especialidades
-        if (influencer.specialties.isNotEmpty) ...[
-          _buildSectionTitle(context, "Especialidades"),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 4.0,
-            children: influencer.specialties
-                .map((specialty) => Chip(
-                      label: Text(specialty),
-                      backgroundColor: Colors.grey.shade100,
-                    ))
-                .toList(),
-          ),
-          SizedBox(height: 24),
-        ],
 
         // Ubicación
         _buildSectionTitle(context, "Ubicación"),
@@ -956,7 +1008,7 @@ class InfluencerDetailPage extends StatelessWidget {
 
         // Galería
         _buildSectionTitle(context, "Galería"),
-        if (influencer.portfolioFiles.isEmpty)
+        if (influencer.s3Files.isEmpty)
           Text("No hay imágenes en el portafolio.",
               style: TextStyle(color: Colors.grey))
         else
@@ -964,9 +1016,9 @@ class InfluencerDetailPage extends StatelessWidget {
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: influencer.portfolioFiles.length,
+              itemCount: influencer.s3Files.length,
               itemBuilder: (context, index) {
-                final file = influencer.portfolioFiles[index];
+                final file = influencer.s3Files[index];
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: ClipRRect(

@@ -19,6 +19,105 @@ class InfluencerCardWidget extends StatelessWidget {
     return count.toString();
   }
 
+  Widget _buildSocialNetworksRow() {
+    // Filtrar solo las redes sociales que tiene el influencer (máximo 2 para tarjetas)
+    List<Widget> socialIcons = [];
+    
+    for (SocialDto social in influencer.socialDtosForCards) {
+      Widget? iconWidget = _getSocialIcon(social.name);
+      if (iconWidget != null) {
+        socialIcons.add(_buildSocialContainer(iconWidget, social));
+      }
+    }
+
+    // Si no tiene redes sociales, no mostrar nada
+    if (socialIcons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: socialIcons
+          .expand((widget) => [widget, const SizedBox(width: 8)])
+          .take(socialIcons.length * 2 - 1) // Quitar el último SizedBox
+          .toList(),
+    );
+  }
+
+  Widget? _getSocialIcon(String socialName) {
+    String socialLower = socialName.toLowerCase();
+    
+    if (socialLower.contains('instagram')) {
+      return Image.asset(
+        'assets/icons/instagramicon.png',
+        width: 12,
+        height: 12,
+        errorBuilder: (context, error, stackTrace) =>
+            const Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 12),
+      );
+    } else if (socialLower.contains('tiktok')) {
+      return Image.asset(
+        'assets/icons/tiktokicon.png',
+        width: 12,
+        height: 12,
+        errorBuilder: (context, error, stackTrace) =>
+            const Icon(Icons.music_note, color: Colors.black, size: 12),
+      );
+    } else if (socialLower.contains('youtube')) {
+      return Image.asset(
+        'assets/icons/youtubeicon.png',
+        width: 12,
+        height: 12,
+        errorBuilder: (context, error, stackTrace) =>
+            const Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 12),
+      );
+    } else if (socialLower.contains('twitch')) {
+      return Image.asset(
+        'assets/icons/twitchicon.png',
+        width: 12,
+        height: 12,
+        errorBuilder: (context, error, stackTrace) =>
+            const Icon(Icons.videogame_asset, color: Color(0xFF9146FF), size: 12),
+      );
+    }
+    
+    // Si no es una red social reconocida, no mostrar icono
+    return null;
+  }
+
+  Widget _buildSocialContainer(Widget iconWidget, SocialDto social) {
+    return Container(
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: const Color.fromARGB(255, 48, 48, 48),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            iconWidget,
+            if (social.followersCount != null && social.followersCount! > 0) ...[
+              const SizedBox(width: 4),
+              Text(
+                _formatFollowersCount(social.followersCount!),
+                style: const TextStyle(
+                  fontSize: 10, 
+                  color: Color.fromARGB(255, 48, 48, 48)
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String defaultProfileUrl = 'https://i.pravatar.cc/150?img=${influencer.id}';
@@ -114,7 +213,7 @@ class InfluencerCardWidget extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage(
-                      influencer.influencerProfileImage?.url ?? defaultProfileUrl,
+                      influencer.influencerLogo?.url ?? defaultProfileUrl,
                     ),
                     onBackgroundImageError: (exception, stackTrace) {
                       // Fallback manejado por defaultProfileUrl
@@ -131,44 +230,38 @@ class InfluencerCardWidget extends StatelessWidget {
                   children: [
                     // Nombre del influencer
                     SizedBox(
-                      width: 140, // Aumentado de 120 a 140
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              influencer.influencerName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          if (influencer.isVerified) ...[
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.verified,
-                              color: Colors.blue,
-                              size: 14,
-                            ),
-                          ],
-                        ],
+                      width: 140,
+                      child: Text(
+                        influencer.influencerName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                       ),
                     ),
 
-                    // Handle (@username)
-                    Text(
-                      influencer.influencerHandle,
-                      style: const TextStyle(color: Colors.grey, fontSize: 10),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    // Alias (@username)
+                    const SizedBox(height: 2),
+                    SizedBox(
+                      width: 140,
+                      child: Text(
+                        '@${influencer.alias}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w300,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
 
-                    const SizedBox(height: 6),
-
+                    const SizedBox(height: 8),
                     // Categoría
                     Container(
                       padding: const EdgeInsets.all(1), // Padding para el borde degradado
@@ -217,122 +310,25 @@ class InfluencerCardWidget extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     // Redes sociales
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Instagram (siempre se muestra)
-                        Container(
-                          padding: const EdgeInsets.all(1),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Color.fromARGB(255, 48, 48, 48),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/instagramicon.png',
-                                  width: 12,
-                                  height: 12,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 12)
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _formatFollowersCount(influencer.followersCount),
-                                  style: const TextStyle(fontSize: 10, color: Color.fromARGB(255, 48, 48, 48)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        
-                        // Segunda red social (TikTok, YouTube o Twitch - el que esté primero)
-                        if (influencer.socialDtos.any((social) => 
-                            social.name.toLowerCase().contains("tiktok") ||
-                            social.name.toLowerCase().contains("youtube") ||
-                            social.name.toLowerCase().contains("twitch"))) ...[
-                          const SizedBox(width: 8),
-                          Builder(
-                            builder: (context) {
-                              Widget iconWidget;
-                              
-                              if (influencer.socialDtos.any((social) => social.name.toLowerCase().contains("tiktok"))) {
-                                iconWidget = Image.asset(
-                                  'assets/icons/tiktokicon.png',
-                                  width: 12,
-                                  height: 12,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.music_note, color: Colors.black, size: 12)
-                                );
-                              } else if (influencer.socialDtos.any((social) => social.name.toLowerCase().contains("youtube"))) {
-                                iconWidget = Image.asset(
-                                  'assets/icons/youtubeicon.png',
-                                  width: 12,
-                                  height: 12,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 12)
-                                );
-                              } else {
-                                iconWidget = Image.asset(
-                                  'assets/icons/twitchicon.png',
-                                  width: 12,
-                                  height: 12,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.videogame_asset, color: Color(0xFF9146FF), size: 12)
-                                );
-                              }
-                              
-                              return Container(
-                                padding: const EdgeInsets.all(1),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Color.fromARGB(255, 48, 48, 48),
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      iconWidget,
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        _formatFollowersCount(influencer.collaborationsCount),
-                                        style: const TextStyle(fontSize: 10, color: Color.fromARGB(255, 48, 48, 48)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
+                    _buildSocialNetworksRow(),
 
                     const SizedBox(height: 4),
 
                     // Descripción/Summary
                     SizedBox(
-                      width: 140, // Aumentado de 120 a 140
+                      width: 140,
                       child: Text(
                         influencer.summary != 'N/A'
                             ? influencer.summary
-                            : 'Creador de contenido',
-                        maxLines: 3, // Aumentado de 2 a 3 líneas
+                            : 'Tendencias de moda, tutoriales de maquillaje, y consejos de est...',
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 9, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          height: 1.3,
+                        ),
                       ),
                     ),
                   ],
