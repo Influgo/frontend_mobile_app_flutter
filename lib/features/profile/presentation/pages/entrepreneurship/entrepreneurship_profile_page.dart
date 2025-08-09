@@ -59,6 +59,7 @@ class _EntrepreneurshipProfilePageState
   //bool showTwitchField = false;
   List<String> focusTags = [];
   List<String> addressList = [];
+  bool showCollaborations = false;
 
   String? selectedCategory;
   List<String> categories = [
@@ -89,7 +90,8 @@ class _EntrepreneurshipProfilePageState
       _initialYoutube,
       //_initialTwitch,
       _initialSelectedCategory,
-      _initialSelectedModality;
+      _initialSelectedModality,
+      _initialShowCollaborations;
   bool? _initialIsPublic;
   List<String>? _initialFocusTags, _initialAddressList;
   List<Map<String, dynamic>>? _initialExistingExtraFiles;
@@ -226,6 +228,7 @@ class _EntrepreneurshipProfilePageState
         _initialDescription != descriptionController.text ||
         _initialSelectedCategory != selectedCategory ||
         _initialSelectedModality != selectedModality ||
+        _initialShowCollaborations != showCollaborations ||
         _initialIsPublic != isPublic ||
         _profileImage != null || // Nueva imagen de perfil
         _coverImage != null || // Nueva imagen de portada
@@ -2095,12 +2098,43 @@ class _EntrepreneurshipProfilePageState
                               ),
                               const SizedBox(height: 16),
                               // buildImageUploadButton(), // UI para "EXTRA" files
-                              buildExtraFilesSection(), // UI para "EXTRA" files
+                              buildExtraFilesSection(),
+                               // UI para "EXTRA" files
+
                               const SizedBox(height: 30),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: (_isDirty && !isSaving)
+                              const Text("Colaboraciones",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "¿Deseas mostrar tus colaboraciones en tu perfil? (Puedes cambiar esta opción en cualquier momento)",
+                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 10),
+                              
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: showCollaborations,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        showCollaborations = value ?? false;
+                                        _checkForChanges();
+                                      });
+                                    },
+                                    activeColor: Colors.black,
+                                  ),
+                                  const Text(
+                                    "Sí, quiero mostrar mis colaboraciones",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+  
+                               const SizedBox(height: 30),
+                               SizedBox(
+                                 width: double.infinity,
+                                 child: ElevatedButton(
+                                   onPressed: (_isDirty && !isSaving)
                                       ? _handleSaveChanges
                                       : null,
                                   style: ElevatedButton.styleFrom(
