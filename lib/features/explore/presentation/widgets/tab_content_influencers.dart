@@ -31,7 +31,7 @@ class _TabContentInfluencersState extends State<TabContentInfluencers>
   // Almacena todos los influencers originales y paginación
   List<Influencer> _allInfluencers = [];
   int _currentPageAll = 0;
-  final int _pageSizeAll = 50;
+  final int _pageSizeAll = 150;
   bool _hasMoreAll = true;
 
   // Categorías específicas para influencers
@@ -111,6 +111,25 @@ class _TabContentInfluencersState extends State<TabContentInfluencers>
           //if (loadMore) _isLoadingMoreAll = false;
 
           if (isInitialLoad) {
+            try {
+              final uniqueCategories = _allInfluencers
+                  .map((e) => e.category)
+                  .where((category) =>
+                      category != 'N/A' &&
+                      category.isNotEmpty &&
+                      !FilterConstants.categories.contains(category))
+                  .toSet()
+                  .toList();
+              uniqueCategories.sort();
+              _categories = [
+                "Todos",
+                ...FilterConstants.categories,
+                ...uniqueCategories
+              ];
+            } catch (e) {
+              // Manejo de error si ocurre al procesar categorías
+              _categories = ["Todos", ...FilterConstants.categories];
+            }
             final uniqueCategories = _allInfluencers
                 .map((e) => e.category)
                 .where((category) =>
@@ -192,17 +211,17 @@ class _TabContentInfluencersState extends State<TabContentInfluencers>
 
     // Preparar "Más populares" - ordenar por seguidores
     _allPopularSorted = List<Influencer>.from(filteredInfluencers)
-      ..sort((a, b) => b.followersCount.compareTo(a.followersCount));
+      ..sort((a, b) => b.id.compareTo(a.id));
     _mostPopularDisplay = _allPopularSorted.take(_visiblePopularCount).toList();
 
     // Preparar "Más solicitados" - ordenar por colaboraciones
     _allRequestedSorted = List<Influencer>.from(filteredInfluencers)
-      ..sort((a, b) => b.collaborationsCount.compareTo(a.collaborationsCount));
+      ..sort((a, b) => b.s3Files.length.compareTo(a.s3Files.length));
     _mostRequestedDisplay = _allRequestedSorted.take(_visibleRequestedCount).toList();
 
     // Preparar "Mejor valoración" - ordenar por rating
     _allBestRatedSorted = List<Influencer>.from(filteredInfluencers)
-      ..sort((a, b) => b.rating.compareTo(a.rating));
+      ..sort((a, b) => a.id.compareTo(b.id));
     _bestRatedDisplay = _allBestRatedSorted.take(_visibleBestRatedCount).toList();
   }
 
@@ -270,15 +289,15 @@ class _TabContentInfluencersState extends State<TabContentInfluencers>
     final filtered = _getFilteredInfluencers();
 
     final popularTempCheck = List<Influencer>.from(filtered)
-      ..sort((a, b) => b.followersCount.compareTo(a.followersCount));
+      ..sort((a, b) => b.id.compareTo(a.id));
     if (popularTempCheck.length < _visiblePopularCount) needsMoreData = true;
 
     final requestedTempCheck = List<Influencer>.from(filtered)
-      ..sort((a, b) => b.collaborationsCount.compareTo(a.collaborationsCount));
+      ..sort((a, b) => b.s3Files.length.compareTo(a.s3Files.length));
     if (requestedTempCheck.length < _visibleRequestedCount) needsMoreData = true;
 
     final ratedTempCheck = List<Influencer>.from(filtered)
-      ..sort((a, b) => b.rating.compareTo(a.rating));
+      ..sort((a, b) => a.id.compareTo(b.id));
     if (ratedTempCheck.length < _visibleBestRatedCount) needsMoreData = true;
 
     if (needsMoreData && _hasMoreAll && !_isLoadingMoreAll) {
@@ -338,17 +357,17 @@ class _TabContentInfluencersState extends State<TabContentInfluencers>
 
     // Determinar si se puede cargar más para cada sección
     final sortedPopular = List<Influencer>.from(filteredInfluencers)
-      ..sort((a, b) => b.followersCount.compareTo(a.followersCount));
+      ..sort((a, b) => b.id.compareTo(a.id));
     bool canLoadMorePopular = _mostPopularDisplay.length < sortedPopular.length ||
         (_hasMoreAll && _mostPopularDisplay.length == sortedPopular.length);
 
     final sortedRequested = List<Influencer>.from(filteredInfluencers)
-      ..sort((a, b) => b.collaborationsCount.compareTo(a.collaborationsCount));
+      ..sort((a, b) => b.s3Files.length.compareTo(a.s3Files.length));
     bool canLoadMoreRequested = _mostRequestedDisplay.length < sortedRequested.length ||
         (_hasMoreAll && _mostRequestedDisplay.length == sortedRequested.length);
 
     final sortedRated = List<Influencer>.from(filteredInfluencers)
-      ..sort((a, b) => b.rating.compareTo(a.rating));
+      ..sort((a, b) => a.id.compareTo(b.id));
     bool canLoadMoreRated = _bestRatedDisplay.length < sortedRated.length ||
         (_hasMoreAll && _bestRatedDisplay.length == sortedRated.length);
 

@@ -3,6 +3,7 @@ import 'package:frontend_mobile_app_flutter/core/constants/api_endpoints.dart';
 import 'package:frontend_mobile_app_flutter/core/utils/api_helper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:logger/logger.dart';
 import 'package:frontend_mobile_app_flutter/core/errors/exceptions.dart';
 
 abstract class AuthRemoteDataSource {
@@ -11,16 +12,16 @@ abstract class AuthRemoteDataSource {
   Future<http.Response> registerInfluencer(Map<String, dynamic> influencerData);
   Future<http.Response> registerEntrepreneur(
       Map<String, dynamic> entrepreneurData);
-  Future<http.Response> validateImages({
-    required String userIdentifier,
+  Future<Map<String, dynamic>> validateImages({
+    required String dni,
     required Uint8List documentFrontImage,
-    required Uint8List documentBackImage,
     required Uint8List profileImage,
   });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final http.Client client;
+  final Logger logger = Logger();
 
   AuthRemoteDataSourceImpl({required this.client});
 
@@ -90,39 +91,56 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<http.Response> validateImages({
-    required String userIdentifier,
+  Future<Map<String, dynamic>> validateImages({
+    required String dni,
     required Uint8List documentFrontImage,
-    required Uint8List documentBackImage,
     required Uint8List profileImage,
   }) async {
-    final url =
-        Uri.parse(APIHelper.buildUrl(validateImagesEndpoint).toString());
+    const String awsLambdaUrl = 'https://zwea5hhty3bfr66h2tyyi4k56u0eoohw.lambda-url.us-east-2.on.aws/';
+    const String apiKey = 'Wb3qcG8dtSGan2TPC6A5PEZEPFuMu5ow';
+    
+    logger.i('Enviando imágenes al nuevo endpoint AWS Lambda...');
+    logger.i('DNI: $dni');
+    
+    final url = Uri.parse(awsLambdaUrl);
     final request = http.MultipartRequest('POST', url)
-      ..fields['userIdentifier'] = userIdentifier
+      ..headers['x-app-secret'] = apiKey
+      ..fields['dni'] = dni
       ..files.add(http.MultipartFile.fromBytes(
-        'documentFrontImage',
-        documentFrontImage,
-        filename: 'documentFrontImage.jpg',
-      ))
-      ..files.add(http.MultipartFile.fromBytes(
-        'documentBackImage',
-        documentBackImage,
-        filename: 'documentBackImage.jpg',
-      ))
-      ..files.add(http.MultipartFile.fromBytes(
-        'profileImage',
+        'photo', // selfie
         profileImage,
-        filename: 'profileImage.jpg',
+        filename: 'photo.jpg',
+      ))
+      ..files.add(http.MultipartFile.fromBytes(
+        'document', // documento frontal únicamente
+        documentFrontImage,
+        filename: 'document.jpg',
       ));
+
+    logger.i('Enviando request a: $awsLambdaUrl');
+    logger.i('Headers: ${request.headers}');
+    logger.i('Fields: ${request.fields}');
+    logger.i('Archivos: ${request.files.map((f) => f.field).toList()}');
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
+    logger.i('Respuesta recibida - Status: ${response.statusCode}');
+    logger.i('Respuesta body: ${response.body}');
+
     if (response.statusCode != 200) {
-      throw ServerException(message: 'Error validating images');
+      logger.e('Error en validación de imágenes - Status: ${response.statusCode}');
+      logger.e('Error body: ${response.body}');
+      throw ServerException(message: 'Error validating images: ${response.statusCode}');
     }
 
-    return response;
+    try {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      logger.i('Response data parseada: $responseData');
+      return responseData;
+    } catch (e) {
+      logger.e('Error parseando respuesta JSON: $e');
+      throw ServerException(message: 'Error parsing response: $e');
+    }
   }
 }
