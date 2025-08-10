@@ -134,6 +134,12 @@ class _SearchPageState extends State<SearchPage>
     super.dispose();
   }
 
+  String _getCurrentSearchType() {
+    // Para búsquedas unificadas, siempre retornar 'unified'
+    // El SearchSuggestions ahora busca en ambos tipos automáticamente
+    return 'entrepreneur'; // Mantenemos por compatibilidad, pero ahora busca en ambos
+  }
+
   void _onSearchSubmitted() {
     if (_searchQuery.trim().isNotEmpty) {
       setState(() {
@@ -316,6 +322,7 @@ class _SearchPageState extends State<SearchPage>
                   )
                 : SearchSuggestions(
                     searchQuery: _searchQuery,
+                    searchType: _getCurrentSearchType(),
                     onSuggestionTap: (suggestion) {
                       _searchController.text = suggestion;
                       _onSearchSubmitted();

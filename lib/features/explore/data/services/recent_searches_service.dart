@@ -240,13 +240,13 @@ class RecentSearchesService {
     );
   }
 
-  // Crear RecentSearch desde Influencer (para cuando esté listo)
+  // Crear RecentSearch desde Influencer
   static RecentSearch fromInfluencer(dynamic influencer) {
     return RecentSearch(
       id: influencer.id.toString(),
-      name: influencer.name ?? 'Influencer',
-      nickname: influencer.username ?? 'username',
-      logoUrl: influencer.profileImage?.url,
+      name: influencer.influencerName ?? 'Influencer',
+      nickname: influencer.alias ?? '',
+      logoUrl: influencer.influencerLogo?.url,
       type: 'influencer',
       timestamp: DateTime.now(),
     );
