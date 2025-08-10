@@ -207,17 +207,6 @@ class LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Ingresar como invitado',
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 34, 34, 34),
-                            decoration: TextDecoration.underline,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
