@@ -69,15 +69,20 @@ class LoginPageState extends State<LoginPage> {
           await prefs.setString('userId', userId);
           logger.i('userId almacenado exitosamente');
 
-          await _fetchAndStoreUserRole(token, userIdentifier, userId, prefs, logger);
+          bool roleObtained = await _fetchAndStoreUserRole(token, userIdentifier, userId, prefs, logger);
 
           logger.i('Token: $token');
           logger.i('userIdentifier: $userIdentifier');
           logger.i('userId: $userId');
 
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
+          if (roleObtained) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          } else {
+            await _clearStoredData(prefs);
+            _showSnackBar("Error al obtener información del usuario. Intente nuevamente.");
+          }
         } else {
           _showSnackBar("Error al obtener el token");
         }
@@ -92,7 +97,7 @@ class LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _fetchAndStoreUserRole(String token, String userIdentifier, String userId, SharedPreferences prefs, Logger logger) async {
+  Future<bool> _fetchAndStoreUserRole(String token, String userIdentifier, String userId, SharedPreferences prefs, Logger logger) async {
     try {
       final identifier = userIdentifier.isNotEmpty ? userIdentifier : userId;
 
@@ -108,8 +113,9 @@ class LoginPageState extends State<LoginPage> {
         final Map<String, dynamic> accountData = json.decode(accountResponse.body);
 
         String userRole = '';
-        if (accountData['roles'] != null && accountData['roles'].isNotEmpty) {
-          final roles = accountData['roles'] as List;
+        // La respuesta viene anidada en 'userDto'
+        if (accountData['userDto'] != null && accountData['userDto']['roles'] != null && accountData['userDto']['roles'].isNotEmpty) {
+          final roles = accountData['userDto']['roles'] as List;
           if (roles.isNotEmpty && roles[0]['role'] != null) {
             userRole = roles[0]['role']['name'] ?? '';
           }
@@ -118,13 +124,26 @@ class LoginPageState extends State<LoginPage> {
         if (userRole.isNotEmpty) {
           await prefs.setString('userRole', userRole);
           logger.i('userRole almacenado exitosamente: $userRole');
+          return true;
+        } else {
+          logger.e('Rol de usuario vacío o no encontrado');
+          return false;
         }
       } else {
         logger.w('Error al obtener información del usuario: ${accountResponse.statusCode}');
+        return false;
       }
     } catch (e) {
       logger.e('Error al obtener el rol del usuario: $e');
+      return false;
     }
+  }
+
+  Future<void> _clearStoredData(SharedPreferences prefs) async {
+    await prefs.remove('token');
+    await prefs.remove('userIdentifier');
+    await prefs.remove('userId');
+    await prefs.remove('userRole');
   }
 
   void _showSnackBar(String message) {

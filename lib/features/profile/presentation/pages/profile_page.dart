@@ -85,8 +85,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
 
           // Extraer el rol del usuario si no estaba almacenado localmente
-          if (userRole == null && data['roles'] != null && data['roles'].isNotEmpty) {
-            final roles = data['roles'] as List;
+          if (userRole == null && data['userDto'] != null && data['userDto']['roles'] != null && data['userDto']['roles'].isNotEmpty) {
+            final roles = data['userDto']['roles'] as List;
             if (roles.isNotEmpty && roles[0]['role'] != null) {
               userRole = roles[0]['role']['name'];
               // Almacenar el rol para futuros usos

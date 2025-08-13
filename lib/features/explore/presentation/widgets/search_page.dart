@@ -88,10 +88,10 @@ class _SearchPageState extends State<SearchPage>
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = json.decode(response.body);
           
-          // Extraer el rol del usuario de roles[0].role.name
+          // Extraer el rol del usuario de userDto.roles[0].role.name
           String userRole = '';
-          if (data['roles'] != null && data['roles'].isNotEmpty) {
-            final roles = data['roles'] as List;
+          if (data['userDto'] != null && data['userDto']['roles'] != null && data['userDto']['roles'].isNotEmpty) {
+            final roles = data['userDto']['roles'] as List;
             if (roles.isNotEmpty && roles[0]['role'] != null) {
               userRole = roles[0]['role']['name'] ?? '';
             }
