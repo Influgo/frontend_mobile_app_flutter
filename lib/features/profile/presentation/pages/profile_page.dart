@@ -77,11 +77,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final Map<String, dynamic> data = json.decode(response.body);
 
         setState(() {
-          fullName = '${data['names']} ${data['lastNames']}';
+          fullName = '${data['userDto']['names']} ${data['userDto']['lastNames']}';
 
-          if (data['profileImage'] != null &&
-              data['profileImage']['url'] != null) {
-            profileImageUrl = data['profileImage']['url'];
+          if (data['userDto']['profileImage'] != null &&
+              data['userDto']['profileImage']['url'] != null) {
+            profileImageUrl = data['userDto']['profileImage']['url'];
           }
 
           // Extraer el rol del usuario si no estaba almacenado localmente

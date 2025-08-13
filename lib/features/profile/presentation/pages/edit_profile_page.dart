@@ -91,23 +91,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
         setState(() {
           // Set controllers with data from API
-          initialName = nameController.text = data['names'] ?? '';
-          initialLastName = lastNameController.text = data['lastNames'] ?? '';
+          initialName = nameController.text = data['userDto']['names'] ?? '';
+          initialLastName = lastNameController.text = data['userDto']['lastNames'] ?? '';
 
-          if (data['identification'] != null) {
+          if (data['userDto']['identification'] != null) {
             initialDocument = documentController.text =
-                data['identification']['number'] ?? '';
-            documentType = data['identification']['type'] ?? '';
+                data['userDto']['identification']['number'] ?? '';
+            documentType = data['userDto']['identification']['type'] ?? '';
             print('📥 Documento: $documentType - $initialDocument');
           }
 
-          initialEmail = emailController.text = data['email'] ?? '';
-          initialPhone = phoneController.text = data['phoneNumber'] ?? '';
+          initialEmail = emailController.text = data['userDto']['email'] ?? '';
+          initialPhone = phoneController.text = data['userDto']['phoneNumber'] ?? '';
 
           // Profile image URL
-          if (data['profileImage'] != null &&
-              data['profileImage']['url'] != null) {
-            profileImageUrl = data['profileImage']['url'];
+          if (data['userDto']['profileImage'] != null &&
+              data['userDto']['profileImage']['url'] != null) {
+            profileImageUrl = data['userDto']['profileImage']['url'];
             print('📥 Imagen de perfil: $profileImageUrl');
           }
 
