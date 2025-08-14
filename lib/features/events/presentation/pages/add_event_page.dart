@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/card_info_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/section_title_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -36,6 +35,9 @@ class _AddEventPageState extends State<AddEventPage> {
 
   bool showPayment = false;
   bool isLoading = false;
+  
+  // Variable para tipo de publicidad
+  String selectedPublicityType = 'presencial'; // 'presencial' o 'virtual'
 
   // Variables para el mapa
   GoogleMapController? mapController;
@@ -686,13 +688,8 @@ class _AddEventPageState extends State<AddEventPage> {
                       ],
                     ),
                     const SectionTitleWidget("Tipo de publicidad"),
-                    buildTextField(
-                        'Tipo de publicidad', kindOfPublicityController),
-                    const CardInfoWidget(
-                      title: "Publicidad virtual",
-                      subtitle:
-                          "Publicidad que se puede realizar desde cualquier lugar (no requiere la presencia física del influencer).",
-                    ),
+                    const SizedBox(height: 16),
+                    _buildPublicityTypeSection(),
                     const SizedBox(height: 10),
                     const SectionTitleWidget(
                         "Trabajo a realizar y Participación"),
@@ -771,6 +768,102 @@ class _AddEventPageState extends State<AddEventPage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPublicityTypeSection() {
+    return Column(
+      children: [
+        _buildPublicityOption(
+          value: 'presencial',
+          title: 'Publicidad presencial',
+          subtitle: 'Publicidad que requiere que el influencer se dirija al lugar indicado.',
+        ),
+        const SizedBox(height: 12),
+        _buildPublicityOption(
+          value: 'virtual',
+          title: 'Publicidad virtual',
+          subtitle: 'Publicidad que se puede realizar desde cualquier lugar (no requiere la presencia física del influencer).',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPublicityOption({
+    required String value,
+    required String title,
+    required String subtitle,
+  }) {
+    final bool isSelected = selectedPublicityType == value;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedPublicityType = value;
+          kindOfPublicityController.text = title;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Color(0xFFF2F2F7),
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          color: Color(0xFFF2F2F7),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? Colors.black : Colors.grey.shade800,
+                  width: 2,
+                ),
+                //color: isSelected ? Colors.blue : Colors.white,
+              ),
+              child: isSelected
+                  ? const Icon(
+                      Icons.circle,
+                      size: 12,
+                      color: Colors.black,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected ? Colors.black : Colors.grey.shade800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isSelected ? Colors.black : Colors.grey.shade800,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
