@@ -5,11 +5,40 @@ import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/pill_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/section_title_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/application_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class EventDetailPage extends StatelessWidget {
+class EventDetailPage extends StatefulWidget {
   final Event event;
 
   const EventDetailPage({super.key, required this.event});
+
+  @override
+  _EventDetailPageState createState() => _EventDetailPageState();
+}
+
+class _EventDetailPageState extends State<EventDetailPage> {
+
+  bool _isLoading = true;
+  String? _errorMessage;
+  String? _userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedUserRole = prefs.getString('userRole');
+      setState(() {
+        _userRole = storedUserRole;
+      });
+    } catch (e) {
+      debugPrint('Error al cargar rol del usuario: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +47,17 @@ class EventDetailPage extends StatelessWidget {
     final DateFormat timeFormat = DateFormat('h:mm a', 'es');
 
     final String formattedDate =
-        dateFormat.format(event.eventDetailsStartDateEvent);
+        dateFormat.format(widget.event.eventDetailsStartDateEvent);
     final String formattedDayDate =
-        dayFormat.format(event.eventDetailsStartDateEvent);
+        dayFormat.format(widget.event.eventDetailsStartDateEvent);
     final String formattedTimeRange =
-        'de ${timeFormat.format(event.eventDetailsStartDateEvent)} - ${timeFormat.format(event.eventDetailsEndDateEvent)}';
+        'de ${timeFormat.format(widget.event.eventDetailsStartDateEvent)} - ${timeFormat.format(widget.event.eventDetailsEndDateEvent)}';
 
     final String defaultImageUrl =
         'https://cdn.pixabay.com/photo/2024/11/25/10/38/mountains-9223041_1280.jpg';
 
-    final String imageUrl = (event.s3File?.isUrlValid == true)
-        ? event.s3File!.url!
+    final String imageUrl = (widget.event.s3File?.isUrlValid == true)
+        ? widget.event.s3File!.url!
         : defaultImageUrl;
 
     return Scaffold(
@@ -66,7 +95,7 @@ class EventDetailPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        event.eventName,
+                        widget.event.eventName,
                         style: const TextStyle(fontSize: 20),
                       ),
                       const SizedBox(height: 4),
@@ -86,7 +115,7 @@ class EventDetailPage extends StatelessWidget {
                       const SizedBox(height: 24),
                       SectionTitleWidget("Acerca de"),
                       Text(
-                        event.eventDescription,
+                        widget.event.eventDescription,
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(height: 24),
@@ -118,12 +147,12 @@ class EventDetailPage extends StatelessWidget {
                       const SizedBox(height: 24),
                       SectionTitleWidget("Monto por persona"),
                       Text(
-                        "${event.jobDetailsPayFare} soles",
+                        "${widget.event.jobDetailsPayFare} soles",
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(height: 24),
                       SectionTitleWidget("Ubicación"),
-                      if (event.address.isEmpty || event.address == 'Sin dirección')
+                      if (widget.event.address.isEmpty || widget.event.address == 'Sin dirección')
                         Padding(
                           padding: const EdgeInsets.only(bottom: 4.0),
                           child: Row(
@@ -150,7 +179,7 @@ class EventDetailPage extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  event.address,
+                                  widget.event.address,
                                   style: const TextStyle(fontSize: 14),
                                 ),
                               ),
@@ -158,34 +187,35 @@ class EventDetailPage extends StatelessWidget {
                           ),
                         ),
                       const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ApplicationPage(event: event),
+                      if (_userRole?.toUpperCase() == 'INFLUENCER')
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ApplicationPage(event: widget.event),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5),
                             ),
-                          ),
-                          child: const Text(
-                            'Postular',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                            child: const Text(
+                              'Postular',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: 16),
                     ],
                   ),
