@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 
 class Step65ImagesNotValidatedPage extends StatefulWidget {
@@ -20,15 +24,47 @@ class Step65ImagesNotValidatedPage extends StatefulWidget {
 
 class _Step65ImagesNotValidatedPageState
     extends State<Step65ImagesNotValidatedPage> {
-  void retryProcess() {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => Step4RegisterPage(
-          onImageCaptured: (image) {},
-        ),
-      ),
-          (route) => false,
+  Future<void> retryProcess() async {
+    // Limpiar las imágenes guardadas antes de reintentar
+    await _clearSavedImages();
+    
+    // Regresar al Step4 (toma de fotos del DNI) dentro del flujo de registro
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => RegisterPage(initialStep: 4)),
     );
+  }
+
+  Future<void> _clearSavedImages() async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Limpiar SOLO las rutas de imágenes guardadas (mantener todos los datos del usuario)
+    await prefs.remove('saved_image_path_doc_front');
+    await prefs.remove('saved_image_path_doc_back');
+    
+    // También limpiar los archivos físicos de las imágenes si existen
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final frontImageFile = File('${directory.path}/document_front.jpg');
+      final backImageFile = File('${directory.path}/document_back.jpg');
+      final selfieImageFile = File('${directory.path}/selfie_register.jpg');
+      
+      if (await frontImageFile.exists()) {
+        await frontImageFile.delete();
+      }
+      if (await backImageFile.exists()) {
+        await backImageFile.delete();
+      }
+      if (await selfieImageFile.exists()) {
+        await selfieImageFile.delete();
+      }
+    } catch (e) {
+      // Ignorar errores de eliminación de archivos
+    }
+    
+    // NOTA: Se mantienen todos los datos del usuario:
+    // - first_name_register, last_name_register, dni_register
+    // - email_register, phone_register, password_register  
+    // - selected_profile, instagram_register, etc.
   }
 
   @override
