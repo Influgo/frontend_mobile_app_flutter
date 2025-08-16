@@ -36,6 +36,7 @@ dependencies:
   app_links: ^3.5.1
   font_awesome_flutter: ^10.6.0
   video_player: ^2.7.2
+  flutter_image_compress: ^2.0.4
 
 dev_dependencies:
   flutter_test:
