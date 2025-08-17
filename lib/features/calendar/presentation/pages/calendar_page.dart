@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:frontend_mobile_app_flutter/features/calendar/presentation/pages/day_events_page.dart';
-import 'package:frontend_mobile_app_flutter/features/events/data/services/event_service.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/data/services/calendar_service.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -20,7 +20,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   // Usar eventos reales del API
   Map<DateTime, List<Event>> events = {};
-  final EventService _eventService = EventService();
+  final CalendarService _calendarService = CalendarService();
   bool _isLoading = true;
 
   @override
@@ -32,15 +32,23 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Future<void> _fetchEvents() async {
     try {
+      print('🗓️ Calendar: Starting to fetch events for ${_focusedDay.year}/${_focusedDay.month}'); // Debug
       setState(() {
         _isLoading = true;
       });
 
-      // Obtener todos los eventos (puedes ajustar el tamaño según necesites)
-      final eventResponse = await _eventService.getEvents(size: 100);
+      // Obtener eventos del mes actual
+      final calendarEvents = await _calendarService.getEventsForMonth(
+        year: _focusedDay.year,
+        month: _focusedDay.month,
+      );
       
-      // Filtrar eventos solo si es emprendedor (ya que son los que crean eventos)
-      List<Event> filteredEvents = eventResponse.content;
+      print('🗓️ Calendar: Received ${calendarEvents.length} calendar events'); // Debug
+      
+      // Extraer los eventos de la respuesta
+      List<Event> filteredEvents = calendarEvents.map((calendarEvent) => calendarEvent.event).toList();
+      
+      print('🗓️ Calendar: Extracted ${filteredEvents.length} events'); // Debug
       
       // Agrupar eventos por fecha
       final Map<DateTime, List<Event>> groupedEvents = {};
@@ -62,11 +70,54 @@ class _CalendarPageState extends State<CalendarPage> {
         events = groupedEvents;
         _isLoading = false;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ Full error in _fetchEvents: $e'); // Debug
+      print('📍 Stack trace: $stackTrace'); // Debug
       debugPrint('Error al cargar eventos: $e');
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchEventsForMonth(DateTime month) async {
+    try {
+      print('🗓️ Calendar Month Change: Fetching events for ${month.year}/${month.month}'); // Debug
+      
+      // Obtener eventos del mes específico
+      final calendarEvents = await _calendarService.getEventsForMonth(
+        year: month.year,
+        month: month.month,
+      );
+      
+      print('🗓️ Calendar Month Change: Received ${calendarEvents.length} calendar events'); // Debug
+      
+      // Extraer los eventos de la respuesta
+      List<Event> filteredEvents = calendarEvents.map((calendarEvent) => calendarEvent.event).toList();
+      
+      // Agrupar eventos por fecha
+      final Map<DateTime, List<Event>> groupedEvents = {};
+      
+      for (Event event in filteredEvents) {
+        final eventDate = DateTime(
+          event.eventDetailsStartDateEvent.year,
+          event.eventDetailsStartDateEvent.month,
+          event.eventDetailsStartDateEvent.day,
+        );
+        
+        if (groupedEvents[eventDate] == null) {
+          groupedEvents[eventDate] = [];
+        }
+        groupedEvents[eventDate]!.add(event);
+      }
+
+      setState(() {
+        events = groupedEvents;
+      });
+    } catch (e, stackTrace) {
+      print('❌ Full error in _fetchEventsForMonth: $e'); // Debug
+      print('📍 Stack trace: $stackTrace'); // Debug
+      debugPrint('Error al cargar eventos del mes: $e');
     }
   }
 
@@ -464,6 +515,8 @@ class _CalendarPageState extends State<CalendarPage> {
                 setState(() {
                   _focusedDay = focusedDay;
                 });
+                // Cargar eventos del nuevo mes
+                _fetchEventsForMonth(focusedDay);
               },
             ),
           ),

@@ -51,12 +51,29 @@ class MediaFile {
   MediaFile({this.url, this.expired = false, this.expiresAt});
 
   factory MediaFile.fromJson(Map<String, dynamic> json) {
+    DateTime? expirationDate;
+    if (json['expiresAt'] != null) {
+      try {
+        // Intentar como int (timestamp en milisegundos)
+        if (json['expiresAt'] is int) {
+          expirationDate = DateTime.fromMillisecondsSinceEpoch(json['expiresAt']);
+        } else if (json['expiresAt'] is String) {
+          // Intentar parsear como string que contiene un número
+          final timestamp = int.tryParse(json['expiresAt']);
+          if (timestamp != null) {
+            expirationDate = DateTime.fromMillisecondsSinceEpoch(timestamp);
+          }
+        }
+      } catch (e) {
+        print('Error parsing expiresAt: $e');
+        expirationDate = null;
+      }
+    }
+    
     return MediaFile(
       url: json['tempUrl'] ?? json['url'],
       expired: json['expired'] ?? false,
-      expiresAt: json['expiresAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['expiresAt'])
-          : null,
+      expiresAt: expirationDate,
     );
   }
 
@@ -101,25 +118,100 @@ class Event {
 
   factory Event.fromJson(Map<String, dynamic> json) {
     try {
+      // Determinar si es la estructura del endpoint del calendario o la estructura normal
+      bool isCalendarEndpoint = json.containsKey('event') && json['event'] is Map;
+      Map<String, dynamic> eventData = isCalendarEndpoint ? json['event'] : json;
+      
+      // Extraer fechas - priorizar estructura normal, luego anidada
+      DateTime startDate;
+      DateTime endDate;
+      String kindOfPublicity;
+      
+      if (eventData.containsKey('eventDetailsStartDateEvent')) {
+        // Estructura normal (crear eventos, endpoints normales)
+        startDate = DateTime.tryParse(eventData['eventDetailsStartDateEvent'] ?? '') ?? DateTime.now();
+        endDate = DateTime.tryParse(eventData['eventDetailsEndDateEvent'] ?? '') ?? DateTime.now();
+        kindOfPublicity = eventData['eventDetailsKindOfPublicity'] ?? 'N/A';
+      } else if (eventData.containsKey('eventDetails') && eventData['eventDetails'] is Map) {
+        // Estructura anidada (endpoint del calendario)
+        final eventDetails = eventData['eventDetails'];
+        startDate = DateTime.tryParse(eventDetails['startDate'] ?? '') ?? DateTime.now();
+        endDate = DateTime.tryParse(eventDetails['endDate'] ?? '') ?? DateTime.now();
+        kindOfPublicity = eventDetails['kindOfPublicity'] ?? 'N/A';
+      } else {
+        startDate = DateTime.now();
+        endDate = DateTime.now();
+        kindOfPublicity = 'N/A';
+      }
+      
+      // Extraer detalles del trabajo - priorizar estructura normal, luego anidada
+      String jobToDo;
+      double payFare;
+      bool showPayment;
+      int quantityOfPeople;
+      
+      if (eventData.containsKey('jobDetailsJobToDo')) {
+        // Estructura normal (crear eventos, endpoints normales)
+        jobToDo = eventData['jobDetailsJobToDo'] ?? 'N/A';
+        payFare = (eventData['jobDetailsPayFare'] ?? 0).toDouble();
+        showPayment = eventData['jobDetailsShowPayment'] ?? false;
+        // Manejar conversión segura de quantityOfPeople
+        var quantityValue = eventData['jobDetailsQuantityOfPeople'];
+        if (quantityValue is String) {
+          quantityOfPeople = int.tryParse(quantityValue) ?? 0;
+        } else {
+          quantityOfPeople = (quantityValue ?? 0).toInt();
+        }
+      } else if (eventData.containsKey('eventJobDetails') && eventData['eventJobDetails'] is Map) {
+        // Estructura anidada (endpoint del calendario)
+        final jobDetails = eventData['eventJobDetails'];
+        jobToDo = jobDetails['jobToDo'] ?? 'N/A';
+        payFare = (jobDetails['payFare'] ?? 0).toDouble();
+        showPayment = jobDetails['showPayment'] ?? false;
+        // Manejar conversión segura de quantityOfPeople
+        var quantityValue = jobDetails['quantityOfPeople'];
+        if (quantityValue is String) {
+          quantityOfPeople = int.tryParse(quantityValue) ?? 0;
+        } else {
+          quantityOfPeople = (quantityValue ?? 0).toInt();
+        }
+      } else {
+        jobToDo = 'N/A';
+        payFare = 0.0;
+        showPayment = false;
+        quantityOfPeople = 0;
+      }
+      
+      // Manejar imagen - priorizar estructura normal
+      MediaFile? eventImage;
+      if (eventData['s3File'] != null) {
+        eventImage = MediaFile.fromJson(eventData['s3File']);
+      } else if (eventData['eventImage'] != null) {
+        eventImage = MediaFile.fromJson(eventData['eventImage']);
+      }
+      
+      // Manejar conversión segura del ID
+      int eventId;
+      var idValue = eventData['id'];
+      if (idValue is String) {
+        eventId = int.tryParse(idValue) ?? 0;
+      } else {
+        eventId = (idValue ?? 0).toInt();
+      }
+      
       return Event(
-        id: json['id'] ?? 0,
-        s3File:
-            json['s3File'] != null ? MediaFile.fromJson(json['s3File']) : null,
-        eventName: json['eventName'] ?? 'Evento sin nombre',
-        eventDescription: json['eventDescription'] ?? 'Sin descripción',
-        eventDetailsStartDateEvent:
-            DateTime.tryParse(json['eventDetailsStartDateEvent'] ?? '') ??
-                DateTime.now(),
-        eventDetailsEndDateEvent:
-            DateTime.tryParse(json['eventDetailsEndDateEvent'] ?? '') ??
-                DateTime.now(),
-        eventDetailsKindOfPublicity:
-            json['eventDetailsKindOfPublicity'] ?? 'N/A',
-        jobDetailsJobToDo: json['jobDetailsJobToDo'] ?? 'N/A',
-        jobDetailsPayFare: (json['jobDetailsPayFare'] ?? 0).toDouble(),
-        jobDetailsShowPayment: json['jobDetailsShowPayment'] ?? false,
-        jobDetailsQuantityOfPeople: json['jobDetailsQuantityOfPeople'] ?? 0,
-        address: json['address'] ?? 'Sin dirección',
+        id: eventId,
+        s3File: eventImage,
+        eventName: eventData['eventName'] ?? 'Evento sin nombre',
+        eventDescription: eventData['eventDescription'] ?? 'Sin descripción',
+        eventDetailsStartDateEvent: startDate,
+        eventDetailsEndDateEvent: endDate,
+        eventDetailsKindOfPublicity: kindOfPublicity,
+        jobDetailsJobToDo: jobToDo,
+        jobDetailsPayFare: payFare,
+        jobDetailsShowPayment: showPayment,
+        jobDetailsQuantityOfPeople: quantityOfPeople,
+        address: eventData['address'] ?? 'Sin dirección',
       );
     } catch (e) {
       debugPrint('Error parsing event: $e');

@@ -338,6 +338,7 @@ class _AddEventPageState extends State<AddEventPage> {
         "address": addressController.text,
         "latitude": selectedLocation.latitude,
         "longitude": selectedLocation.longitude,
+        "locationDepartment": "string", // Campo requerido por el endpoint
       };
 
       final response = await http.post(
@@ -352,7 +353,10 @@ class _AddEventPageState extends State<AddEventPage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         _showSuccessDialog();
       } else {
-        _showErrorDialog('Error al crear el evento: ${response.statusCode}');
+        // Mostrar más detalles del error
+        final errorBody = response.body;
+        print('Error response: ${response.statusCode} - $errorBody');
+        _showErrorDialog('Error al crear el evento: ${response.statusCode}\n$errorBody');
       }
     } catch (e) {
       _showErrorDialog('Error de conexión: $e');
