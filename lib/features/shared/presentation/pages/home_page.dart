@@ -4,6 +4,10 @@ import 'package:frontend_mobile_app_flutter/features/explore/presentation/pages/
 import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/events_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/modals/account_under_review_modal.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/presentation/pages/calendar_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,11 +18,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
-  bool userUnderReview = true;
+  String? _accountStatus;
+  bool _isLoadingAccountStatus = true;
 
-  static final List<Widget> _pages = <Widget>[
+  static List<Widget> _pages = <Widget>[
     ExploraPage(),
-    Center(child: Text('Calendario')),
+    Center(child: Text('Calendario')), // Will be replaced dynamically
     EventsPage(),
     Center(child: Text('Chat')),
     ProfileScreen(),
@@ -32,12 +37,67 @@ class _HomePageState extends State<HomePage> {
     'assets/icons/perfilicon.svg',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadAccountStatus();
+  }
+
+  Future<void> _loadAccountStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+      final token = prefs.getString('token');
+
+      if (userId == null || token == null) {
+        setState(() {
+          _isLoadingAccountStatus = false;
+        });
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final accountStatus = data['userDto']?['accountStatus'];
+        
+        setState(() {
+          _accountStatus = accountStatus;
+          _isLoadingAccountStatus = false;
+          // Update pages dynamically based on account status
+          if (_accountStatus?.toUpperCase() == 'ACTIVE') {
+            _pages[1] = CalendarPage();
+          } else {
+            _pages[1] = Center(child: Text('Calendario'));
+          }
+        });
+      } else {
+        setState(() {
+          _isLoadingAccountStatus = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error al cargar estado de cuenta: $e');
+      setState(() {
+        _isLoadingAccountStatus = false;
+      });
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    if ((index == 1 || index == 3) && userUnderReview) {
+    // Validación específica para Calendario (index 1) y Chat (index 3)
+    if ((index == 1 || index == 3) && _accountStatus?.toUpperCase() == 'PENDING_VERIFICATION') {
       Future.delayed(Duration(milliseconds: 300), () {
         _showAccountUnderReviewModal();
       });
@@ -61,11 +121,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: _pages[_selectedIndex],
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages
-      ),
+      body: _isLoadingAccountStatus 
+          ? const Center(child: CircularProgressIndicator())
+          : IndexedStack(
+              index: _selectedIndex,
+              children: _pages
+            ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
