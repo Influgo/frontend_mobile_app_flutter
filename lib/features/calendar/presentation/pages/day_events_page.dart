@@ -19,6 +19,16 @@ class DayEventsPage extends StatelessWidget {
     final DateFormat monthFormat = DateFormat('MMMM', 'es');
     final String formattedMonth = monthFormat.format(selectedMonth);
     
+    // Debug: Imprimir información de los eventos recibidos
+    print('📋 DayEventsPage: Received month events for ${selectedMonth.year}/${selectedMonth.month}');
+    print('📋 DayEventsPage: Total days with events: ${monthEvents.length}');
+    monthEvents.forEach((date, eventList) {
+      print('📋 DayEventsPage: Date ${date.day}/${date.month}/${date.year} has ${eventList.length} events');
+      eventList.forEach((event) {
+        print('📋 DayEventsPage: - Event: ${event.eventName}');
+      });
+    });
+    
     // Crear lista ordenada de fechas con eventos
     final sortedDates = monthEvents.keys.toList()
       ..sort((a, b) => a.compareTo(b));
