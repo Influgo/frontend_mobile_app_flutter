@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/platform_storage_helper.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/datasources/auth_remote_data_source.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
@@ -58,7 +59,6 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
 
   Future<void> deleteStoredPhotos() async {
     try {
-      final directory = await getApplicationDocumentsDirectory();
       final photoNames = [
         'document_front.jpg',
         'document_back.jpg',
@@ -66,11 +66,8 @@ class _Step7TermsConditionsPageState extends State<Step7TermsConditionsPage> {
       ];
 
       for (final photoName in photoNames) {
-        final filePath = '${directory.path}/$photoName';
-        final file = File(filePath);
-
-        if (await file.exists()) {
-          await file.delete();
+        final success = await PlatformStorageHelper.deleteImage(photoName);
+        if (success) {
           print('$photoName eliminada exitosamente');
         } else {
           print('$photoName no se encontró para eliminar');

@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/platform_storage_helper.dart';
 
 class SharedPreferencesService {
   Future<void> clearStoredValues() async {
@@ -31,7 +32,6 @@ class SharedPreferencesService {
     await prefs.remove('saved_image_path_doc_back');
 
     try {
-      final directory = await getApplicationDocumentsDirectory();
       final photoNames = [
         'document_front.jpg',
         'document_back.jpg',
@@ -39,11 +39,8 @@ class SharedPreferencesService {
       ];
 
       for (final photoName in photoNames) {
-        final filePath = '${directory.path}/$photoName';
-        final file = File(filePath);
-
-        if (await file.exists()) {
-          await file.delete();
+        final success = await PlatformStorageHelper.deleteImage(photoName);
+        if (success) {
           print('$photoName eliminada exitosamente');
         } else {
           print('$photoName no se encontró para eliminar');

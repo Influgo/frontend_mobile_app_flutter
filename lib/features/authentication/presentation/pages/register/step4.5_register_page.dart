@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/platform_storage_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
@@ -31,10 +32,8 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
   }
 
   Future<void> _loadSavedImage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final backDocImagePath = prefs.getString('saved_image_path_doc_back');
-    if (backDocImagePath != null && File(backDocImagePath).existsSync()) {
-      final imageBytes = await File(backDocImagePath).readAsBytes();
+    final imageBytes = await PlatformStorageHelper.loadImageBytes('document_back.jpg');
+    if (imageBytes != null) {
       setState(() {
         _capturedImageBytes = imageBytes;
       });
@@ -42,13 +41,7 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
   }
 
   Future<void> _saveImage(Uint8List imageBytes) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final backDocImagePath = '${directory.path}/document_back.jpg';
-    final imageFile = File(backDocImagePath);
-    await imageFile.writeAsBytes(imageBytes);
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('saved_image_path_doc_back', backDocImagePath);
+    await PlatformStorageHelper.saveImageBytes('document_back.jpg', imageBytes);
   }
 
   Future<void> _takePicture() async {

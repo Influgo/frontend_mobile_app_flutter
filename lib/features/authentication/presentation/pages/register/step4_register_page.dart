@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
 import 'package:frontend_mobile_app_flutter/core/utils/image_compression_helper.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/platform_storage_helper.dart';
 import 'package:logger/logger.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -31,10 +32,8 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
   }
 
   Future<void> _loadSavedImage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final frontDocImagePath = prefs.getString('saved_image_path_doc_front');
-    if (frontDocImagePath != null && File(frontDocImagePath).existsSync()) {
-      final imageBytes = await File(frontDocImagePath).readAsBytes();
+    final imageBytes = await PlatformStorageHelper.loadImageBytes('document_front.jpg');
+    if (imageBytes != null) {
       setState(() {
         _capturedImageBytes = imageBytes;
       });
@@ -42,13 +41,7 @@ class _Step4RegisterPageState extends State<Step4RegisterPage> {
   }
 
   Future<void> _saveImage(Uint8List imageBytes) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final frontDocImagePath = '${directory.path}/document_front.jpg';
-    final imageFile = File(frontDocImagePath);
-    await imageFile.writeAsBytes(imageBytes);
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('saved_image_path_doc_front', frontDocImagePath);
+    await PlatformStorageHelper.saveImageBytes('document_front.jpg', imageBytes);
   }
 
   Future<void> _takePicture() async {

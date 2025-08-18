@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/platform_storage_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step4_register_page.dart';
@@ -43,20 +44,9 @@ class _Step65ImagesNotValidatedPageState
     
     // También limpiar los archivos físicos de las imágenes si existen
     try {
-      final directory = await getApplicationDocumentsDirectory();
-      final frontImageFile = File('${directory.path}/document_front.jpg');
-      final backImageFile = File('${directory.path}/document_back.jpg');
-      final selfieImageFile = File('${directory.path}/selfie_register.jpg');
-      
-      if (await frontImageFile.exists()) {
-        await frontImageFile.delete();
-      }
-      if (await backImageFile.exists()) {
-        await backImageFile.delete();
-      }
-      if (await selfieImageFile.exists()) {
-        await selfieImageFile.delete();
-      }
+      await PlatformStorageHelper.deleteImage('document_front.jpg');
+      await PlatformStorageHelper.deleteImage('document_back.jpg');
+      await PlatformStorageHelper.deleteImage('selfie_register.jpg');
     } catch (e) {
       // Ignorar errores de eliminación de archivos
     }

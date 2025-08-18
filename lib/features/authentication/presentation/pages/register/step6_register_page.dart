@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
@@ -11,6 +11,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/data/models/
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_validated.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_not_validated.dart';
 import 'package:frontend_mobile_app_flutter/core/utils/image_compression_helper.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/platform_storage_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,11 +44,8 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
   }
 
   Future<void> _loadSavedImage() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final imagePath = '${directory.path}/selfie_register.jpg';
-    final imageFile = File(imagePath);
-    if (await imageFile.exists()) {
-      final imageBytes = await imageFile.readAsBytes();
+    final imageBytes = await PlatformStorageHelper.loadImageBytes('selfie_register.jpg');
+    if (imageBytes != null) {
       setState(() {
         _capturedImageBytes = imageBytes;
       });
@@ -55,10 +53,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
   }
 
   Future<void> _saveImage(Uint8List imageBytes) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final imagePath = '${directory.path}/selfie_register.jpg';
-    final imageFile = File(imagePath);
-    await imageFile.writeAsBytes(imageBytes);
+    await PlatformStorageHelper.saveImageBytes('selfie_register.jpg', imageBytes);
   }
 
   Future<void> _pickImage() async {
