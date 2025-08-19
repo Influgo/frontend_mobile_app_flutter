@@ -70,6 +70,10 @@ class _CalendarPageState extends State<CalendarPage> {
         events = groupedEvents;
         _isLoading = false;
       });
+      
+      // Precargar eventos del próximo mes para el preview
+      final nextMonth = DateTime(_focusedDay.year, _focusedDay.month + 1);
+      _loadNextMonthEvents(nextMonth);
     } catch (e, stackTrace) {
       print('❌ Full error in _fetchEvents: $e'); // Debug
       print('📍 Stack trace: $stackTrace'); // Debug
@@ -95,8 +99,11 @@ class _CalendarPageState extends State<CalendarPage> {
       // Extraer los eventos de la respuesta
       List<Event> filteredEvents = calendarEvents.map((calendarEvent) => calendarEvent.event).toList();
       
-      // Agrupar eventos por fecha
-      final Map<DateTime, List<Event>> groupedEvents = {};
+      // Agrupar eventos por fecha y actualizar solo el mes específico
+      final Map<DateTime, List<Event>> newEvents = Map.from(events); // Preservar eventos existentes
+      
+      // Limpiar solo los eventos del mes específico
+      newEvents.removeWhere((date, _) => date.year == month.year && date.month == month.month);
       
       for (Event event in filteredEvents) {
         final eventDate = DateTime(
@@ -105,15 +112,19 @@ class _CalendarPageState extends State<CalendarPage> {
           event.eventDetailsStartDateEvent.day,
         );
         
-        if (groupedEvents[eventDate] == null) {
-          groupedEvents[eventDate] = [];
+        if (newEvents[eventDate] == null) {
+          newEvents[eventDate] = [];
         }
-        groupedEvents[eventDate]!.add(event);
+        newEvents[eventDate]!.add(event);
       }
 
       setState(() {
-        events = groupedEvents;
+        events = newEvents;
       });
+      
+      // Precargar eventos del próximo mes para el preview
+      final nextMonth = DateTime(month.year, month.month + 1);
+      _loadNextMonthEvents(nextMonth);
     } catch (e, stackTrace) {
       print('❌ Full error in _fetchEventsForMonth: $e'); // Debug
       print('📍 Stack trace: $stackTrace'); // Debug
@@ -127,15 +138,66 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Map<DateTime, List<Event>> _getEventsForMonth(DateTime month) {
+    print('🔍 _getEventsForMonth: Looking for events in ${month.year}/${month.month}'); // Debug
     final Map<DateTime, List<Event>> monthEvents = {};
     
     events.forEach((date, eventList) {
       if (date.year == month.year && date.month == month.month) {
+        print('🔍 Found ${eventList.length} events for date ${date.day}/${date.month}/${date.year}'); // Debug
         monthEvents[date] = eventList;
       }
     });
     
+    print('🔍 Total events for month ${month.month}/${month.year}: ${monthEvents.length} days with events'); // Debug
     return monthEvents;
+  }
+
+  Future<void> _loadNextMonthEvents(DateTime nextMonth) async {
+    try {
+      print('🗓️ Loading events for next month preview: ${nextMonth.year}/${nextMonth.month}'); // Debug
+      
+      // Verificar si ya tenemos eventos para ese mes
+      bool hasNextMonthEvents = events.keys.any((date) => 
+        date.year == nextMonth.year && date.month == nextMonth.month);
+      
+      if (hasNextMonthEvents) {
+        print('🗓️ Next month events already loaded, skipping...'); // Debug
+        return;
+      }
+      
+      // Obtener eventos del mes específico
+      final calendarEvents = await _calendarService.getEventsForMonth(
+        year: nextMonth.year,
+        month: nextMonth.month,
+      );
+      
+      print('🗓️ Next month preview: Received ${calendarEvents.length} calendar events'); // Debug
+      
+      // Extraer los eventos de la respuesta
+      List<Event> filteredEvents = calendarEvents.map((calendarEvent) => calendarEvent.event).toList();
+      
+      // Agrupar eventos por fecha y añadir al mapa principal SIN reemplazar los existentes
+      final Map<DateTime, List<Event>> newEvents = Map.from(events); // Copiar eventos existentes
+      
+      for (Event event in filteredEvents) {
+        final eventDate = DateTime(
+          event.eventDetailsStartDateEvent.year,
+          event.eventDetailsStartDateEvent.month,
+          event.eventDetailsStartDateEvent.day,
+        );
+        
+        if (newEvents[eventDate] == null) {
+          newEvents[eventDate] = [];
+        }
+        newEvents[eventDate]!.add(event);
+      }
+
+      setState(() {
+        events = newEvents;
+      });
+    } catch (e) {
+      print('❌ Error loading next month events: $e'); // Debug
+    }
   }
 
   @override
@@ -559,6 +621,12 @@ class _CalendarPageState extends State<CalendarPage> {
         nextMonthEvents[date] = eventList;
       }
     });
+
+    // Si no hay eventos del próximo mes cargados, cargarlos (pero sin await para evitar flash)
+    if (nextMonthEvents.isEmpty) {
+      // Cargar eventos del próximo mes de forma asíncrona sin bloquear la UI
+      Future.microtask(() => _loadNextMonthEvents(nextMonth));
+    }
 
     return TableCalendar<String>(
       firstDay: DateTime.utc(2020, 1, 1),
