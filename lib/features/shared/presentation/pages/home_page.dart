@@ -4,6 +4,9 @@ import 'package:frontend_mobile_app_flutter/features/explore/presentation/pages/
 import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/events_page.dart';
 import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/modals/account_under_review_modal.dart';
+import 'package:frontend_mobile_app_flutter/features/authentication/presentation/modals/complete_profile_modal.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/influencer/influencer_profile_page.dart';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
 import 'package:frontend_mobile_app_flutter/features/calendar/presentation/pages/calendar_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +23,8 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   String? _accountStatus;
   bool _isLoadingAccountStatus = true;
+  bool? _profileCompleted;
+  String? _userRole;
 
   static List<Widget> _pages = <Widget>[
     ExploraPage(),
@@ -67,9 +72,19 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final accountStatus = data['userDto']?['accountStatus'];
+        final profileCompleted = data['profileCompleted'];
+        final roles = data['userDto']?['roles'] as List<dynamic>?;
+        
+        // Extraer el rol del usuario
+        String? userRole;
+        if (roles != null && roles.isNotEmpty) {
+          userRole = roles.first['role']?['name'];
+        }
         
         setState(() {
           _accountStatus = accountStatus;
+          _profileCompleted = profileCompleted;
+          _userRole = userRole;
           _isLoadingAccountStatus = false;
           // Update pages dynamically based on account status
           if (_accountStatus?.toUpperCase() == 'ACTIVE') {
@@ -97,10 +112,22 @@ class _HomePageState extends State<HomePage> {
     });
 
     // Validación específica para Calendario (index 1) y Chat (index 3)
-    if ((index == 1 || index == 3) && _accountStatus?.toUpperCase() == 'PENDING_VERIFICATION') {
-      Future.delayed(Duration(milliseconds: 300), () {
-        _showAccountUnderReviewModal();
-      });
+    if (index == 1 || index == 3) {
+      // Primera validación: Account Status
+      if (_accountStatus?.toUpperCase() == 'PENDING_VERIFICATION') {
+        Future.delayed(Duration(milliseconds: 300), () {
+          _showAccountUnderReviewModal();
+        });
+        return;
+      }
+      
+      // Segunda validación: Profile Completed (solo para Chat)
+      if (index == 3 && _accountStatus?.toUpperCase() == 'ACTIVE' && _profileCompleted == false) {
+        Future.delayed(Duration(milliseconds: 300), () {
+          _showCompleteProfileModal();
+        });
+        return;
+      }
     }
   }
 
@@ -116,6 +143,44 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  void _showCompleteProfileModal() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return CompleteProfileModal(
+          userRole: _userRole ?? 'INFLUENCER',
+          onClose: () {
+            Navigator.of(context).pop();
+          },
+          onCompleteProfile: () {
+            Navigator.of(context).pop();
+            _navigateToProfile();
+          },
+        );
+      },
+    );
+  }
+
+  void _navigateToProfile() {
+    // Navegar directamente a la página de creación de perfil según el rol
+    if (_userRole?.toUpperCase() == 'INFLUENCER') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const InfluencerProfilePage(),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const EntrepreneurshipProfilePage(),
+        ),
+      );
+    }
   }
 
   @override
