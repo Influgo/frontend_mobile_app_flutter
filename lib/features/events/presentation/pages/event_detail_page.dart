@@ -6,6 +6,8 @@ import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/section_title_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/pages/application_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -18,7 +20,7 @@ class EventDetailPage extends StatefulWidget {
 
 class _EventDetailPageState extends State<EventDetailPage> {
 
-  bool _isLoading = true;
+  bool _isLoading = false;
   String? _errorMessage;
   String? _userRole;
 
@@ -37,6 +39,96 @@ class _EventDetailPageState extends State<EventDetailPage> {
       });
     } catch (e) {
       debugPrint('Error al cargar rol del usuario: $e');
+    }
+  }
+
+  Future<int?> _getInfluencerId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) return null;
+
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/influencer/self'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['id'] as int?;
+      }
+    } catch (e) {
+      print('Error getting influencer ID: $e');
+    }
+    return null;
+  }
+
+  Future<void> _applyToEvent() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) {
+        setState(() {
+          _errorMessage = 'Token de autenticación no encontrado';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Obtener el influencerId
+      final influencerId = await _getInfluencerId();
+      if (influencerId == null) {
+        setState(() {
+          _errorMessage = 'No se pudo obtener el ID del influencer';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final body = {
+        "influencerId": influencerId,
+        "eventId": widget.event.id,
+      };
+
+      final response = await http.post(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/event-applications'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Navegar a la página de éxito
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ApplicationPage(event: widget.event),
+          ),
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'Error al enviar postulación: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error de conexión: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -188,33 +280,56 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         ),
                       const SizedBox(height: 24),
                       if (_userRole?.toUpperCase() == 'INFLUENCER')
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ApplicationPage(event: widget.event),
+                        Column(
+                          children: [
+                            if (_errorMessage != null)
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.red[50],
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.red[200]!),
                                 ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
+                                child: Text(
+                                  _errorMessage!,
+                                  style: TextStyle(
+                                    color: Colors.red[700],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _applyToEvent,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Postular',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
                               ),
                             ),
-                            child: const Text(
-                              'Postular',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       const SizedBox(height: 16),
                     ],

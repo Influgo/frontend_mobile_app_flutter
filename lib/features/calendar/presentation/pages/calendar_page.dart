@@ -212,6 +212,7 @@ class _CalendarPageState extends State<CalendarPage> {
           surfaceTintColor: const Color(0xFFF9F9F9), // Color cuando se hace scroll
           foregroundColor: Colors.black, // Color de los iconos y texto
           toolbarHeight: 70, // Reducir altura del AppBar
+          automaticallyImplyLeading: false, // Quitar flecha de atrás
           systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarColor: Color(0xFFF9F9F9), // Color de la barra de estado
             statusBarIconBrightness: Brightness.dark,
@@ -275,6 +276,7 @@ class _CalendarPageState extends State<CalendarPage> {
         backgroundColor: const Color(0xFFF9F9F9),
         surfaceTintColor: const Color(0xFFF9F9F9), // Color cuando se hace scroll
         foregroundColor: Colors.black, // Color de los iconos y texto
+        automaticallyImplyLeading: false, // Quitar flecha de atrás
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Color(0xFFF9F9F9), // Color de la barra de estado
           statusBarIconBrightness: Brightness.dark,

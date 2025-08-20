@@ -294,11 +294,13 @@ class DayEventsPage extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           // Ícono de flecha
+          /*
           Icon(
             Icons.chevron_right,
             color: Colors.grey[400],
             size: 20,
           ),
+          */
         ],
       ),
     );
