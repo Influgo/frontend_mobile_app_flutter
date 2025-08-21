@@ -6,6 +6,7 @@ import '../widgets/share_entrepreneurship_modal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
 
 // Modelos placeholder para datos faltantes
 class Review {
@@ -152,6 +153,12 @@ class ExploraDetailPage extends StatelessWidget {
                         onSelected: (String value) {
                           if (value == 'edit') {
                             // TODO: Implementar editar perfil
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const EntrepreneurshipProfilePage(),
+                              ),
+                            );
                           } else if (value == 'share') {
                             _showShareModal(context);
                           }

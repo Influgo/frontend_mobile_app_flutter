@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/influencer/influencer_profile_page.dart';
 
 // Modelos placeholder para datos faltantes (similares a ExploraDetailPage)
 class Review {
@@ -222,6 +223,12 @@ class InfluencerDetailPage extends StatelessWidget {
                         onSelected: (String value) {
                           if (value == 'edit') {
                             // TODO: Implementar editar perfil
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const InfluencerProfilePage(),
+                              ),
+                            );
                           } else if (value == 'share') {
                             _showShareModal(context);
                           }
