@@ -3,6 +3,9 @@ import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/influencer_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // Modelos placeholder para datos faltantes (similares a ExploraDetailPage)
 class Review {
@@ -196,56 +199,70 @@ class InfluencerDetailPage extends StatelessWidget {
             actions: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFEFEF),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert,
-                        color: Colors.black, size: 20),
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    color: Colors.white,
-                    elevation: 8,
-                    onSelected: (String value) {
-                      if (value == 'edit') {
-                        // TODO: Implementar editar perfil
-                      } else if (value == 'share') {
-                        _showShareModal(context);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit_outlined,
-                                color: Colors.black, size: 20),
-                            SizedBox(width: 12),
-                            Text('Editar Perfil',
-                                style: TextStyle(color: Colors.black)),
-                          ],
-                        ),
+                child: FutureBuilder<int?>(
+                  future: _getSelfInfluencerId(),
+                  builder: (context, snapshot) {
+                    final bool showEdit = snapshot.hasData && snapshot.data == influencer.id;
+                    return Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFEFEF),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      PopupMenuItem<String>(
-                        value: 'share',
-                        child: Row(
-                          children: [
-                            Icon(Icons.share_outlined,
-                                color: Colors.black, size: 20),
-                            SizedBox(width: 12),
-                            Text('Compartir Perfil',
-                                style: TextStyle(color: Colors.black)),
-                          ],
+                      child: PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert,
+                            color: Colors.black, size: 20),
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                        color: Colors.white,
+                        elevation: 8,
+                        onSelected: (String value) {
+                          if (value == 'edit') {
+                            // TODO: Implementar editar perfil
+                          } else if (value == 'share') {
+                            _showShareModal(context);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          final items = <PopupMenuEntry<String>>[];
+                          if (showEdit) {
+                            items.add(
+                              PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Row(
+                                  children: const [
+                                    Icon(Icons.edit_outlined,
+                                        color: Colors.black, size: 20),
+                                    SizedBox(width: 12),
+                                    Text('Editar Perfil',
+                                        style: TextStyle(color: Colors.black)),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                          items.add(
+                            PopupMenuItem<String>(
+                              value: 'share',
+                              child: Row(
+                                children: const [
+                                  Icon(Icons.share_outlined,
+                                      color: Colors.black, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Compartir Perfil',
+                                      style: TextStyle(color: Colors.black)),
+                                ],
+                              ),
+                            ),
+                          );
+                          return items;
+                        },
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -1225,5 +1242,26 @@ class InfluencerDetailPage extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Compartir perfil de ${influencer.influencerName}')),
     );
+  }
+
+  Future<int?> _getSelfInfluencerId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) return null;
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/influencer/self'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['id'] as int?;
+      }
+    } catch (e) {
+      debugPrint('Error al obtener ID de influencer: $e');
+    }
+    return null;
   }
 }

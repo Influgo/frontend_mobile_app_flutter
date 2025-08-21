@@ -22,46 +22,34 @@ class AccountUnderReviewModal extends StatelessWidget {
 
         Center(
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.85, 
+            width: MediaQuery.of(context).size.width * 0.85,
             padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(15), 
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: GestureDetector(
-                    onTap: onClose,
-                    child: SvgPicture.asset(
-                      'assets/icons/closeicon.svg',
-                      width: 20,
-                      height: 20,
-                    ),
-                  ),
-                ),
-
                 SizedBox(height: 10),
 
                 Stack(
                   alignment: Alignment.center,
                   children: [
-                  SvgPicture.asset(
-                    'assets/icons/revisionicon.svg',
-                    width: 140,
-                    height: 140,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 30.0), // Added bottom padding
-                    child: Image.asset(
-                    'assets/images/review.gif',
-                    width: 280,
-                    height: null,
-                    fit: BoxFit.contain,
+                    SvgPicture.asset(
+                      'assets/icons/revisionicon.svg',
+                      width: 140,
+                      height: 140,
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 30.0),
+                      child: Image.asset(
+                        'assets/images/review.gif',
+                        width: 280,
+                        height: null,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ],
                 ),
 
@@ -73,8 +61,8 @@ class AccountUnderReviewModal extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
                     fontSize: 17,
-                    color: Color(0xFF3D3D67), 
-                    decoration: TextDecoration.none, 
+                    color: Color(0xFF3D3D67),
+                    decoration: TextDecoration.none,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -87,22 +75,22 @@ class AccountUnderReviewModal extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w400,
                     fontSize: 14,
-                    color: Color(0xFF717191), 
+                    color: Color(0xFF717191),
                     decoration: TextDecoration.none,
                   ),
                   textAlign: TextAlign.center,
                 ),
 
-                SizedBox(height: 25), 
+                SizedBox(height: 25),
 
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: onClose,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF222222), 
+                      backgroundColor: Color(0xFF222222),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5), 
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 24),
                     ),
@@ -112,7 +100,7 @@ class AccountUnderReviewModal extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
                         fontSize: 15,
-                        color: Colors.white, 
+                        color: Colors.white,
                       ),
                     ),
                   ),
