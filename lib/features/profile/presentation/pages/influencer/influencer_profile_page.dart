@@ -344,7 +344,56 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
           focusTags = data['influencerFocus'] != null
               ? List<String>.from(data['influencerFocus'])
               : [];
-          locationController.text = data['influencerAddress']?['department'] ?? 'Lima';
+          
+          // Manejar influencerAddress de forma segura
+          String locationText = 'Lima'; // valor por defecto
+          try {
+            var addressData = data['influencerAddress'];
+            print('🔍 Estructura de influencerAddress: $addressData');
+            print('🔍 Tipo de influencerAddress: ${addressData.runtimeType}');
+            
+            if (addressData != null) {
+              if (addressData is String) {
+                // Si es directamente un string (como "N/A")
+                if (addressData == "N/A" || addressData.isEmpty) {
+                  locationText = 'Lima'; // mantener valor por defecto
+                } else {
+                  locationText = addressData;
+                }
+                print('✅ Address como string: "$addressData" → Usando: "$locationText"');
+              } else if (addressData is Map) {
+                // Si es un mapa, buscar 'department'
+                locationText = addressData['department']?.toString() ?? 'Lima';
+                print('✅ Department extraído del mapa: $locationText');
+              } else if (addressData is List && addressData.isNotEmpty) {
+                // Si es una lista, tomar el primer elemento
+                var firstAddress = addressData[0];
+                if (firstAddress is Map) {
+                  locationText = firstAddress['department']?.toString() ?? 
+                               firstAddress['address']?.toString() ?? 
+                               firstAddress.toString();
+                } else {
+                  locationText = firstAddress.toString();
+                }
+                print('✅ Address extraído de la lista: $locationText');
+              }
+            }
+          } catch (e) {
+            print('⚠️ Error procesando influencerAddress: $e');
+            locationText = 'Lima'; // mantener valor por defecto
+          }
+          
+          locationController.text = locationText;
+          
+          // Asignar selectedDepartment basado en locationText
+          if (departments.contains(locationText)) {
+            selectedDepartment = locationText;
+            print('✅ selectedDepartment asignado: $selectedDepartment');
+          } else {
+            selectedDepartment = null; // No está en la lista de departamentos
+            print('⚠️ "$locationText" no está en la lista de departamentos. selectedDepartment = null');
+          }
+          
           profileImageUrl = (data['influencerLogo'] is Map
               ? (data['influencerLogo'] as Map)['url']?.toString()
               : null);
@@ -572,6 +621,7 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
         'https://influyo-testing.ryzeon.me/api/v1/entities/influencer/update');
 
     final Map<String, dynamic> body = {
+      "id": influencerId,
       'influencerInformationInfluencerName': nameController.text,
       'alias': nicknameController.text,
       'influencerInformationInfluencerSummary': summaryController.text,
@@ -579,14 +629,13 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
           descriptionController.text,
       if (selectedCategory != null)
         'influencerInformationInfluencerCategory': selectedCategory,
-      'influencerAddress': {
-        'department': selectedDepartment,
-      },
+      'influencerAddress': selectedDepartment, // Enviar como string, no como objeto
       'influencerFocus': focusTags,
     };
 
     print('📤 Actualizando información del influencer...');
     print('📤 URL: $url');
+    print('📤 Token: ${token != null ? "Token presente (${token!.length} chars)" : "Token nulo"}');
     print('📤 Body: ${jsonEncode(body)}');
 
     try {
@@ -693,8 +742,13 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
 
     print('📤 Actualizando redes sociales...');
     print('📤 URL: $url');
-    // El body será el array de socialDtos directamente.
-    print('📤 Body: ${jsonEncode(socialDtos)}');
+    
+    // Envolver el array en un objeto según lo que espera el backend
+    final Map<String, dynamic> body = {
+      'socialDtos': socialDtos,
+    };
+    
+    print('📤 Body: ${jsonEncode(body)}');
 
     try {
       final response = await http.patch(
@@ -703,8 +757,7 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body:
-            jsonEncode(socialDtos), // Enviar el array directamente como cuerpo
+        body: jsonEncode(body), // Enviar el objeto que contiene el array
       );
 
       print('📥 Social Media Update - Status: ${response.statusCode}');
@@ -1496,31 +1549,35 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500)),
                               const SizedBox(height: 10),
-                              DropdownButtonFormField<String>(
-                                value: selectedCategory,
-                                decoration: InputDecoration(
-                                  labelText: "Categoría principal",
-                                  labelStyle: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                              SizedBox(
+                                width: double.infinity,
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedCategory,
+                                  decoration: InputDecoration(
+                                    labelText: "Categoría principal",
+                                    labelStyle: const TextStyle(
+                                        fontSize: 14, color: Colors.black),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 14, horizontal: 12),
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 14, horizontal: 12),
+                                  items: categories.map((String category) {
+                                    return DropdownMenuItem<String>(
+                                      value: category,
+                                      child: Text(category),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedCategory = newValue;
+                                      _checkForChanges();
+                                    });
+                                  },
+                                  hint: const Text('Seleccione una categoría'),
+                                  isExpanded: true,
                                 ),
-                                items: categories.map((String category) {
-                                  return DropdownMenuItem<String>(
-                                    value: category,
-                                    child: Text(category),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedCategory = newValue;
-                                    _checkForChanges();
-                                  });
-                                },
-                                hint: const Text('Seleccione una categoría'),
                               ),
                               const SizedBox(height: 10),
                               buildTextField('Resumen del influencer',
@@ -1577,12 +1634,12 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
                                 const SizedBox(height: 8),
                               ],
                               const Divider(color: Colors.grey, thickness: 0.3),
+                              /*
                               // Facebook
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  /*
                                   const Text('Facebook',
                                       style: TextStyle(
                                           fontSize: 16, color: Colors.grey)),
@@ -1740,33 +1797,36 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
                                 const SizedBox(height: 8),
                               ],
                               const SizedBox(height: 20),
-                              buildTextField("Ubicación",
-                                  locationController), // Para añadir nuevas
-                              DropdownButtonFormField<String>(
-                                value: selectedDepartment,
-                                decoration: InputDecoration(
-                                  labelText: "Ubicación",
-                                  labelStyle: const TextStyle(
-                                      fontSize: 14, color: Colors.black),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                              // buildTextField("Ubicación", locationController), // Comentado: usamos dropdown en su lugar
+                              SizedBox(
+                                width: double.infinity,
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedDepartment,
+                                  decoration: InputDecoration(
+                                    labelText: "Ubicación",
+                                    labelStyle: const TextStyle(
+                                        fontSize: 14, color: Colors.black),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 14, horizontal: 12),
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 14, horizontal: 12),
+                                  items: departments.map((String location) {
+                                    return DropdownMenuItem<String>(
+                                      value: location,
+                                      child: Text(location),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedDepartment = newValue;
+                                      _checkForChanges();
+                                    });
+                                  },
+                                  hint: const Text('Departamento donde resides'),
+                                  isExpanded: true,
                                 ),
-                                items: categories.map((String location) {
-                                  return DropdownMenuItem<String>(
-                                    value: location,
-                                    child: Text(location),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedCategory = newValue;
-                                    _checkForChanges();
-                                  });
-                                },
-                                hint: const Text('Departamento donde resides'),
                               ),
                               const SizedBox(height: 10),
                               /*
@@ -1878,8 +1938,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                            ],
-                          ),
                             ],
                           ),
                         ),

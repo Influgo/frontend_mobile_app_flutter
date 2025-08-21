@@ -18,7 +18,7 @@ class MediaValidationResult {
 
 class MediaValidationHelper {
   // Constantes de validación
-  static const double maxImageSizeInMB = 5.0;
+  static const double maxImageSizeInMB = 3.0; // 3MB por imagen (6MB total / 2 imágenes)
   static const Duration maxVideoDuration = Duration(minutes: 1);
   static const int maxTotalFiles = 3;
 

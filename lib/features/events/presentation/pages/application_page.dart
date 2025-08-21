@@ -20,26 +20,18 @@ class ApplicationPage extends StatelessWidget {
               
               // Ícono de éxito
               Container(
-                width: 130,
-                height: 130,
+                width: 150,
+                height: 150,
                 decoration: BoxDecoration(
                   color: Color(0xFFDBF2DD),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
-                  child: Container(
+                  child: Image.asset(
+                    'assets/images/check.gif',
                     width: 60,
                     height: 60,
-                    decoration: BoxDecoration(
-                      //color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Color(0xFF48BA79), width: 3.5),
-                    ),
-                    child: const Icon(
-                      Icons.check_rounded,
-                      color: Color(0xFF48BA79),
-                      size: 40,
-                    ),
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),

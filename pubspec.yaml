@@ -25,7 +25,7 @@ dependencies:
   camera: ^0.11.1
   flutter_launcher_icons: ^0.14.3
   path_provider: ^2.1.5
-  intl: ^0.18.0
+  intl: ^0.20.2
   google_maps_flutter: ^2.2.0
   geolocator: ^9.0.2
   google_places_flutter: ^2.0.9
@@ -36,6 +36,8 @@ dependencies:
   app_links: ^3.5.1
   font_awesome_flutter: ^10.6.0
   video_player: ^2.7.2
+  table_calendar: ^3.1.2
+  flutter_image_compress: ^2.0.4
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +76,7 @@ flutter:
     - assets/icons/filtericon.svg
     - assets/icons/exploraicon.svg
     - assets/icons/calendarioicon.svg
+    - assets/icons/calendarview.svg
     - assets/icons/eventosicon.svg
     - assets/icons/chaticon.svg
     - assets/icons/perfilicon.svg
@@ -85,6 +88,7 @@ flutter:
     - assets/icons/camerafillicon.svg
     - assets/icons/facebookicon.svg
     - assets/icons/instagramicon.svg
+    - assets/icons/listevents.svg
     - assets/icons/tiktokicon.svg
     - assets/icons/facebookicon.svg
     - assets/icons/instagramicon.svg

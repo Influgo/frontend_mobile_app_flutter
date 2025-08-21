@@ -10,6 +10,7 @@ import 'package:frontend_mobile_app_flutter/features/authentication/data/datasou
 import 'package:frontend_mobile_app_flutter/features/authentication/data/models/validation_data.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_validated.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/step6.5_images_not_validated.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/image_compression_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,17 +66,51 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
     final XFile? image = await picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.front,
-      maxWidth: 1080,
-      maxHeight: 1080,
+      maxWidth: 1024,      // Optimizado para mejor compresión
+      maxHeight: 1024,     // Optimizado para mejor compresión
+      imageQuality: 85,    // Calidad inicial para reducir tamaño
     );
 
     if (image != null) {
-      final imageBytes = await image.readAsBytes();
-      await _saveImage(imageBytes);
-      setState(() {
-        _capturedImageBytes = imageBytes;
-      });
-      logger.i('Foto de perfil capturada: ${imageBytes.length} bytes');
+      try {
+        final imageBytes = await image.readAsBytes();
+        logger.i('Imagen original capturada: ${ImageCompressionHelper.formatFileSize(imageBytes.length)}');
+        
+        // Comprimir imagen automáticamente
+        final compressedBytes = await ImageCompressionHelper.compressImage(
+          imageBytes, 
+          fileName: 'selfie_register.jpg'
+        );
+        
+        // Validar tamaño final
+        final imageInfo = ImageCompressionHelper.getImageInfo(compressedBytes);
+        logger.i('Imagen final: ${imageInfo['sizeInMB']}MB (válida: ${imageInfo['isValid']})');
+        
+        await _saveImage(compressedBytes);
+        setState(() {
+          _capturedImageBytes = compressedBytes;
+        });
+        
+        // Mostrar información al usuario si la imagen fue comprimida significativamente
+        if (imageBytes.length > compressedBytes.length) {
+          final compressionRatio = ((imageBytes.length - compressedBytes.length) / imageBytes.length * 100);
+          if (compressionRatio > 20) { // Si se redujo más del 20%
+            logger.i('Imagen comprimida: ${compressionRatio.toStringAsFixed(1)}% de reducción');
+          }
+        }
+        
+      } catch (e) {
+        logger.e('Error al procesar imagen: $e');
+        // Mostrar error al usuario
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error al procesar la imagen. Intente nuevamente.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -132,27 +167,11 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
 
       logger.i('Validación completada. Respuesta: $validationResponse');
 
-      // TODO: Analizar la respuesta para determinar el porcentaje de similaridad
-      // Por ahora, loggeamos la respuesta completa para entender su estructura
+      // Verificar el campo 'match' del backend para determinar si la validación fue exitosa
       logger.i('Estructura completa de la respuesta: ${validationResponse.toString()}');
       
-      // Verificar si hay un campo de porcentaje o similaridad en la respuesta
-      if (validationResponse.containsKey('percentage')) {
-        logger.i('Porcentaje encontrado: ${validationResponse['percentage']}');
-      }
-      if (validationResponse.containsKey('similarity')) {
-        logger.i('Similaridad encontrada: ${validationResponse['similarity']}');
-      }
-      if (validationResponse.containsKey('score')) {
-        logger.i('Score encontrado: ${validationResponse['score']}');
-      }
-      if (validationResponse.containsKey('confidence')) {
-        logger.i('Confidence encontrado: ${validationResponse['confidence']}');
-      }
-
-      // Determinar si la validación fue exitosa basado en la respuesta
-      // TODO: Ajustar esta lógica una vez que conozcamos el formato exacto de la respuesta
-      bool isValidationSuccessful = _determineValidationSuccess(validationResponse);
+      bool isValidationSuccessful = validationResponse['match'] == true;
+      logger.i('Campo match encontrado: ${validationResponse['match']}');
 
       logger.i('¿Validación exitosa? $isValidationSuccessful');
 
@@ -210,38 +229,6 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
     }
   }
 
-  // Método auxiliar para determinar si la validación fue exitosa
-  // TODO: Actualizar esta lógica una vez que conozcamos el formato exacto de la respuesta
-  bool _determineValidationSuccess(Map<String, dynamic> response) {
-    // Buscar posibles campos de porcentaje/similaridad
-    double? percentage;
-    
-    if (response.containsKey('percentage')) {
-      percentage = (response['percentage'] as num?)?.toDouble();
-    } else if (response.containsKey('similarity')) {
-      percentage = (response['similarity'] as num?)?.toDouble();
-    } else if (response.containsKey('score')) {
-      percentage = (response['score'] as num?)?.toDouble();
-    } else if (response.containsKey('confidence')) {
-      percentage = (response['confidence'] as num?)?.toDouble();
-    }
-
-    logger.i('Porcentaje extraído para evaluación: $percentage');
-
-    // Si no encontramos un porcentaje, asumimos éxito por el momento (para testing)
-    if (percentage == null) {
-      logger.w('No se encontró porcentaje en la respuesta, asumiendo éxito para testing');
-      return true;
-    }
-
-    // Umbral de similaridad (ajustar según requisitos)
-    const double threshold = 70.0;
-    bool isSuccessful = percentage >= threshold;
-    
-    logger.i('Porcentaje: $percentage%, Umbral: $threshold%, ¿Exitoso? $isSuccessful');
-    
-    return isSuccessful;
-  }
 
   @override
   Widget build(BuildContext context) {

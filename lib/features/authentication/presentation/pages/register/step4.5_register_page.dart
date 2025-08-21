@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/pages/register/register_page.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/gradient_bars.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/influyo_logo.dart';
+import 'package:frontend_mobile_app_flutter/core/utils/image_compression_helper.dart';
 import 'package:logger/logger.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -51,14 +52,42 @@ class _Step4_5RegisterPageState extends State<Step4_5RegisterPage> {
   }
 
   Future<void> _takePicture() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1024,      // Optimizado para compresión
+      maxHeight: 1024,     // Optimizado para compresión
+      imageQuality: 85,    // Calidad inicial
+    );
 
     if (image != null) {
-      final bytes = await image.readAsBytes();
-      await _saveImage(bytes);
-      setState(() {
-        _capturedImageBytes = bytes;
-      });
+      try {
+        final bytes = await image.readAsBytes();
+        logger.i('DNI reverso original: ${ImageCompressionHelper.formatFileSize(bytes.length)}');
+        
+        // Comprimir imagen del DNI reverso
+        final compressedBytes = await ImageCompressionHelper.compressImage(
+          bytes, 
+          fileName: 'dni_reverso.jpg'
+        );
+        
+        await _saveImage(compressedBytes);
+        setState(() {
+          _capturedImageBytes = compressedBytes;
+        });
+        
+        logger.i('DNI reverso comprimido: ${ImageCompressionHelper.formatFileSize(compressedBytes.length)}');
+        
+      } catch (e) {
+        logger.e('Error al procesar imagen DNI reverso: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error al procesar la imagen. Intente nuevamente.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
