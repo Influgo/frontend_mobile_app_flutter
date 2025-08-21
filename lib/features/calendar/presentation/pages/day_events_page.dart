@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/presentation/pages/event_information_page.dart';
 
 class DayEventsPage extends StatelessWidget {
   final DateTime selectedMonth;
@@ -164,145 +165,164 @@ class DayEventsPage extends StatelessWidget {
     final String startTime = timeFormat.format(event.eventDetailsStartDateEvent);
     final String endTime = timeFormat.format(event.eventDetailsEndDateEvent);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F7),
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(12),
-          bottomRight: Radius.circular(12),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Barra de color lateral integrada al inicio
-          Container(
-            width: 5,
-            height: 85, // Altura para cubrir todo el card
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFC20B0C),
-                  Color(0xFF7E0F9D),
-                  Color(0xFF2616C7),
-                ],
+    return Builder(
+      builder: (BuildContext context) {
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EventInformationPage(event: event),
               ),
+            );
+          },
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          ),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF2F2F7),
+              shape: BoxShape.rectangle,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+                bottomRight: Radius.circular(12),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          ),
-          // Información del evento con padding interno
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Columna izquierda: Nombre y participantes
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Nombre del evento
-                      Text(
-                        event.eventName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Participantes
-                      _buildParticipants(),
-                    ],
+            child: Row(
+              children: [
+                // Barra de color lateral integrada al inicio
+                Container(
+                  width: 5,
+                  height: 85, // Altura para cubrir todo el card
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFC20B0C),
+                        Color(0xFF7E0F9D),
+                        Color(0xFF2616C7),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 16),
-                // Columna derecha: Horas
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      startTime,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w400,
+                // Información del evento con padding interno
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Columna izquierda: Nombre y participantes
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Nombre del evento
+                            Text(
+                              event.eventName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Participantes
+                            _buildParticipants(),
+                          ],
+                        ),
                       ),
-                    ),
-                    Text(
-                      endTime,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w400,
+                      const SizedBox(width: 16),
+                      // Columna derecha: Horas
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            startTime,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            endTime,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                /*
-                // Columna derecha: Imagen del evento
-                const SizedBox(width: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.grey[300],
-                    child: event.s3File != null && event.s3File!.isUrlValid
-                        ? Image.network(
-                            event.s3File!.url!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[300],
-                                child: const Icon(
+                      /*
+                      // Columna derecha: Imagen del evento
+                      const SizedBox(width: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          color: Colors.grey[300],
+                          child: event.s3File != null && event.s3File!.isUrlValid
+                              ? Image.network(
+                                  event.s3File!.url!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[300],
+                                      child: const Icon(
+                                        Icons.image,
+                                        color: Colors.grey,
+                                        size: 25,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Icon(
                                   Icons.image,
                                   color: Colors.grey,
                                   size: 25,
                                 ),
-                              );
-                            },
-                          )
-                        : const Icon(
-                            Icons.image,
-                            color: Colors.grey,
-                            size: 25,
-                          ),
+                        ),
+                      ),
+                      */
+                    ],
                   ),
+                ),
+                ),
+                const SizedBox(width: 8),
+
+                /*
+                // Ícono de flecha
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey[400],
+                  size: 20,
                 ),
                 */
               ],
             ),
           ),
-          ),
-          const SizedBox(width: 8),
-          // Ícono de flecha
-          /*
-          Icon(
-            Icons.chevron_right,
-            color: Colors.grey[400],
-            size: 20,
-          ),
-          */
-        ],
-      ),
+        );
+      },
     );
   }
 

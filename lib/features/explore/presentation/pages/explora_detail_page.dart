@@ -3,6 +3,10 @@ import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets
 import 'package:frontend_mobile_app_flutter/features/explore/data/models/entrepreneurship_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widgets/share_entrepreneurship_modal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:frontend_mobile_app_flutter/features/profile/presentation/pages/entrepreneurship/entrepreneurship_profile_page.dart';
 
 // Modelos placeholder para datos faltantes
 class Review {
@@ -133,48 +137,68 @@ class ExploraDetailPage extends StatelessWidget {
                     color: const Color(0xFFEFEFEF),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert,
-                        color: Colors.black, size: 20),
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    color: Colors.white,
-                    elevation: 8,
-                    onSelected: (String value) {
-                      if (value == 'edit') {
-                        // TODO: Implementar editar perfil
-                      } else if (value == 'share') {
-                        _showShareModal(context);
-                      }
+                  child: FutureBuilder<bool>(
+                    future: _checkIsOwner(),
+                    builder: (context, snapshot) {
+                      final bool isOwner = snapshot.data == true;
+                      return PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert,
+                            color: Colors.black, size: 20),
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        color: Colors.white,
+                        elevation: 8,
+                        onSelected: (String value) {
+                          if (value == 'edit') {
+                            // TODO: Implementar editar perfil
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const EntrepreneurshipProfilePage(),
+                              ),
+                            );
+                          } else if (value == 'share') {
+                            _showShareModal(context);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          final List<PopupMenuEntry<String>> items = [];
+                          if (isOwner) {
+                            items.add(
+                              PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.edit_outlined,
+                                        color: Colors.black, size: 20),
+                                    SizedBox(width: 12),
+                                    Text('Editar Perfil',
+                                        style: TextStyle(color: Colors.black)),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                          items.add(
+                            PopupMenuItem<String>(
+                              value: 'share',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.share_outlined,
+                                      color: Colors.black, size: 20),
+                                  SizedBox(width: 12),
+                                  Text('Compartir Perfil',
+                                      style: TextStyle(color: Colors.black)),
+                                ],
+                              ),
+                            ),
+                          );
+                          return items;
+                        },
+                      );
                     },
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit_outlined,
-                                color: Colors.black, size: 20),
-                            SizedBox(width: 12),
-                            Text('Editar Perfil',
-                                style: TextStyle(color: Colors.black)),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'share',
-                        child: Row(
-                          children: [
-                            Icon(Icons.share_outlined,
-                                color: Colors.black, size: 20),
-                            SizedBox(width: 12),
-                            Text('Compartir Perfil',
-                                style: TextStyle(color: Colors.black)),
-                          ],
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ),
@@ -208,7 +232,7 @@ class ExploraDetailPage extends StatelessWidget {
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey[300],
                           child:
-                              Icon(Icons.broken_image, color: Colors.grey[600]),
+                          Icon(Icons.broken_image, color: Colors.grey[600]),
                         ),
                       ),
                     ),
@@ -223,10 +247,10 @@ class ExploraDetailPage extends StatelessWidget {
                         color: Colors.grey[200],
                         image: entrepreneurship.entrepreneurLogo?.url != null
                             ? DecorationImage(
-                                image: NetworkImage(
-                                    entrepreneurship.entrepreneurLogo!.url),
-                                fit: BoxFit.cover,
-                              )
+                          image: NetworkImage(
+                              entrepreneurship.entrepreneurLogo!.url),
+                          fit: BoxFit.cover,
+                        )
                             : null,
                         shape: OvalBorder(
                           side: BorderSide(
@@ -237,8 +261,8 @@ class ExploraDetailPage extends StatelessWidget {
                       ),
                       child: entrepreneurship.entrepreneurLogo?.url == null
                           ? Icon(Icons.business,
-                              size: designLogoRadius * 0.8,
-                              color: Colors.grey[600])
+                          size: designLogoRadius * 0.8,
+                          color: Colors.grey[600])
                           : null,
                     ),
                   ),
@@ -249,7 +273,7 @@ class ExploraDetailPage extends StatelessWidget {
           SliverToBoxAdapter(
             child: Container(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: _buildContent(
                 context,
                 exampleRating,
@@ -267,13 +291,13 @@ class ExploraDetailPage extends StatelessWidget {
   // ===== MÉTODO MEJORADO PARA OBTENER ICONOS DE REDES SOCIALES =====
   Widget _getSocialIcon(String socialName) {
     String lowerName = socialName.toLowerCase();
-    
+
     if (lowerName.contains("instagram")) {
       return Image.asset(
         'assets/icons/instagramicon.png',
         width: 24,
         height: 24,
-        errorBuilder: (context, error, stackTrace) => 
+        errorBuilder: (context, error, stackTrace) =>
             Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 24),
       );
     } else if (lowerName.contains("facebook")) {
@@ -281,7 +305,7 @@ class ExploraDetailPage extends StatelessWidget {
         'assets/icons/facebookicon.png',
         width: 24,
         height: 24,
-        errorBuilder: (context, error, stackTrace) => 
+        errorBuilder: (context, error, stackTrace) =>
             Icon(Icons.facebook, color: Color(0xFF1877F2), size: 24),
       );
     } else if (lowerName.contains("youtube")) {
@@ -289,7 +313,7 @@ class ExploraDetailPage extends StatelessWidget {
         'assets/icons/youtubeicon.png',
         width: 24,
         height: 24,
-        errorBuilder: (context, error, stackTrace) => 
+        errorBuilder: (context, error, stackTrace) =>
             Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 24),
       );
     } else if (lowerName.contains("tiktok")) {
@@ -297,7 +321,7 @@ class ExploraDetailPage extends StatelessWidget {
         'assets/icons/tiktokicon.png',
         width: 24,
         height: 24,
-        errorBuilder: (context, error, stackTrace) => 
+        errorBuilder: (context, error, stackTrace) =>
             Icon(Icons.music_note, color: Colors.black, size: 24),
       );
     } else {
@@ -346,11 +370,11 @@ class ExploraDetailPage extends StatelessWidget {
       int exampleTotalReviews,
       List<Review> exampleReviews,
       List<Collaborator> exampleCollaborators) {
-    
+
     // Filtrar redes sociales excluyendo Twitch y Twitter
     final filteredSocials = entrepreneurship.socialDtos
-        .where((social) => !social.name.toLowerCase().contains("twitch") && 
-                          !social.name.toLowerCase().contains("twitter"))
+        .where((social) => !social.name.toLowerCase().contains("twitch") &&
+        !social.name.toLowerCase().contains("twitter"))
         .toList();
 
     return Column(
@@ -370,9 +394,9 @@ class ExploraDetailPage extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       entrepreneurship.entrepreneurshipName,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 20,
-                          ),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                   SizedBox(width: 8),
@@ -383,10 +407,10 @@ class ExploraDetailPage extends StatelessWidget {
               Text(
                 "@${entrepreneurship.entrepreneursNickname}",
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w400,
-                      fontSize: 13,
-                    ),
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w400,
+                  fontSize: 13,
+                ),
               ),
               SizedBox(height: 10),
               PillWidget(entrepreneurship.category),
@@ -409,26 +433,26 @@ class ExploraDetailPage extends StatelessWidget {
         // Redes
         _buildSectionTitle(context, "Redes"),
         SizedBox(height: 8), // Espaciado consistente después del título
-        if (entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch") && 
-                                                       !social.name.toLowerCase().contains("twitter")).isEmpty)
+        if (entrepreneurship.socialDtos.where((social) => !social.name.toLowerCase().contains("twitch") &&
+            !social.name.toLowerCase().contains("twitter")).isEmpty)
           Text("No hay redes sociales disponibles.",
               style: TextStyle(color: Colors.grey))
         else
           Column(
             children: entrepreneurship.socialDtos
-                .where((social) => !social.name.toLowerCase().contains("twitch") && 
-                                  !social.name.toLowerCase().contains("twitter"))
+                .where((social) => !social.name.toLowerCase().contains("twitch") &&
+                !social.name.toLowerCase().contains("twitter"))
                 .map((social) {
               Widget iconWidget;
               String url = social.socialUrl.trim();
-              
+
               // Lógica para iconos usando assets personalizados
               if (social.name.toLowerCase().contains("instagram")) {
                 iconWidget = Image.asset(
                   'assets/icons/instagramicon.png',
                   width: 20,
                   height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
+                  errorBuilder: (context, error, stackTrace) =>
                       Icon(Icons.camera_alt, color: Color(0xFFE4405F), size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
@@ -443,7 +467,7 @@ class ExploraDetailPage extends StatelessWidget {
                   'assets/icons/facebookicon.png',
                   width: 20,
                   height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
+                  errorBuilder: (context, error, stackTrace) =>
                       Icon(Icons.facebook, color: Color(0xFF1877F2), size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
@@ -458,7 +482,7 @@ class ExploraDetailPage extends StatelessWidget {
                   'assets/icons/youtubeicon.png',
                   width: 20,
                   height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
+                  errorBuilder: (context, error, stackTrace) =>
                       Icon(Icons.play_circle_outline, color: Color(0xFFFF0000), size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
@@ -473,7 +497,7 @@ class ExploraDetailPage extends StatelessWidget {
                   'assets/icons/tiktokicon.png',
                   width: 20,
                   height: 20,
-                  errorBuilder: (context, error, stackTrace) => 
+                  errorBuilder: (context, error, stackTrace) =>
                       Icon(Icons.music_note, color: Colors.black, size: 20),
                 );
                 if (!(social.socialUrl.contains("http") ||
@@ -534,19 +558,19 @@ class ExploraDetailPage extends StatelessWidget {
         else
           ...entrepreneurship.addresses
               .map((address) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: Row(
-                      children: [
-                        Icon(Icons.location_on_outlined,
-                            size: 18, color: Colors.grey[700]),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(address,
-                              style: Theme.of(context).textTheme.bodyLarge),
-                        ),
-                      ],
-                    ),
-                  ))
+            padding: const EdgeInsets.only(bottom: 4.0),
+            child: Row(
+              children: [
+                Icon(Icons.location_on_outlined,
+                    size: 18, color: Colors.grey[700]),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(address,
+                      style: Theme.of(context).textTheme.bodyLarge),
+                ),
+              ],
+            ),
+          ))
               .toList(),
         SizedBox(height: 24),
         // Galería
@@ -703,7 +727,7 @@ class ExploraDetailPage extends StatelessWidget {
                               children: [
                                 Text(review.userName,
                                     style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
+                                    TextStyle(fontWeight: FontWeight.bold)),
                                 Text(
                                   "${review.date.day}/${review.date.month}/${review.date.year}",
                                   style: Theme.of(context)
@@ -728,6 +752,42 @@ class ExploraDetailPage extends StatelessWidget {
         SizedBox(height: 30),
       ],
     );
+  }
+
+  // Método para verificar si el usuario es el propietario del emprendimiento
+  Future<bool> _checkIsOwner() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) return false;
+      final uri = Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/entrepreneur/self');
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final dynamic decoded = jsonDecode(response.body);
+        if (decoded is Map) {
+          final Map<String, dynamic> data = Map<String, dynamic>.from(decoded);
+          final dynamic id = data['id'];
+          if (id is int) {
+            return id == entrepreneurship.id;
+          } else if (id is String) {
+            final parsed = int.tryParse(id);
+            if (parsed != null) {
+              return parsed.toString() == entrepreneurship.id.toString();
+            }
+            return id.toString() == entrepreneurship.id.toString();
+          } else if (id != null) {
+            return id.toString() == entrepreneurship.id.toString();
+          }
+        }
+      }
+    } catch (_) {}
+    return false;
   }
 
   Widget _buildSectionTitle(BuildContext context, String title) {
