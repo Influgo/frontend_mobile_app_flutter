@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/tab_event_content_applicators.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
-import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/event_content_information_tab.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/data/models/extended_event_model.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/tab_event_content_information.dart';
 import 'package:frontend_mobile_app_flutter/features/authentication/presentation/widgets/custom_tab_item.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class EventInformationPage extends StatefulWidget {
   final Event event;
@@ -16,6 +21,8 @@ class EventInformationPage extends StatefulWidget {
 class _EventInformationPageState extends State<EventInformationPage> 
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  ExtendedEvent? _extendedEvent;
+  bool _isLoadingApplications = false;
 
   @override
   void initState() {
@@ -23,6 +30,98 @@ class _EventInformationPageState extends State<EventInformationPage>
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       setState(() {});
+    });
+    _loadEventApplications();
+  }
+
+  Future<void> _loadEventApplications() async {
+    setState(() {
+      _isLoadingApplications = true;
+    });
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) {
+        _createEmptyExtendedEvent();
+        return;
+      }
+
+      // Obtener entrepreneur ID
+      final entrepreneurId = await _getEntrepreneurId();
+      if (entrepreneurId == null) {
+        _createEmptyExtendedEvent();
+        return;
+      }
+
+      // Llamar al endpoint para obtener eventos con aplicaciones
+      final now = DateTime.now();
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/events/schedule/month?entrepreneurId=$entrepreneurId&year=${now.year}&month=${now.month}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> eventsData = json.decode(response.body);
+        
+        // Buscar el evento actual en la respuesta
+        final eventData = eventsData.firstWhere(
+          (data) => data['event']['id'] == widget.event.id,
+          orElse: () => null,
+        );
+
+        if (eventData != null) {
+          setState(() {
+            _extendedEvent = ExtendedEvent.fromJson(eventData);
+            _isLoadingApplications = false;
+          });
+        } else {
+          _createEmptyExtendedEvent();
+        }
+      } else {
+        _createEmptyExtendedEvent();
+      }
+    } catch (e) {
+      print('Error loading event applications: $e');
+      _createEmptyExtendedEvent();
+    }
+  }
+
+  Future<int?> _getEntrepreneurId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      
+      if (token == null) return null;
+
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/entrepreneur/self'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['id'] as int?;
+      }
+    } catch (e) {
+      print('Error getting entrepreneur ID: $e');
+    }
+    return null;
+  }
+
+  void _createEmptyExtendedEvent() {
+    setState(() {
+      _extendedEvent = ExtendedEvent(
+        event: widget.event,
+        pendingApplications: [],
+        acceptedApplications: [],
+      );
+      _isLoadingApplications = false;
     });
   }
 
@@ -34,16 +133,10 @@ class _EventInformationPageState extends State<EventInformationPage>
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat dayFormat = DateFormat('EEEE d', 'es'); // Lunes 21
     final DateFormat dateFormat = DateFormat('d MMM yyyy', 'es');
-    final DateFormat timeFormat = DateFormat('h:mm a', 'es');
 
     final String formattedDate =
         dateFormat.format(widget.event.eventDetailsStartDateEvent);
-    final String formattedDayDate =
-        dayFormat.format(widget.event.eventDetailsStartDateEvent);
-    final String formattedTimeRange =
-        'de ${timeFormat.format(widget.event.eventDetailsStartDateEvent)} - ${timeFormat.format(widget.event.eventDetailsEndDateEvent)}';
     final String defaultImageUrl =
         'https://cdn.pixabay.com/photo/2024/11/25/10/38/mountains-9223041_1280.jpg';
 
@@ -123,7 +216,7 @@ class _EventInformationPageState extends State<EventInformationPage>
                         tabController: _tabController,
                       ),
                       CustomTabItem(
-                        title: 'Postulaciones',
+                        title: _isLoadingApplications ? 'Postulaciones...' : 'Postulaciones',
                         index: 1,
                         tabController: _tabController,
                       ),
@@ -176,19 +269,26 @@ class _EventInformationPageState extends State<EventInformationPage>
                   controller: _tabController,
                   children: [
                     // Tab 1: Información del evento
-                    EventContentInformationTab(event: widget.event),
-                    
-                    // Tab 2: Postulaciones (placeholder por ahora)
-                    const Center(
-                      child: Text(
-                        'Postulaciones\n(En desarrollo)',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
+                    TabEventContentInformation(event: widget.event),
+
+                    // Tab 2: Postulaciones
+                    _isLoadingApplications
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : _extendedEvent != null
+                            ? TabEventContentApplicators(
+                                extendedEvent: _extendedEvent!,
+                              )
+                            : const Center(
+                                child: Text(
+                                  'Error al cargar las aplicaciones',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
 
                     // Tab 3: Participantes (placeholder por ahora)
                     const Center(
