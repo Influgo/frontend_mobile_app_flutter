@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:frontend_mobile_app_flutter/features/calendar/data/models/extended_event_model.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/contract_entrepreneurship_screen.dart';
 
 class TabEventContentApplicators extends StatefulWidget {
   final ExtendedEvent extendedEvent;
@@ -15,6 +17,7 @@ class TabEventContentApplicators extends StatefulWidget {
 
 class _TabEventContentApplicatorsState extends State<TabEventContentApplicators> {
   late List<EventApplication> _pendingApplications;
+  final Set<int> _acceptedApplicationIds = <int>{}; // Track accepted applications
 
   @override
   void initState() {
@@ -126,10 +129,15 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Botón Aceptar - con fondo negro
+                      // Botón Aceptar/Firmar - con fondo negro
                       ElevatedButton(
                         onPressed: () {
-                          _showAcceptDialog(application);
+                          final isAccepted = _acceptedApplicationIds.contains(application.influencer.id);
+                          if (isAccepted) {
+                            _navigateToContract(application);
+                          } else {
+                            _showAcceptDialog(application);
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
@@ -141,7 +149,7 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                           minimumSize: Size(90, 45),
                         ),
                         child: Text(
-                          'Aceptar',
+                          _acceptedApplicationIds.contains(application.influencer.id) ? 'Firmar' : 'Aceptar',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -185,26 +193,128 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
   void _showAcceptDialog(EventApplication application) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Aceptar aplicación'),
-          content: Text('¿Estás seguro de que quieres aceptar la aplicación de ${application.influencer.influencerName}?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancelar'),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.85,
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _acceptApplication(application);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-              child: Text('Aceptar'),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icono de advertencia
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFF2C94C).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SvgPicture.asset(
+                      'assets/icons/alerticon.svg',
+                      width: 24,
+                      height: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                // Precaución
+                Text(
+                  '¿Seguro que deseas aceptar la aplicación de ${application.influencer.influencerName}?',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 24),
+
+                // Mensaje
+                Text(
+                  'Luego tendrás que firmar un contrato, para oficializar su participación en tu evento.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                SizedBox(height: 24),
+                
+                // Botones
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.black87,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          minimumSize: Size(100, 60),
+                        ),
+                        child: Text(
+                          'No, cancelar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _acceptApplication(application);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black87,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          minimumSize: Size(100, 60),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Sí, continuar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -242,10 +352,13 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                     color: Colors.red.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.warning_amber_rounded,
-                    color: Colors.red,
-                    size: 30,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SvgPicture.asset(
+                      'assets/icons/rejecticon.svg',
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -256,6 +369,7 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.black87,
+                    fontWeight: FontWeight.w500,
                     height: 1.4,
                   ),
                   textAlign: TextAlign.center,
@@ -277,7 +391,7 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                           minimumSize: Size(100, 60),
                         ),
                         child: Text(
-                          'No, Cancelar',
+                          'No, cancelar',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -304,7 +418,7 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                           elevation: 0,
                         ),
                         child: Text(
-                          'Sí, Rechazar',
+                          'Sí, rechazar',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -326,18 +440,47 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
     // TODO: Implementar API call para aceptar aplicación
     print('Aceptando aplicación de ${application.influencer.influencerName} para evento ${widget.extendedEvent.event.eventName}');
     
-    // Remover de la lista local temporalmente
+    // Marcar como aceptada pero mantener en la lista para mostrar botón de firmar
     setState(() {
-      _pendingApplications.remove(application);
+      _acceptedApplicationIds.add(application.influencer.id);
     });
     
     // Mostrar snackbar de confirmación
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Aplicación de ${application.influencer.influencerName} aceptada'),
+        content: Text('Aplicación de ${application.influencer.influencerName} aceptada. Ahora puedes firmar el contrato.'),
         backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
       ),
     );
+  }
+
+  void _navigateToContract(EventApplication application) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContractEntrepreneurshipScreen(
+          application: application,
+          eventName: widget.extendedEvent.event.eventName,
+        ),
+      ),
+    );
+
+    // Si se firmó el contrato, remover de la lista
+    if (result == true) {
+      setState(() {
+        _pendingApplications.remove(application);
+        _acceptedApplicationIds.remove(application.influencer.id);
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Contrato firmado con ${application.influencer.influencerName}'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _rejectApplication(EventApplication application) {

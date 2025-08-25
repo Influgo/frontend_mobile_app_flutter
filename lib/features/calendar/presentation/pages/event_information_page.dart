@@ -56,9 +56,9 @@ class _EventInformationPageState extends State<EventInformationPage>
       }
 
       // Llamar al endpoint para obtener eventos con aplicaciones
-      final now = DateTime.now();
+      final eventDate = widget.event.eventDetailsStartDateEvent;
       final response = await http.get(
-        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/events/schedule/month?entrepreneurId=$entrepreneurId&year=${now.year}&month=${now.month}'),
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/events/schedule/month?entrepreneurId=$entrepreneurId&year=${eventDate.year}&month=${eventDate.month}'),
         headers: {
           'Authorization': 'Bearer $token',
         },
