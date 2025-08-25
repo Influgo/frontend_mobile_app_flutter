@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:frontend_mobile_app_flutter/features/events/domain/repositories/event_repository_impl.dart';
 import 'package:frontend_mobile_app_flutter/features/events/domain/usecases/get_events_usecase.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/event_card_widget.dart';
@@ -183,6 +185,7 @@ class _EventsPageState extends State<EventsPage> {
   String? _errorMessage;
   List<Event> _allEvents = []; // Almacena todos los eventos originales
   String? _userRole; // Para almacenar el rol del usuario
+  String? _accountStatus; // Para almacenar el estado de verificación del usuario
 
   // Filtros básicos y avanzados
   String _selectedCategory = "Todos";
@@ -203,19 +206,49 @@ class _EventsPageState extends State<EventsPage> {
     super.initState();
     // Instanciamos el use case aquí, asegurando que el servicio se crea una vez.
     _useCase = GetEventsUseCase(EventRepositoryImpl(EventService()));
-    _loadUserRole();
+    _loadUserData();
     _fetchEvents();
   }
 
-  Future<void> _loadUserRole() async {
+  Future<void> _loadUserData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final storedUserRole = prefs.getString('userRole');
+      final userId = prefs.getString('userId');
+      final token = prefs.getString('token');
+
       setState(() {
         _userRole = storedUserRole;
       });
+
+      // Obtener el estado de verificación del usuario si tenemos userId y token
+      if (userId != null && token != null) {
+        await _loadAccountStatus(userId, token);
+      }
     } catch (e) {
-      debugPrint('Error al cargar rol del usuario: $e');
+      debugPrint('Error al cargar datos del usuario: $e');
+    }
+  }
+
+  Future<void> _loadAccountStatus(String userId, String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final accountStatus = data['userDto']?['accountStatus'];
+        setState(() {
+          _accountStatus = accountStatus;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error al cargar estado de cuenta: $e');
     }
   }
 
@@ -390,7 +423,8 @@ class _EventsPageState extends State<EventsPage> {
           Expanded(child: _buildContent()),
         ],
       ),
-      floatingActionButton: _userRole?.toUpperCase() == 'ENTREPRENEUR' 
+      floatingActionButton: _userRole?.toUpperCase() == 'ENTREPRENEUR' && 
+                             _accountStatus?.toUpperCase() == 'ACTIVE'
         ? CustomFAB(
             onPressed: () {
               Navigator.pushNamed(context, '/add-event');
