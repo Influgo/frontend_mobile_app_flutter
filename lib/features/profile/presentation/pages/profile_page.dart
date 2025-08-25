@@ -30,6 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String userId = '';
   bool isLoading = true;
   String? userRole;
+  String? accountStatus;
 
   @override
   void initState() {
@@ -78,6 +79,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         setState(() {
           fullName = '${data['userDto']['names']} ${data['userDto']['lastNames']}';
+          
+          // Obtener el estado de la cuenta
+          accountStatus = data['userDto']?['accountStatus'];
 
           if (data['userDto']['profileImage'] != null &&
               data['userDto']['profileImage']['url'] != null) {
@@ -304,6 +308,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (items[index] == 'Cerrar sesión') {
                       _showLogoutDialog(context);
                     } else if (items[index] == 'Métodos de pago' && userRole?.toUpperCase() == 'INFLUENCER') {
+                      _showAccountUnderReviewModal();
+                    } else if (accountStatus?.toUpperCase() == 'PENDING_VERIFICATION' &&
+                               (items[index] == 'Mis postulaciones' ||
+                                items[index] == 'Historial de pagos' ||
+                                items[index] == 'Faltas')) {
                       _showAccountUnderReviewModal();
                     } else {
                       navigateToPage(context, items[index]);
