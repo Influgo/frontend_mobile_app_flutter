@@ -40,7 +40,6 @@ class _EntrepreneurshipProfilePageState
   final TextEditingController tiktokController = TextEditingController();
   //final TextEditingController twitchController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController focusController = TextEditingController();
   final TextEditingController rucController = TextEditingController();
 
   // --- Nodos de Foco ---
@@ -57,7 +56,6 @@ class _EntrepreneurshipProfilePageState
   bool showTiktokField = false;
   bool showYoutubeField = false;
   //bool showTwitchField = false;
-  List<String> focusTags = [];
   List<String> addressList = [];
   bool showCollaborations = false;
 
@@ -93,7 +91,7 @@ class _EntrepreneurshipProfilePageState
       _initialSelectedModality,
       _initialShowCollaborations;
   bool? _initialIsPublic;
-  List<String>? _initialFocusTags, _initialAddressList;
+  List<String>? _initialAddressList;
   List<Map<String, dynamic>>? _initialExistingExtraFiles;
 
   // --- Variables de Imágenes ---
@@ -131,7 +129,6 @@ class _EntrepreneurshipProfilePageState
     youtubeController.addListener(_checkForChanges);
     //twitchController.addListener(_checkForChanges);
     // representativeController y addressController se manejan al agregar/borrar
-    // focusController se maneja al agregar/borrar
   }
 
   @override
@@ -160,7 +157,6 @@ class _EntrepreneurshipProfilePageState
     tiktokController.dispose();
     //twitchController.dispose();
     addressController.dispose();
-    focusController.dispose();
     rucController.dispose();
     super.dispose();
   }
@@ -179,7 +175,6 @@ class _EntrepreneurshipProfilePageState
     _initialSelectedCategory = selectedCategory;
     _initialSelectedModality = selectedModality;
     _initialIsPublic = isPublic;
-    _initialFocusTags = List.from(focusTags);
     _initialAddressList = List.from(addressList);
     // Las imágenes se comprueban por nulidad de _profileImage y _coverImage
 
@@ -237,7 +232,6 @@ class _EntrepreneurshipProfilePageState
         _initialTiktok != tiktokController.text ||
         _initialYoutube != youtubeController.text ||
         //_initialTwitch != twitchController.text ||
-        !_listEquals(_initialFocusTags, focusTags) ||
         !_listEquals(_initialAddressList, addressList) ||
         extraFilesChanged;
 
@@ -357,16 +351,11 @@ class _EntrepreneurshipProfilePageState
             }
           }
           selectedModality = data['entrepreneurAddressAddressType'] ?? 'N/A';
-          focusTags = data['entrepreneurFocus'] != null
-              ? List<String>.from(data['entrepreneurFocus'])
-              : [];
           addressList = data['entrepreneurAddresses'] != null
               ? List<String>.from(data['entrepreneurAddresses'])
               : [];
 
-          if (data['entrepreneurFocus'] != null &&
-              addressList.isNotEmpty &&
-              addressList[0] == "N/A") {
+          if (addressList.isNotEmpty && addressList[0] == "N/A") {
             _removeAddress("N/A");
           }
           // logoImageUrl = data['entrepreneurLogo']?['url'];
@@ -582,28 +571,6 @@ class _EntrepreneurshipProfilePageState
     }
   }
 
-  void _addFocusTag() {
-    String text = focusController.text.trim();
-    if (text.isNotEmpty) {
-      setState(() {
-        if (!focusTags.contains(text)) {
-          // Evitar duplicados
-          focusTags.add(text);
-          focusController.clear();
-          _checkForChanges();
-        } else {
-          showSnackBar("Este enfoque ya ha sido agregado.", isError: true);
-        }
-      });
-    }
-  }
-
-  void _removeFocusTag(String tag) {
-    setState(() {
-      focusTags.remove(tag);
-      _checkForChanges();
-    });
-  }
 
   void _addAddress() {
     String address = addressController.text.trim();
@@ -681,7 +648,6 @@ class _EntrepreneurshipProfilePageState
       'entrepreneurshipInformationDescription': descriptionController.text,
       'showOwnerName': true,
       'entrepreneurAddressAddressType': selectedModality,
-      'entrepreneurFocus': focusTags,
       'entrepreneurAddresses': addressList,
     };
 
@@ -1138,18 +1104,6 @@ class _EntrepreneurshipProfilePageState
     );
   }
 
-  Widget buildFocusTags() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 4,
-      children: focusTags
-          .map((tag) => Chip(
-                label: Text(tag),
-                onDeleted: () => _removeFocusTag(tag),
-              ))
-          .toList(),
-    );
-  }
 
   Widget buildAddressList() {
     return Column(
@@ -2056,34 +2010,6 @@ class _EntrepreneurshipProfilePageState
                                 ),
                               ),
                               buildAddressList(),
-                              const SizedBox(height: 30),
-                              /*
-                              const Text("Enfoque de tu emprendimiento",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 10),
-                              buildTextField("Enfoque",
-                                  focusController), // Para añadir nuevos
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _addFocusTag,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    side: const BorderSide(color: Colors.black),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                  ),
-                                  child: const Text("Agregar enfoque",
-                                      style: TextStyle(color: Colors.black)),
-                                ),
-                              ),
-                              */
-                              const SizedBox(height: 10),
-                              focusTags != []
-                                  ? buildFocusTags()
-                                  : Container(), // Muestra los enfoques y permite borrarlos
                               const SizedBox(height: 20),
                               const Text(
                                   "Selecciona los videos y fotos del emprendimiento",

@@ -36,7 +36,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
   final TextEditingController tiktokController = TextEditingController();
   final TextEditingController twitchController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
-  final TextEditingController focusController = TextEditingController();
 
   // --- Nodos de Foco ---
   final FocusNode instagramFocusNode = FocusNode();
@@ -51,7 +50,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
   bool showTiktokField = false;
   bool showYoutubeField = false;
   bool showTwitchField = false;
-  List<String> focusTags = [];
   bool showCollaborations = false;
 
   String? selectedCategory;
@@ -102,7 +100,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
       _initialSelectedCategory,
       _initialSelectedDepartment;
   bool? _initialShowCollaborations;
-  List<String>? _initialFocusTags;
   List<Map<String, dynamic>>? _initialExistingExtraFiles;
 
   // --- Variables de Imágenes ---
@@ -161,7 +158,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
     tiktokController.dispose();
     twitchController.dispose();
     locationController.dispose();
-    focusController.dispose();
     super.dispose();
   }
 
@@ -178,7 +174,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
     _initialSelectedCategory = selectedCategory;
     _initialSelectedDepartment = selectedDepartment;
     _initialShowCollaborations = showCollaborations;
-    _initialFocusTags = List.from(focusTags);
 
     if (_existingExtraFiles.isNotEmpty) {
       _initialExistingExtraFiles = _existingExtraFiles
@@ -229,7 +224,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
         _initialTiktok != tiktokController.text ||
         _initialYoutube != youtubeController.text ||
         _initialTwitch != twitchController.text ||
-        !_listEquals(_initialFocusTags, focusTags) ||
         extraFilesChanged;
 
     if (_isDirty != changed) {
@@ -348,9 +342,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
                   '⚠️ Categoría del API "$apiCategory" no encontrada en la lista local. Usando null para Dropdown.');
             }
           }
-          focusTags = data['influencerFocus'] != null
-              ? List<String>.from(data['influencerFocus'])
-              : [];
           
           // Manejar influencerAddress de forma segura
           String locationText = 'Lima'; // valor por defecto
@@ -565,27 +556,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
     }
   }
 
-  void _addFocusTag() {
-    String text = focusController.text.trim();
-    if (text.isNotEmpty) {
-      setState(() {
-        if (!focusTags.contains(text)) {
-          focusTags.add(text);
-          focusController.clear();
-          _checkForChanges();
-        } else {
-          showSnackBar("Este enfoque ya ha sido agregado.", isError: true);
-        }
-      });
-    }
-  }
-
-  void _removeFocusTag(String tag) {
-    setState(() {
-      focusTags.remove(tag);
-      _checkForChanges();
-    });
-  }
 
   void _showImagePickerDialog(bool isProfile) {
     showModalBottomSheet(
@@ -637,7 +607,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
       if (selectedCategory != null)
         'influencerInformationInfluencerCategory': selectedCategory,
       'influencerAddress': selectedDepartment, // Enviar como string, no como objeto
-      'influencerFocus': focusTags.isEmpty ? <String>[] : focusTags,
     };
 
     print('📤 Actualizando información del influencer...');
@@ -1096,18 +1065,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
     );
   }
 
-  Widget buildFocusTags() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 4,
-      children: focusTags
-          .map((tag) => Chip(
-                label: Text(tag),
-                onDeleted: () => _removeFocusTag(tag),
-              ))
-          .toList(),
-    );
-  }
 
   // Archivos extra con validación
   Future<void> _pickExtraFile(String type) async {
@@ -1842,34 +1799,6 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
                                   isExpanded: true,
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              /*
-                              const Text("Enfoque de tu perfil",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500)),
-                              const SizedBox(height: 10),
-                              buildTextField("Enfoque",
-                                  focusController), // Para añadir nuevos
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: _addFocusTag,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    side: const BorderSide(color: Colors.black),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
-                                  ),
-                                  child: const Text("Agregar enfoque",
-                                      style: TextStyle(color: Colors.black)),
-                                ),
-                              ),
-                              */
-                              const SizedBox(height: 10),
-                              focusTags != []
-                                  ? buildFocusTags()
-                                  : Container(), // Muestra los enfoques y permite borrarlos
                               const SizedBox(height: 20),
                               const Text(
                                   "Selecciona los videos y fotos del influencer",
