@@ -86,6 +86,7 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
   bool isSaving = false;
   String? token;
   int? influencerId;
+  int? userId;
 
   // --- Variables para detectar cambios ---
   bool _isDirty = false;
@@ -253,6 +254,12 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       token = prefs.getString('token');
+      String? userIdString = prefs.getString('userId');
+      if (userIdString != null) {
+        userId = int.tryParse(userIdString);
+        print('✅ User ID cargado: $userId');
+      }
+      
       if (token != null) {
         await fetchInfluencerData();
       } else {
@@ -611,9 +618,9 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
   }
 
   Future<bool> _updateInfluencerInfo() async {
-    print('InfluencerId: $influencerId');
-    if (influencerId == null) {
-      showSnackBar('ID de influencer no disponible.', isError: true);
+    print('UserId: $userId');
+    if (userId == null) {
+      showSnackBar('ID de usuario no disponible.', isError: true);
       return false;
     }
 
@@ -621,7 +628,7 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
         'https://influyo-testing.ryzeon.me/api/v1/entities/influencer/update');
 
     final Map<String, dynamic> body = {
-      "id": influencerId,
+      "id": userId,
       'influencerInformationInfluencerName': nameController.text,
       'alias': nicknameController.text,
       'influencerInformationInfluencerSummary': summaryController.text,
@@ -630,7 +637,7 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
       if (selectedCategory != null)
         'influencerInformationInfluencerCategory': selectedCategory,
       'influencerAddress': selectedDepartment, // Enviar como string, no como objeto
-      'influencerFocus': focusTags,
+      'influencerFocus': focusTags.isEmpty ? <String>[] : focusTags,
     };
 
     print('📤 Actualizando información del influencer...');
@@ -852,9 +859,16 @@ class _InfluencerProfilePageState extends State<InfluencerProfilePage> {
     // 1. Actualizar información principal
     infoUpdated = await _updateInfluencerInfo();
 
-    // 2. Actualizar redes sociales (solo si la info se actualizó)
-    if (infoUpdated) {
+    // 2. Actualizar redes sociales (solo si la info se actualizó Y las redes sociales cambiaron)
+    bool socialMediaChanged = _initialInstagram != instagramController.text ||
+        _initialTiktok != tiktokController.text ||
+        _initialYoutube != youtubeController.text ||
+        _initialTwitch != twitchController.text;
+        
+    if (infoUpdated && socialMediaChanged) {
       socialsUpdated = await _updateSocialMedia();
+    } else {
+      socialsUpdated = true; // No hay cambios en redes sociales, se considera exitoso
     }
 
     // 3. Subir imagen de perfil/logo (solo si lo anterior tuvo éxito y hay nueva imagen)
