@@ -4,10 +4,10 @@ import 'package:frontend_mobile_app_flutter/features/events/data/models/event_mo
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/card_info_widget.dart';
 import 'package:frontend_mobile_app_flutter/features/events/presentation/widgets/section_title_widget.dart';
 
-class EventContentInformationTab extends StatelessWidget {
+class TabEventContentInformation extends StatelessWidget {
   final Event event;
 
-  const EventContentInformationTab({super.key, required this.event});
+  const TabEventContentInformation({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {

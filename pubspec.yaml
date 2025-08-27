@@ -100,3 +100,5 @@ flutter:
     - assets/icons/tiktokicon.png
     - assets/icons/youtubeicon.png
     - assets/icons/twitchicon.png
+    - assets/icons/rejecticon.svg
+    - assets/icons/alerticon.svg
