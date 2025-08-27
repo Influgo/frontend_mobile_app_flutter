@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class SignedContractScreen extends StatelessWidget {
-  const SignedContractScreen({super.key});
+  final VoidCallback? onGoToParticipants;
+  
+  const SignedContractScreen({
+    super.key,
+    this.onGoToParticipants,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -74,16 +79,10 @@ class SignedContractScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Aquí iría la navegación a la página de postulaciones
-                      Navigator.pop(context);
-                      /*
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Redirigiendo a mis postulaciones...'),
-                          backgroundColor: Colors.blue,
-                        ),
-                      );
-                      */
+                      // Ejecutar callback para ir al tab de participantes
+                      onGoToParticipants?.call();
+                      // Cerrar esta pantalla y la anterior (ContractEntrepreneurshipScreen)
+                      Navigator.pop(context, true);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

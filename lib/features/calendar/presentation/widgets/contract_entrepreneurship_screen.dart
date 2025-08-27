@@ -5,11 +5,13 @@ import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widge
 class ContractEntrepreneurshipScreen extends StatefulWidget {
   final EventApplication application;
   final String eventName;
+  final VoidCallback? onContractSigned;
 
   const ContractEntrepreneurshipScreen({
     super.key,
     required this.application,
     required this.eventName,
+    this.onContractSigned,
   });
 
   @override
@@ -220,7 +222,9 @@ class _ContractEntrepreneurshipScreenState extends State<ContractEntrepreneurshi
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SignedContractScreen(),
+        builder: (context) => SignedContractScreen(
+          onGoToParticipants: widget.onContractSigned,
+        ),
       ),
     );
 

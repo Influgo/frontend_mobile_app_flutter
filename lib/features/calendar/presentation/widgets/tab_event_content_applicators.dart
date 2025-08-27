@@ -5,10 +5,12 @@ import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widge
 
 class TabEventContentApplicators extends StatefulWidget {
   final ExtendedEvent extendedEvent;
+  final VoidCallback? onContractSigned;
 
   const TabEventContentApplicators({
     super.key,
     required this.extendedEvent,
+    this.onContractSigned,
   });
 
   @override
@@ -129,7 +131,7 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Botón Aceptar/Firmar - con fondo negro
+                      // Botón Aceptar/Firmar - con fondo dinámico
                       ElevatedButton(
                         onPressed: () {
                           final isAccepted = _acceptedApplicationIds.contains(application.influencer.id);
@@ -140,7 +142,9 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: _acceptedApplicationIds.contains(application.influencer.id) 
+                              ? Color(0xFF006BD6) 
+                              : Colors.black,
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           shape: RoundedRectangleBorder(
@@ -437,13 +441,19 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
   }
 
   void _acceptApplication(EventApplication application) {
-    // TODO: Implementar API call para aceptar aplicación
+    // Solo marcar como aceptada localmente, NO cambiar el estado aún
     print('Aceptando aplicación de ${application.influencer.influencerName} para evento ${widget.extendedEvent.event.eventName}');
+    print('Estado actual del influencer: ${application.status}');
+    print('ID del influencer: ${application.influencer.id}');
     
     // Marcar como aceptada pero mantener en la lista para mostrar botón de firmar
     setState(() {
       _acceptedApplicationIds.add(application.influencer.id);
     });
+    
+    print('Estado después de aceptar - IDs aceptados: $_acceptedApplicationIds');
+    print('¿Está en la lista de aceptados? ${_acceptedApplicationIds.contains(application.influencer.id)}');
+    print('� El estado permanece PENDING hasta firmar el contrato');
     
     // Mostrar snackbar de confirmación
     ScaffoldMessenger.of(context).showSnackBar(
@@ -462,24 +472,45 @@ class _TabEventContentApplicatorsState extends State<TabEventContentApplicators>
         builder: (context) => ContractEntrepreneurshipScreen(
           application: application,
           eventName: widget.extendedEvent.event.eventName,
+          onContractSigned: widget.onContractSigned,
         ),
       ),
     );
 
-    // Si se firmó el contrato, remover de la lista
+    // Si se firmó el contrato, AHORA SÍ cambiar el estado a APPROVED en el backend
     if (result == true) {
-      setState(() {
-        _pendingApplications.remove(application);
-        _acceptedApplicationIds.remove(application.influencer.id);
-      });
+      print('🎉 Contrato firmado! Llamando al backend para cambiar estado a APPROVED...');
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Contrato firmado con ${application.influencer.influencerName}'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      // Cambiar el estado de PENDING a APPROVED (llamada al backend)
+      bool success = await widget.extendedEvent.approveApplication(application.influencer.id);
+      
+      if (success) {
+        setState(() {
+          // Actualizar la lista local de aplicaciones pendientes
+          _pendingApplications = widget.extendedEvent.getPendingApplications();
+          _acceptedApplicationIds.remove(application.influencer.id);
+        });
+        
+        print('✅ Estado cambiado exitosamente a APPROVED en el backend');
+        print('📊 El influencer ahora aparece en Participantes');
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Contrato firmado con ${application.influencer.influencerName}. Ahora aparece en "Participantes".'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        print('❌ Error al cambiar estado a APPROVED en el backend');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al procesar el contrato. Inténtalo de nuevo.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 

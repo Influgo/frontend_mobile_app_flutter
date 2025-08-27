@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/tab_event_content_applicators.dart';
+import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/tab_event_content_accepted.dart';
 import 'package:frontend_mobile_app_flutter/features/events/data/models/event_model.dart';
 import 'package:frontend_mobile_app_flutter/features/calendar/data/models/extended_event_model.dart';
 import 'package:frontend_mobile_app_flutter/features/calendar/presentation/widgets/tab_event_content_information.dart';
@@ -279,6 +280,10 @@ class _EventInformationPageState extends State<EventInformationPage>
                         : _extendedEvent != null
                             ? TabEventContentApplicators(
                                 extendedEvent: _extendedEvent!,
+                                onContractSigned: () {
+                                  // Cambiar al tab de participantes (índice 2)
+                                  _tabController.animateTo(2);
+                                },
                               )
                             : const Center(
                                 child: Text(
@@ -290,17 +295,24 @@ class _EventInformationPageState extends State<EventInformationPage>
                                 ),
                               ),
 
-                    // Tab 3: Participantes (placeholder por ahora)
-                    const Center(
-                      child: Text(
-                        'Participantes\n(En desarrollo)',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
+                    // Tab 3: Participantes
+                    _isLoadingApplications
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : _extendedEvent != null
+                            ? TabEventContentAccepted(
+                                extendedEvent: _extendedEvent!,
+                              )
+                            : const Center(
+                                child: Text(
+                                  'Error al cargar los colaboradores aceptados',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
                   ],
                 ),
               ),
