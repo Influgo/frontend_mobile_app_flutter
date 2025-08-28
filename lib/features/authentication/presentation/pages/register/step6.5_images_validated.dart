@@ -19,10 +19,9 @@ class Step65ImagesValidatedPage extends StatefulWidget {
 
 class _Step65ImagesValidatedPageState extends State<Step65ImagesValidatedPage> {
   void validateAndContinue() {
-    // Navegar al Step7 con los datos de validación
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => RegisterPage(initialStep: 7)),
-    );
+    // Regresar al flujo principal de registro y continuar al Step 7
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    RegisterPage.goToStep(context, 7);
   }
 
   @override
