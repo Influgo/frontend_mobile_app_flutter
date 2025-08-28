@@ -200,15 +200,9 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
 
       if (mounted) {
         if (isValidationSuccessful) {
-          // Navegar a página de validación exitosa
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Step65ImagesValidatedPage(
-                validationData: updatedValidationData,
-              ),
-            ),
-          );
+          // Validación exitosa - ir directamente al Step 7 (términos y condiciones)
+          logger.i('Validación exitosa - navegando al Step 7');
+          RegisterPage.goToNextStep(context);
         } else {
           // Navegar a página de validación fallida
           Navigator.pushReplacement(
