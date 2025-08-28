@@ -251,10 +251,10 @@ class _RegisterPageState extends State<RegisterPage> {
             children: _pages,
           ),
           if (_currentStep >= 0 && _currentStep < 9)
-            SafeArea(
-              child: Positioned(
-                top: 30,
-                left: 16,
+            Positioned(
+              top: 30,
+              left: 16,
+              child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: IconButton(
