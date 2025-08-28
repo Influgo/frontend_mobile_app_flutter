@@ -19,16 +19,8 @@ class Step65ImagesValidatedPage extends StatefulWidget {
 
 class _Step65ImagesValidatedPageState extends State<Step65ImagesValidatedPage> {
   void validateAndContinue() {
-    // Hacer pop para regresar al RegisterPage principal
-    Navigator.of(context).pop();
-    
-    // Usar un pequeño delay para asegurar que el pop se complete
-    // antes de intentar navegar al siguiente paso
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        RegisterPage.goToNextStep(context);
-      }
-    });
+    // Regresar al step6 con un resultado que indique que debe continuar al siguiente paso
+    Navigator.of(context).pop(true); // true = continuar al siguiente paso
   }
 
   @override
