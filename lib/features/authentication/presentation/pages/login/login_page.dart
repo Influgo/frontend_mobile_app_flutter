@@ -101,8 +101,11 @@ class LoginPageState extends State<LoginPage> {
     try {
       final identifier = userIdentifier.isNotEmpty ? userIdentifier : userId;
 
+      final endpoint = 'https://influyo-testing.ryzeon.me/api/v1/account/$identifier';
+      logger.i('Llamando al endpoint: $endpoint');
+      
       final accountResponse = await http.get(
-        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/account/$identifier'),
+        Uri.parse(endpoint),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -111,14 +114,38 @@ class LoginPageState extends State<LoginPage> {
 
       if (accountResponse.statusCode == 200) {
         final Map<String, dynamic> accountData = json.decode(accountResponse.body);
+        logger.i('Respuesta del endpoint account: $accountData');
 
         String userRole = '';
+        
+        // Imprimir toda la respuesta para debuggear
+        logger.i('Estructura completa de accountData: $accountData');
+        
         // La respuesta viene anidada en 'userDto'
-        if (accountData['userDto'] != null && accountData['userDto']['roles'] != null && accountData['userDto']['roles'].isNotEmpty) {
-          final roles = accountData['userDto']['roles'] as List;
-          if (roles.isNotEmpty && roles[0]['role'] != null) {
-            userRole = roles[0]['role']['name'] ?? '';
+        if (accountData['userDto'] != null) {
+          final userDto = accountData['userDto'];
+          logger.i('userDto encontrado: $userDto');
+          
+          if (userDto['roles'] != null && userDto['roles'].isNotEmpty) {
+            final roles = userDto['roles'] as List;
+            logger.i('Roles encontrados: $roles');
+            
+            if (roles.isNotEmpty) {
+              final firstRole = roles[0];
+              logger.i('Primer rol: $firstRole');
+              
+              if (firstRole['role'] != null && firstRole['role']['name'] != null) {
+                userRole = firstRole['role']['name'].toString();
+                logger.i('Rol extraído: $userRole');
+              } else {
+                logger.w('Estructura de rol incorrecta. firstRole[role]: ${firstRole['role']}');
+              }
+            }
+          } else {
+            logger.w('userDto[roles] es null o vacío: ${userDto['roles']}');
           }
+        } else {
+          logger.w('userDto es null en la respuesta');
         }
 
         if (userRole.isNotEmpty) {
