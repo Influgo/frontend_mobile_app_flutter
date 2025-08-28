@@ -150,6 +150,19 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
         perfilImage: _capturedImageBytes,
       );
 
+      // Verificar que todas las imágenes necesarias estén disponibles
+      if (updatedValidationData.anversoImage == null) {
+        logger.e('Imagen del anverso del documento no disponible');
+        throw Exception('Imagen del documento frontal no disponible. Por favor, regrese al paso anterior.');
+      }
+
+      if (updatedValidationData.perfilImage == null) {
+        logger.e('Imagen del perfil no disponible');
+        throw Exception('Imagen del perfil no disponible. Por favor, tome la foto nuevamente.');
+      }
+
+      logger.i('Verificando imágenes - Anverso: ${updatedValidationData.anversoImage!.length} bytes, Perfil: ${updatedValidationData.perfilImage!.length} bytes');
+
       // Llamar al callback con la imagen capturada
       widget.onImageCaptured(_capturedImageBytes!);
 
@@ -162,11 +175,26 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
 
       logger.i('Validación completada. Respuesta: $validationResponse');
 
+      // Validar que la respuesta no sea null y tenga la estructura esperada
+      if (validationResponse == null || validationResponse is! Map<String, dynamic>) {
+        logger.e('La respuesta de validación es null o no tiene el formato esperado');
+        throw Exception('Respuesta de validación inválida del servidor');
+      }
+
       // Verificar el campo 'match' del backend para determinar si la validación fue exitosa
       logger.i('Estructura completa de la respuesta: ${validationResponse.toString()}');
       
-      bool isValidationSuccessful = validationResponse['match'] == true;
-      logger.i('Campo match encontrado: ${validationResponse['match']}');
+      // Verificación segura del campo 'match' con null safety
+      final matchValue = validationResponse['match'];
+      bool isValidationSuccessful = false;
+      
+      if (matchValue != null) {
+        isValidationSuccessful = matchValue == true;
+        logger.i('Campo match encontrado: $matchValue');
+      } else {
+        logger.w('Campo match no encontrado en la respuesta o es null');
+        logger.w('Campos disponibles en la respuesta: ${validationResponse.keys.toList()}');
+      }
 
       logger.i('¿Validación exitosa? $isValidationSuccessful');
 
@@ -196,6 +224,7 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
       }
     } catch (e) {
       logger.e('Error en la validación de imágenes: $e');
+      logger.e('Stack trace: ${StackTrace.current}');
 
       // Navegar a página de validación fallida
       if (mounted) {
@@ -205,12 +234,22 @@ class _Step6RegisterPageState extends State<Step6RegisterPage> {
           perfilImage: _capturedImageBytes,
         );
 
+        // Crear un mensaje de error más descriptivo
+        String errorMessage = 'Error de conexión durante la validación';
+        if (e.toString().contains('ServerException')) {
+          errorMessage = 'Error del servidor durante la validación de imágenes';
+        } else if (e.toString().contains('SocketException')) {
+          errorMessage = 'Error de conexión a internet durante la validación';
+        } else if (e.toString().contains('TimeoutException')) {
+          errorMessage = 'Timeout durante la validación de imágenes';
+        }
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => Step65ImagesNotValidatedPage(
               validationData: updatedValidationData,
-              errorMessage: e.toString(),
+              errorMessage: errorMessage,
             ),
           ),
         );
