@@ -134,11 +134,11 @@ class LoginPageState extends State<LoginPage> {
               final firstRole = roles[0];
               logger.i('Primer rol: $firstRole');
               
-              if (firstRole['role'] != null && firstRole['role']['name'] != null) {
-                userRole = firstRole['role']['name'].toString();
+              if (firstRole['name'] != null) {
+                userRole = firstRole['name'].toString();
                 logger.i('Rol extraído: $userRole');
               } else {
-                logger.w('Estructura de rol incorrecta. firstRole[role]: ${firstRole['role']}');
+                logger.w('Estructura de rol incorrecta. firstRole[name]: ${firstRole['name']}');
               }
             }
           } else {
