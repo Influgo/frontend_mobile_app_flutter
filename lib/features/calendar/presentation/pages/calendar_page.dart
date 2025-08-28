@@ -165,6 +165,12 @@ class _CalendarPageState extends State<CalendarPage> {
         return;
       }
       
+      // NO cargar eventos del mismo mes que ya tenemos
+      if (nextMonth.year == _focusedDay.year && nextMonth.month == _focusedDay.month) {
+        print('🗓️ Next month is same as current focused month, skipping...'); // Debug
+        return;
+      }
+      
       // Obtener eventos del mes específico
       final calendarEvents = await _calendarService.getEventsForMonth(
         year: nextMonth.year,
@@ -186,10 +192,20 @@ class _CalendarPageState extends State<CalendarPage> {
           event.eventDetailsStartDateEvent.day,
         );
         
+        // Verificar que no estemos duplicando eventos del mismo día
         if (newEvents[eventDate] == null) {
           newEvents[eventDate] = [];
         }
-        newEvents[eventDate]!.add(event);
+        
+        // Verificar si el evento ya existe antes de agregarlo
+        bool eventExists = newEvents[eventDate]!.any((existingEvent) => 
+          existingEvent.id == event.id);
+        
+        if (!eventExists) {
+          newEvents[eventDate]!.add(event);
+        } else {
+          print('🗓️ Event ${event.eventName} already exists for ${eventDate.day}/${eventDate.month}, skipping...'); // Debug
+        }
       }
 
       setState(() {
@@ -339,6 +355,11 @@ class _CalendarPageState extends State<CalendarPage> {
               focusedDay: _focusedDay,
               calendarFormat: _calendarFormat,
               selectedDayPredicate: (day) {
+                /*
+                print('🗓️ DEBUG: selectedDayPredicate for ${day.day}/${day.month}/${day.year}');
+                print('🗓️ DEBUG: _selectedDay = $_selectedDay');
+                print('🗓️ DEBUG: isSameDay result = ${isSameDay(_selectedDay, day)}');
+                */
                 return isSameDay(_selectedDay, day);
               },
               calendarBuilders: CalendarBuilders(
@@ -399,38 +420,36 @@ class _CalendarPageState extends State<CalendarPage> {
                   final events = _getEventsForDay(day);
                   final hasEvents = events.isNotEmpty;
                   
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(9.0),
-                        decoration: BoxDecoration(
-                          gradient: hasEvents
-                              ? LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0xFFC20B0C),
-                                    Color(0xFF7E0F9D),
-                                    Color(0xFF2616C7),
-                                  ],
-                                )
-                              : null,
-                          color: hasEvents ? null : Colors.grey.withOpacity(0.5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${day.day}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                  // Si hay eventos, usar SOLO el gradiente de eventos, no mostrar indicador de "hoy"
+                  if (hasEvents) {
+                    return Stack(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.all(9.0),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFFC20B0C),
+                                Color(0xFF7E0F9D),
+                                Color(0xFF2616C7),
+                              ],
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${day.day}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      // Marcador azul en la parte blanca debajo del círculo
-                      if (hasEvents)
+                        // Marcador azul en la parte blanca debajo del círculo
                         Positioned(
                           bottom: 0,
                           left: 0,
@@ -446,12 +465,39 @@ class _CalendarPageState extends State<CalendarPage> {
                             ),
                           ),
                         ),
+                      ],
+                    );
+                  }
+                  
+                  // Si NO hay eventos, mostrar el indicador normal de "hoy"
+                  return Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(9.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${day.day}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   );
                 },
                 selectedBuilder: (context, day, focusedDay) {
                   final events = _getEventsForDay(day);
                   final hasEvents = events.isNotEmpty;
+                  final isToday = isSameDay(day, DateTime.now());
+                  
+                  print('🗓️ DEBUG: selectedBuilder called for day ${day.day}/${day.month}/${day.year}, hasEvents: $hasEvents, isToday: $isToday');
                   
                   return Stack(
                     children: [
@@ -469,13 +515,16 @@ class _CalendarPageState extends State<CalendarPage> {
                                   ],
                                 )
                               : null,
+                          // Si es hoy y no hay eventos, mostrar fondo gris
+                          color: (isToday && !hasEvents) ? Colors.grey.withOpacity(0.5) : null,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Text(
                             '${day.day}',
                             style: TextStyle(
-                              color: hasEvents ? Colors.white : Colors.black,
+                              // Si es hoy sin eventos o tiene eventos, texto blanco; sino negro
+                              color: (hasEvents || (isToday && !hasEvents)) ? Colors.white : Colors.black,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -709,50 +758,52 @@ class _CalendarPageState extends State<CalendarPage> {
           final dayEvents = nextMonthEvents[dayKey] ?? [];
           final hasEvents = dayEvents.isNotEmpty;
           
-          return GestureDetector(
-            onTap: hasEvents ? () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DayEventsPage(
-                    selectedMonth: nextMonth,
-                    monthEvents: nextMonthEvents,
+          // Debug: Verificar qué día está siendo detectado como "hoy"
+          print('🗓️ DEBUG: todayBuilder called for day ${day.day}/${day.month}/${day.year}, hasEvents: $hasEvents');
+          print('🗓️ DEBUG: Current DateTime.now() = ${DateTime.now()}');
+          
+          // Si hay eventos, usar SOLO el gradiente de eventos, no mostrar indicador de "hoy"
+          if (hasEvents) {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DayEventsPage(
+                      selectedMonth: nextMonth,
+                      monthEvents: nextMonthEvents,
+                    ),
                   ),
-                ),
-              );
-            } : null,
-            child: Stack(
-              children: [
-                Container(
-                  margin: const EdgeInsets.all(9.0),
-                  decoration: BoxDecoration(
-                    gradient: hasEvents
-                        ? LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFFC20B0C),
-                              Color(0xFF7E0F9D),
-                              Color(0xFF2616C7),
-                            ],
-                          )
-                        : null,
-                    color: hasEvents ? null : Colors.grey.withOpacity(0.5), // Color para día actual sin eventos
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${day.day}',
-                      style: TextStyle(
-                        color: Colors.white, // Siempre blanco para el día actual
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                );
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.all(9.0),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFC20B0C),
+                          Color(0xFF7E0F9D),
+                          Color(0xFF2616C7),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // Marcador azul en la parte blanca debajo del círculo
-                if (hasEvents)
+                  // Marcador azul en la parte blanca debajo del círculo
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -768,6 +819,33 @@ class _CalendarPageState extends State<CalendarPage> {
                       ),
                     ),
                   ),
+                ],
+              ),
+            );
+          }
+          
+          // Si NO hay eventos, mostrar el indicador normal de "hoy"
+          return GestureDetector(
+            onTap: null,
+            child: Stack(
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(9.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           );
