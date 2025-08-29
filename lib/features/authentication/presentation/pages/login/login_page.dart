@@ -42,7 +42,6 @@ class LoginPageState extends State<LoginPage> {
     final url = Uri.parse(APIHelper.buildUrl(loginEndpoint).toString());
 
     try {
-      
       final response = await http.post(
         url,
         headers: {
@@ -117,9 +116,8 @@ class LoginPageState extends State<LoginPage> {
         // La respuesta viene anidada en 'userDto'
         if (accountData['userDto'] != null && accountData['userDto']['roles'] != null && accountData['userDto']['roles'].isNotEmpty) {
           final roles = accountData['userDto']['roles'] as List;
-          if (roles.isNotEmpty) {
-            // Estructura nueva: roles[0]['name'] directamente
-            userRole = roles[0]['name'] ?? '';
+          if (roles.isNotEmpty && roles[0]['role'] != null) {
+            userRole = roles[0]['role']['name'] ?? '';
           }
         }
 

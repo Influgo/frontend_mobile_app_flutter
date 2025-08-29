@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
         // Extraer el rol del usuario
         String? userRole;
         if (roles != null && roles.isNotEmpty) {
-          userRole = roles.first['roles']?['name'];
+          userRole = roles.first['role']?['name'];
         }
         
         setState(() {

@@ -6,19 +6,16 @@ import 'dart:convert';
 
 // Modelo para las aplicaciones (pending y accepted)
 class EventApplication {
-  final int? id;  // ID de la aplicación
   final String status;
   final Influencer influencer;
 
   EventApplication({
-    this.id,
     required this.status,
     required this.influencer,
   });
 
   factory EventApplication.fromJson(Map<String, dynamic> json) {
     return EventApplication(
-      id: json['id'] as int?,  // Puede venir del JSON o ser null
       status: json['status'] ?? '',
       influencer: Influencer.fromJson(json['influencer'] ?? {}),
     );
@@ -106,22 +103,20 @@ class ExtendedEvent {
       }
 
       final application = pendingApplications[applicationIndex];
-      
-      // Verificar que la aplicación tenga ID
-      if (application.id == null) {
-        print('❌ La aplicación no tiene ID');
-        return false;
-      }
+
 
       // 3. Hacer llamada al backend para aprobar la aplicación
-      print('🌐 Llamando al backend para aprobar aplicación con ID: ${application.id}');
+      print('🌐 Llamando al backend para aprobar aplicación...');
       final response = await http.put( 
-        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/event-applications/${application.id}'),
+        //Cambiar al put del back
+        Uri.parse('https://influyo-testing.ryzeon.me/api/v1/entities/applications/$influencerId/approve'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: json.encode({
+          'eventId': event.id,
+          'influencerId': influencerId,
           'status': 'APPROVED'
         }),
       );
@@ -132,7 +127,6 @@ class ExtendedEvent {
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Crear una nueva aplicación con estado APPROVED
         final approvedApplication = EventApplication(
-          id: application.id,
           status: 'APPROVED',
           influencer: application.influencer,
         );
@@ -141,7 +135,7 @@ class ExtendedEvent {
         pendingApplications.removeAt(applicationIndex);
         acceptedApplications.add(approvedApplication);
         
-        print('✅ Aplicación aprobada exitosamente: ${application.influencer.influencerName} (App ID: ${application.id})');
+        print('✅ Aplicación aprobada exitosamente: ${application.influencer.influencerName} (ID: $influencerId)');
         print('📊 Pendientes: ${pendingApplications.length}, Aceptadas: ${acceptedApplications.length}');
         
         return true; // Éxito
